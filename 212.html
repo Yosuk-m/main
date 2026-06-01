@@ -2,210 +2,198 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>ピラミッド水量グラフィック</title>
+  <title>最終結果発表</title>
 
   <style>
     body {
       font-family: sans-serif;
-      background: #f5f7fb;
-      padding: 40px;
+      background: #000;
+      color: #fff;
+      padding: 30px;
       text-align: center;
     }
 
     .container {
-      max-width: 600px;
+      position: relative;
+      max-width: 720px;
       margin: 0 auto;
-      background: white;
+      background: #000;
+      color: #fff;
       padding: 30px;
       border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 6px 30px rgba(255, 255, 255, 0.2);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.25);
     }
 
-    .inputs {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-      margin-bottom: 20px;
+    #fireworksCanvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
     }
 
-    input {
-      padding: 12px;
-      font-size: 18px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      text-align: right;
+    .content {
+      position: relative;
+      z-index: 1;
     }
 
-    button {
-      padding: 12px 32px;
-      font-size: 18px;
-      font-weight: bold;
-      border: none;
-      border-radius: 10px;
-      background: #1e90ff;
-      color: white;
-      cursor: pointer;
-      margin-bottom: 24px;
+    h1 {
+      color: #fff;
+      font-size: 36px;
+      margin-bottom: 10px;
     }
 
-    button:hover {
-      background: #0077e6;
+    .note {
+      font-size: 14px;
+      color: #ddd;
+      margin-top: -5px;
+      margin-bottom: 10px;
+    }
+
+    svg {
+      width: 500px;
+      height: 390px;
+      max-width: 100%;
+      margin-bottom: 10px;
     }
 
     .total {
       font-size: 24px;
       font-weight: bold;
-      margin-bottom: 20px;
+      margin-bottom: 18px;
+      color: #fff;
     }
 
-    svg {
-      width: 320px;
-      height: 260px;
+    button {
+      padding: 10px 28px;
+      font-size: 17px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background: #ff3b1f;
+      color: white;
+      cursor: pointer;
+      margin-bottom: 16px;
     }
 
-    .pyramid-outline {
-      fill: none;
-      stroke: #333;
-      stroke-width: 4;
+    button:hover {
+      background: #d92f18;
     }
 
-    .segment-line {
-      stroke: rgba(0, 0, 0, 0.25);
-      stroke-width: 1;
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      max-width: 320px;
+      margin: 0 auto;
     }
 
-    .label {
+    input {
+      width: 60px;
+      padding: 8px;
       font-size: 16px;
-      fill: #333;
+      border: 1px solid #fff;
+      border-radius: 6px;
+      text-align: right;
+      background: #111;
+      color: #fff;
     }
 
-    .note {
-      font-size: 14px;
-      color: #666;
-      margin-top: -10px;
-      margin-bottom: 20px;
+    input:focus {
+      outline: 2px solid #ff3b1f;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>合計点のピラミッド表示</h1>
+    <canvas id="fireworksCanvas"></canvas>
 
-    <p class="note">各項目は25点満点、合計100点満点です。</p>
+    <div class="content">
+      <h1>最終結果発表</h1>
 
-    <div class="inputs">
-      <input type="number" class="value-input" min="0" max="25" value="0">
-      <input type="number" class="value-input" min="0" max="25" value="0">
-      <input type="number" class="value-input" min="0" max="25" value="0">
-      <input type="number" class="value-input" min="0" max="25" value="0">
-    </div>
+      <p class="note">各項目は25点満点、合計100点満点です。</p>
 
-    <button id="confirmButton">確定</button>
+      <svg viewBox="0 0 500 390">
+        <defs>
+          <clipPath id="pyramidClip">
+            <polygon points="250,20 50,380 450,380" />
+          </clipPath>
 
-    <div class="total">
-      合計：<span id="totalValue">0</span> / 100点
-    </div>
+          <clipPath id="fillClip">
+            <rect id="fillClipRect" x="50" y="380" width="400" height="0" />
+          </clipPath>
 
-    <svg viewBox="0 0 320 260">
-      <defs>
-        <!-- ピラミッド型に切り抜く -->
-        <clipPath id="pyramidClip">
-          <polygon points="160,20 40,230 280,230" />
-        </clipPath>
+          <!-- 下から 青 → 緑 → 黄 → 赤 → 濃い赤 のグラデーション -->
+          <linearGradient id="scoreGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+            <stop offset="0%" stop-color="#0066ff" />
+            <stop offset="25%" stop-color="#00b050" />
+            <stop offset="50%" stop-color="#fff200" />
+            <stop offset="75%" stop-color="#ff3b1f" />
+            <stop offset="100%" stop-color="#7a0000" />
+          </linearGradient>
+        </defs>
 
-        <!-- 水が下から満ちる表示範囲 -->
-        <clipPath id="fillClip">
-          <rect id="fillClipRect" x="40" y="230" width="240" height="0" />
-        </clipPath>
-
-        <!-- 0%〜25%：赤グラデーション -->
-        <linearGradient id="redGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stop-color="#ff4d4d" />
-          <stop offset="100%" stop-color="#ffb3b3" />
-        </linearGradient>
-
-        <!-- 25%〜50%：青グラデーション -->
-        <linearGradient id="blueGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stop-color="#0066ff" />
-          <stop offset="100%" stop-color="#99ccff" />
-        </linearGradient>
-
-        <!-- 50%〜75%：黄グラデーション -->
-        <linearGradient id="yellowGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stop-color="#ffd400" />
-          <stop offset="100%" stop-color="#fff4a3" />
-        </linearGradient>
-
-        <!-- 75%〜100%：金グラデーション -->
-        <linearGradient id="goldGradient" x1="0%" y1="100%" x2="0%" y2="0%">
-          <stop offset="0%" stop-color="#d4af37" />
-          <stop offset="50%" stop-color="#ffd700" />
-          <stop offset="100%" stop-color="#fff2a8" />
-        </linearGradient>
-      </defs>
-
-      <!-- 水のグラデーション帯 -->
-      <g clip-path="url(#pyramidClip)">
-        <g clip-path="url(#fillClip)">
-          <!-- 75%〜100%：金 -->
-          <rect x="40" y="20" width="240" height="52.5" fill="url(#goldGradient)" />
-
-          <!-- 50%〜75%：黄 -->
-          <rect x="40" y="72.5" width="240" height="52.5" fill="url(#yellowGradient)" />
-
-          <!-- 25%〜50%：青 -->
-          <rect x="40" y="125" width="240" height="52.5" fill="url(#blueGradient)" />
-
-          <!-- 0%〜25%：赤 -->
-          <rect x="40" y="177.5" width="240" height="52.5" fill="url(#redGradient)" />
+        <g clip-path="url(#pyramidClip)">
+          <g clip-path="url(#fillClip)">
+            <rect
+              x="50"
+              y="20"
+              width="400"
+              height="360"
+              fill="url(#scoreGradient)"
+            />
+          </g>
         </g>
+      </svg>
 
-        <!-- 25%ごとの境界線 -->
-        <line class="segment-line" x1="70" y1="177.5" x2="250" y2="177.5" />
-        <line class="segment-line" x1="100" y1="125" x2="220" y2="125" />
-        <line class="segment-line" x1="130" y1="72.5" x2="190" y2="72.5" />
-      </g>
+      <div class="total">
+        合計：<span id="totalValue">0</span> / 100点
+      </div>
 
-      <!-- ピラミッドの枠線 -->
-      <polygon
-        class="pyramid-outline"
-        points="160,20 40,230 280,230"
-      />
+      <button id="confirmButton">確定</button>
 
-      <text
-        id="percentLabel"
-        class="label"
-        x="160"
-        y="250"
-        text-anchor="middle"
-      >
-        0%
-      </text>
-    </svg>
+      <div class="inputs">
+        <input type="number" class="value-input" min="0" max="25" value="0">
+        <input type="number" class="value-input" min="0" max="25" value="0">
+        <input type="number" class="value-input" min="0" max="25" value="0">
+        <input type="number" class="value-input" min="0" max="25" value="0">
+      </div>
+    </div>
   </div>
 
   <script>
     const inputs = document.querySelectorAll(".value-input");
     const confirmButton = document.getElementById("confirmButton");
     const totalValue = document.getElementById("totalValue");
-    const percentLabel = document.getElementById("percentLabel");
     const fillClipRect = document.getElementById("fillClipRect");
+
+    const container = document.querySelector(".container");
+    const fireworksCanvas = document.getElementById("fireworksCanvas");
+    const ctx = fireworksCanvas.getContext("2d");
 
     const MAX_TOTAL = 100;
     const MAX_ITEM_SCORE = 25;
 
-    const PYRAMID_TOP_Y = 20;
-    const PYRAMID_BOTTOM_Y = 230;
-    const PYRAMID_HEIGHT = PYRAMID_BOTTOM_Y - PYRAMID_TOP_Y;
+    const PYRAMID_BOTTOM_Y = 380;
+    const PYRAMID_HEIGHT = 360;
 
     let animationId = null;
+
+    let fireworksAnimationId = null;
+    let fireworksTimer = null;
+    let fireworksRunning = false;
+    let fireworksLevel = 0;
+    let particles = [];
 
     function easeOutCubic(t) {
       return 1 - Math.pow(1 - t, 3);
     }
 
-    function animateWater(targetY, targetHeight) {
+    function animateWater(targetHeight) {
       if (animationId) {
         cancelAnimationFrame(animationId);
       }
@@ -213,7 +201,6 @@
       const duration = 1200;
       const startTime = performance.now();
 
-      // いったん空にする
       fillClipRect.setAttribute("y", PYRAMID_BOTTOM_Y);
       fillClipRect.setAttribute("height", 0);
 
@@ -236,13 +223,149 @@
       animationId = requestAnimationFrame(animate);
     }
 
+    function resizeFireworksCanvas() {
+      const rect = container.getBoundingClientRect();
+      const scale = window.devicePixelRatio || 1;
+
+      fireworksCanvas.width = rect.width * scale;
+      fireworksCanvas.height = rect.height * scale;
+
+      ctx.setTransform(scale, 0, 0, scale, 0, 0);
+    }
+
+    function createFirework() {
+      const width = fireworksCanvas.clientWidth;
+      const height = fireworksCanvas.clientHeight;
+
+      const x = Math.random() * width;
+      const y = 60 + Math.random() * height * 0.45;
+
+      const colors = [
+        "#0066ff",
+        "#00b050",
+        "#fff200",
+        "#ff3b1f",
+        "#7a0000",
+        "#ffffff"
+      ];
+
+      const color = colors[Math.floor(Math.random() * colors.length)];
+
+      const particleCount = fireworksLevel === 2 ? 90 : 40;
+      const speedBase = fireworksLevel === 2 ? 3 : 2;
+
+      for (let i = 0; i < particleCount; i++) {
+        const angle = Math.PI * 2 * (i / particleCount);
+        const speed = speedBase + Math.random() * 4;
+
+        particles.push({
+          x,
+          y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          alpha: 1,
+          size: fireworksLevel === 2
+            ? 1.8 + Math.random() * 3
+            : 1.3 + Math.random() * 2,
+          color
+        });
+      }
+    }
+
+    function updateFireworks() {
+      const width = fireworksCanvas.clientWidth;
+      const height = fireworksCanvas.clientHeight;
+
+      ctx.clearRect(0, 0, width, height);
+      ctx.globalCompositeOperation = "lighter";
+
+      const fireworkChance = fireworksLevel === 2 ? 0.11 : 0.045;
+
+      if (fireworksRunning && Math.random() < fireworkChance) {
+        createFirework();
+      }
+
+      particles = particles.filter(particle => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.vy += 0.04;
+        particle.alpha -= 0.015;
+
+        if (particle.alpha <= 0) {
+          return false;
+        }
+
+        ctx.globalAlpha = particle.alpha;
+        ctx.fillStyle = particle.color;
+
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+
+        return true;
+      });
+
+      ctx.globalAlpha = 1;
+      ctx.globalCompositeOperation = "source-over";
+
+      if (fireworksRunning || particles.length > 0) {
+        fireworksAnimationId = requestAnimationFrame(updateFireworks);
+      } else {
+        fireworksAnimationId = null;
+        ctx.clearRect(0, 0, width, height);
+      }
+    }
+
+    function startFireworks(level) {
+      resizeFireworksCanvas();
+
+      fireworksLevel = level;
+      fireworksRunning = true;
+
+      if (fireworksTimer) {
+        clearTimeout(fireworksTimer);
+      }
+
+      const duration = level === 2 ? 4500 : 2500;
+
+      fireworksTimer = setTimeout(() => {
+        fireworksRunning = false;
+      }, duration);
+
+      if (!fireworksAnimationId) {
+        updateFireworks();
+      }
+    }
+
+    function stopFireworks() {
+      fireworksRunning = false;
+      fireworksLevel = 0;
+      particles = [];
+
+      if (fireworksTimer) {
+        clearTimeout(fireworksTimer);
+        fireworksTimer = null;
+      }
+
+      if (fireworksAnimationId) {
+        cancelAnimationFrame(fireworksAnimationId);
+        fireworksAnimationId = null;
+      }
+
+      ctx.clearRect(
+        0,
+        0,
+        fireworksCanvas.clientWidth,
+        fireworksCanvas.clientHeight
+      );
+    }
+
     function fillPyramid() {
       let total = 0;
 
       inputs.forEach(input => {
         let value = Number(input.value) || 0;
 
-        // 0未満は0点、25点を超えたら25点として扱う
         value = Math.max(0, Math.min(value, MAX_ITEM_SCORE));
 
         input.value = value;
@@ -250,16 +373,23 @@
       });
 
       const ratio = total / MAX_TOTAL;
-      const percent = Math.round(ratio * 100);
-
       const fillHeight = PYRAMID_HEIGHT * ratio;
-      const waterY = PYRAMID_BOTTOM_Y - fillHeight;
 
       totalValue.textContent = total;
-      percentLabel.textContent = percent + "%";
 
-      animateWater(waterY, fillHeight);
+      animateWater(fillHeight);
+
+      if (total >= 75) {
+        startFireworks(2);
+      } else if (total >= 50) {
+        startFireworks(1);
+      } else {
+        stopFireworks();
+      }
     }
+
+    window.addEventListener("resize", resizeFireworksCanvas);
+    resizeFireworksCanvas();
 
     confirmButton.addEventListener("click", fillPyramid);
   </script>
