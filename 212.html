@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ピラミッド水量グラフィック</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f5f7fb;
+      padding: 40px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    input {
+      padding: 12px;
+      font-size: 18px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      text-align: right;
+    }
+
+    button {
+      padding: 12px 32px;
+      font-size: 18px;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      background: #1e90ff;
+      color: white;
+      cursor: pointer;
+      margin-bottom: 24px;
+    }
+
+    button:hover {
+      background: #0077e6;
+    }
+
+    .total {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+
+    svg {
+      width: 320px;
+      height: 260px;
+    }
+
+    .pyramid-outline {
+      fill: none;
+      stroke: #333;
+      stroke-width: 4;
+    }
+
+    .segment-line {
+      stroke: rgba(0, 0, 0, 0.25);
+      stroke-width: 1;
+    }
+
+    .label {
+      font-size: 16px;
+      fill: #333;
+    }
+
+    .note {
+      font-size: 14px;
+      color: #666;
+      margin-top: -10px;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h1>合計点のピラミッド表示</h1>
+
+    <p class="note">各項目は25点満点、合計100点満点です。</p>
+
+    <div class="inputs">
+      <input type="number" class="value-input" min="0" max="25" value="0">
+      <input type="number" class="value-input" min="0" max="25" value="0">
+      <input type="number" class="value-input" min="0" max="25" value="0">
+      <input type="number" class="value-input" min="0" max="25" value="0">
+    </div>
+
+    <button id="confirmButton">確定</button>
+
+    <div class="total">
+      合計：<span id="totalValue">0</span> / 100点
+    </div>
+
+    <svg viewBox="0 0 320 260">
+      <defs>
+        <!-- ピラミッド型に切り抜く -->
+        <clipPath id="pyramidClip">
+          <polygon points="160,20 40,230 280,230" />
+        </clipPath>
+
+        <!-- 水が下から満ちる表示範囲 -->
+        <clipPath id="fillClip">
+          <rect id="fillClipRect" x="40" y="230" width="240" height="0" />
+        </clipPath>
+
+        <!-- 0%〜25%：赤グラデーション -->
+        <linearGradient id="redGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#ff4d4d" />
+          <stop offset="100%" stop-color="#ffb3b3" />
+        </linearGradient>
+
+        <!-- 25%〜50%：青グラデーション -->
+        <linearGradient id="blueGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#0066ff" />
+          <stop offset="100%" stop-color="#99ccff" />
+        </linearGradient>
+
+        <!-- 50%〜75%：黄グラデーション -->
+        <linearGradient id="yellowGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#ffd400" />
+          <stop offset="100%" stop-color="#fff4a3" />
+        </linearGradient>
+
+        <!-- 75%〜100%：金グラデーション -->
+        <linearGradient id="goldGradient" x1="0%" y1="100%" x2="0%" y2="0%">
+          <stop offset="0%" stop-color="#d4af37" />
+          <stop offset="50%" stop-color="#ffd700" />
+          <stop offset="100%" stop-color="#fff2a8" />
+        </linearGradient>
+      </defs>
+
+      <!-- 水のグラデーション帯 -->
+      <g clip-path="url(#pyramidClip)">
+        <g clip-path="url(#fillClip)">
+          <!-- 75%〜100%：金 -->
+          <rect x="40" y="20" width="240" height="52.5" fill="url(#goldGradient)" />
+
+          <!-- 50%〜75%：黄 -->
+          <rect x="40" y="72.5" width="240" height="52.5" fill="url(#yellowGradient)" />
+
+          <!-- 25%〜50%：青 -->
+          <rect x="40" y="125" width="240" height="52.5" fill="url(#blueGradient)" />
+
+          <!-- 0%〜25%：赤 -->
+          <rect x="40" y="177.5" width="240" height="52.5" fill="url(#redGradient)" />
+        </g>
+
+        <!-- 25%ごとの境界線 -->
+        <line class="segment-line" x1="70" y1="177.5" x2="250" y2="177.5" />
+        <line class="segment-line" x1="100" y1="125" x2="220" y2="125" />
+        <line class="segment-line" x1="130" y1="72.5" x2="190" y2="72.5" />
+      </g>
+
+      <!-- ピラミッドの枠線 -->
+      <polygon
+        class="pyramid-outline"
+        points="160,20 40,230 280,230"
+      />
+
+      <text
+        id="percentLabel"
+        class="label"
+        x="160"
+        y="250"
+        text-anchor="middle"
+      >
+        0%
+      </text>
+    </svg>
+  </div>
+
+  <script>
+    const inputs = document.querySelectorAll(".value-input");
+    const confirmButton = document.getElementById("confirmButton");
+    const totalValue = document.getElementById("totalValue");
+    const percentLabel = document.getElementById("percentLabel");
+    const fillClipRect = document.getElementById("fillClipRect");
+
+    const MAX_TOTAL = 100;
+    const MAX_ITEM_SCORE = 25;
+
+    const PYRAMID_TOP_Y = 20;
+    const PYRAMID_BOTTOM_Y = 230;
+    const PYRAMID_HEIGHT = PYRAMID_BOTTOM_Y - PYRAMID_TOP_Y;
+
+    let animationId = null;
+
+    function easeOutCubic(t) {
+      return 1 - Math.pow(1 - t, 3);
+    }
+
+    function animateWater(targetY, targetHeight) {
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
+
+      const duration = 1200;
+      const startTime = performance.now();
+
+      // いったん空にする
+      fillClipRect.setAttribute("y", PYRAMID_BOTTOM_Y);
+      fillClipRect.setAttribute("height", 0);
+
+      function animate(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easedProgress = easeOutCubic(progress);
+
+        const currentHeight = targetHeight * easedProgress;
+        const currentY = PYRAMID_BOTTOM_Y - currentHeight;
+
+        fillClipRect.setAttribute("y", currentY);
+        fillClipRect.setAttribute("height", currentHeight);
+
+        if (progress < 1) {
+          animationId = requestAnimationFrame(animate);
+        }
+      }
+
+      animationId = requestAnimationFrame(animate);
+    }
+
+    function fillPyramid() {
+      let total = 0;
+
+      inputs.forEach(input => {
+        let value = Number(input.value) || 0;
+
+        // 0未満は0点、25点を超えたら25点として扱う
+        value = Math.max(0, Math.min(value, MAX_ITEM_SCORE));
+
+        input.value = value;
+        total += value;
+      });
+
+      const ratio = total / MAX_TOTAL;
+      const percent = Math.round(ratio * 100);
+
+      const fillHeight = PYRAMID_HEIGHT * ratio;
+      const waterY = PYRAMID_BOTTOM_Y - fillHeight;
+
+      totalValue.textContent = total;
+      percentLabel.textContent = percent + "%";
+
+      animateWater(waterY, fillHeight);
+    }
+
+    confirmButton.addEventListener("click", fillPyramid);
+  </script>
+</body>
+</html>
