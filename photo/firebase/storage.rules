@@ -1,0 +1,13 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /photo_posts/{fileName} {
+      // 画像だけ、最大6MB。firebase-config.js の maxFileSizeMB と合わせてください。
+      allow write: if request.resource.size < 6 * 1024 * 1024
+        && request.resource.contentType.matches('image/.*');
+
+      // 投稿者確認ページと管理者ページの表示用に公開読み取り。
+      allow read: if true;
+    }
+  }
+}

@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /photo_posts/{postId} {
+      // ログインなしで投稿できるようにするルール。
+      // 本番では App Check / Authentication / 管理者認証の追加を推奨します。
+      allow create: if request.resource.data.keys().hasOnly([
+          'id', 'name', 'comment', 'imageUrl', 'imagePath', 'createdAt', 'clientCreatedAt', 'userAgent'
+        ])
+        && request.resource.data.id == postId
+        && request.resource.data.name is string
+        && request.resource.data.name.size() <= 60
+        && request.resource.data.comment is string
+        && request.resource.data.comment.size() <= 300
+        && request.resource.data.imageUrl is string
+        && request.resource.data.imagePath == 'photo_posts/' + postId + '.jpg';
+
+      // 投稿者の確認ページと管理者ページをログインなしで動かすため公開読み取りにしています。
+      allow get, list: if true;
+
+      // 画面からの編集・削除は不可。
+      allow update, delete: if false;
+    }
+  }
+}
