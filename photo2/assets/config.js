@@ -8,8 +8,8 @@ window.SITE_CONFIG = {
   siteTitle: "写真投稿フォーム",
   subtitle: "スマホから写真を提出できます",
   organizationName: "",
-  onedriveFileRequestUrl: "https://example.com/PASTE_ONEDRIVE_FILE_REQUEST_URL_HERE",
-  adminOnedriveFolderUrl: "https://example.com/PASTE_ADMIN_ONEDRIVE_FOLDER_URL_HERE",
+  onedriveFileRequestUrl: "https://sistkanri-my.sharepoint.com/:f:/g/personal/matsumura_yosuke_sist_ac_jp/IgC3tsY6u_f4SqEI32tUNeaSAc8-gqaTdqN0bPPMCHEIZ9s",
+  adminOnedriveFolderUrl: "https://sistkanri-my.sharepoint.com/:f:/g/personal/matsumura_yosuke_sist_ac_jp/IgC3tsY6u_f4SqEI32tUNeaSAdRPoo1x71ptF7EHuIYb9dg?e=LSE43T",
   adminPasscode: "", // 例: "1234"。空欄なら不要。
   allowLocalPreview: true
 };
