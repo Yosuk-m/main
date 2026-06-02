@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>写真投稿フォーム</title>
+  <link rel="stylesheet" href="assets/style.css">
+</head>
+<body data-page="index">
+  <main class="wrapper">
+    <header>
+      <div class="kicker">ログインなし・スマホ対応</div>
+      <h1 data-site-title>写真投稿フォーム</h1>
+      <p class="lead" data-site-subtitle>スマホから写真を提出できます</p>
+      <p class="small" data-org></p>
+    </header>
+
+    <section class="card">
+      <h2>写真を提出する</h2>
+      <p>
+        下のボタンからOneDriveの提出画面を開き、写真を選択してアップロードしてください。
+      </p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="num">1</div>
+          <div>
+            <strong>必要なら写真を確認</strong>
+            <span>このサイト上の確認は端末内プレビューです。OneDriveへはまだ送信されません。</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">2</div>
+          <div>
+            <strong>OneDriveの提出画面を開く</strong>
+            <span>OneDriveの画面で写真を選択してアップロードします。</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="num">3</div>
+          <div>
+            <strong>提出完了</strong>
+            <span>提出後、管理者はOneDriveフォルダで写真を確認できます。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>写真の確認</h2>
+      <label for="photoInput">送信前に写真をプレビューする</label>
+      <input id="photoInput" type="file" accept="image/*">
+      <div id="previewBox" class="previewBox">
+        <img id="previewImage" alt="選択した写真のプレビュー">
+        <div id="previewName" class="previewCaption"></div>
+      </div>
+      <p class="small">
+        注意: このプレビューは送信前確認用です。提出は次のOneDrive画面で行います。
+      </p>
+    </section>
+
+    <section class="card">
+      <h2>OneDriveへ進む</h2>
+      <p>
+        ボタンを押すとOneDriveのファイル要求ページが開きます。
+      </p>
+      <div id="urlWarning" class="notice hidden">
+        まだOneDriveのファイル要求URLが設定されていません。<code>assets/config.js</code> を編集してください。
+      </div>
+      <div class="actions">
+        <a id="openRequestButton" class="btn" href="#">写真を投稿する</a>
+        <a class="btn secondary" href="thanks.html">投稿後の案内を見る</a>
+      </div>
+    </section>
+
+    <nav class="footerNav">
+      <a href="admin.html">管理者ページ</a>
+      <span>投稿写真の保存先: OneDrive</span>
+    </nav>
+  </main>
+
+  <script src="assets/config.js"></script>
+  <script src="assets/app.js"></script>
+</body>
+</html>
