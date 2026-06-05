@@ -326,7 +326,7 @@
   <div class="container" id="resultContainer">
     <h1>最終結果発表</h1>
 
-    <p class="note">各項目は2000点満点、合計6000点満点です。</p>
+    <p class="note">各項目の上限はありません。3項目の点数合計を表示します。</p>
 
     <div class="stage">
       <svg viewBox="0 0 620 420">
@@ -443,21 +443,21 @@
 
 
     <div class="ranking" id="rankingBox" aria-live="polite">
-      現在順位：<span id="rankingValue">未確定</span>
+      ランキング：<span id="rankingValue">未確定</span>
       <span class="ranking-count" id="rankingCount"></span>
     </div>
-    <div class="ranking-note">点数データは、このブラウザ内に保存されます。</div>
+    <div class="ranking-note">点数データはこのブラウザ内に保存され、上位何％にあたるかを表示します。ピラミッドの高さは保存データ内の順位に対応し、1位が最上位になります。</div>
 
     <div class="total">
-      合計：<span id="totalValue">0</span> / 6000点
+      合計：<span id="totalValue">0</span>点
     </div>
 
     <button id="confirmButton">確定</button>
 
     <div class="inputs">
-      <input type="number" class="value-input" min="0" max="2000" value="0">
-      <input type="number" class="value-input" min="0" max="2000" value="0">
-      <input type="number" class="value-input" min="0" max="2000" value="0">
+      <input type="number" class="value-input" min="0" value="0">
+      <input type="number" class="value-input" min="0" value="0">
+      <input type="number" class="value-input" min="0" value="0">
     </div>
   </div>
 
@@ -471,8 +471,6 @@
     const scoreMarker = document.getElementById("scoreMarker");
     const scoreMarkerText = document.getElementById("scoreMarkerText");
 
-    const MAX_TOTAL = 6000;
-    const MAX_ITEM_SCORE = 2000;
     const LOW_SCORE_CHARACTER_LIMIT = 1800;
     const HIGH_SCORE_REWARD_LIMIT = 4500;
     const SCORE_HISTORY_KEY = "final_result_pyramid_score_history_v1";
@@ -527,7 +525,8 @@
       inputs.forEach(input => {
         let value = Number(input.value) || 0;
 
-        value = Math.max(0, Math.min(value, MAX_ITEM_SCORE));
+        // 各項目の上限は設けず、0未満のみ0として扱います。
+        value = Math.max(0, value);
 
         input.value = value;
         total += value;
@@ -550,8 +549,7 @@
           .filter(record => {
             return record &&
               Number.isFinite(Number(record.score)) &&
-              Number(record.score) >= 0 &&
-              Number(record.score) <= MAX_TOTAL;
+              Number(record.score) >= 0;
           })
           .map(record => ({
             score: Number(record.score),
@@ -576,24 +574,42 @@
     }
 
     function getRank(total, history) {
-      // 自分より高い点数の件数 + 1 を順位にする方式です。
+      // 自分より高い点数の件数 + 1 を順位にします。
       // 同点の場合は同じ順位になります。
       return history.filter(record => record.score > total).length + 1;
     }
 
-    function updateRanking(total) {
-      const history = saveScore(total);
-      const rank = getRank(total, history);
+    function getTopPercentage(rank, history) {
+      return Math.max(1, Math.ceil((rank / history.length) * 100));
+    }
 
-      rankingValue.textContent = rank + "位";
-      rankingCount.textContent = "（" + history.length + "件中）";
+    function getRankBasedTargetY(rank, history) {
+      // ピラミッドの高さをランキングに対応させます。
+      // 1位は必ず最上位、最下位は下部に近づくように配置します。
+      if (history.length <= 1) {
+        return PYRAMID_TOP_Y;
+      }
+
+      const rankRatio = (rank - 1) / (history.length - 1);
+      const limitedRatio = Math.max(0, Math.min(rankRatio, 1));
+
+      return PYRAMID_TOP_Y + PYRAMID_HEIGHT * limitedRatio;
+    }
+
+    function updateRankingDisplay(rank, history) {
+      const topPercentage = getTopPercentage(rank, history);
+
+      rankingValue.textContent = "上位" + topPercentage + "%";
+      rankingCount.textContent = "（" + history.length + "件中 / " + rank + "位相当）";
     }
 
     function showResult() {
       const total = calculateTotal();
 
-      const ratio = total / MAX_TOTAL;
-      const targetY = PYRAMID_BOTTOM_Y - PYRAMID_HEIGHT * ratio;
+      // 先に保存し、保存済みデータ内の順位に応じてライン位置を決めます。
+      const history = saveScore(total);
+      const rank = getRank(total, history);
+      const targetY = getRankBasedTargetY(rank, history);
 
       totalValue.textContent = total;
       rankingValue.textContent = "集計中...";
@@ -603,7 +619,7 @@
       resultContainer.classList.remove("high-score-active");
 
       animateScoreLine(targetY, total, () => {
-        updateRanking(total);
+        updateRankingDisplay(rank, history);
 
         if (total <= LOW_SCORE_CHARACTER_LIMIT) {
           resultContainer.classList.add("low-score-active");
