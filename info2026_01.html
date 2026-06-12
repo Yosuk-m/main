@@ -1,0 +1,400 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.hidden{display:none!important}
+.screen{padding:1.5rem}
+.btn{padding:8px 18px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-size:14px;transition:background 0.15s}
+.btn:hover{background:var(--color-background-secondary)}
+.btn:active{transform:scale(0.98)}
+.btn-p{background:#534AB7;color:#fff;border-color:#534AB7}
+.btn-p:hover{background:#3C3489}
+.btn-d{background:#E24B4A;color:#fff;border-color:#E24B4A}
+.btn-d:hover{background:#A32D2D}
+.btn-g{background:#639922;color:#fff;border-color:#639922}
+.btn-g:hover{background:#3B6D11}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem}
+.metric{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:1rem;text-align:center}
+.mv{font-size:22px;font-weight:500;color:var(--color-text-primary)}
+.ml{font-size:12px;color:var(--color-text-secondary);margin-top:4px}
+.tag-ok{background:#EAF3DE;color:#3B6D11;padding:2px 8px;border-radius:4px;font-size:12px}
+.tag-ng{background:#FCEBEB;color:#A32D2D;padding:2px 8px;border-radius:4px;font-size:12px}
+input,select{width:100%;padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:14px;background:var(--color-background-primary);color:var(--color-text-primary)}
+.pbar{height:6px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden;margin:6px 0}
+.pfill{height:100%;background:#534AB7;border-radius:3px;transition:width 0.3s}
+.ntabs{display:flex;gap:4px;margin-bottom:1.5rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ntab{padding:8px 14px;border:none;background:none;cursor:pointer;color:var(--color-text-secondary);font-size:13px;border-bottom:2px solid transparent;margin-bottom:-0.5px}
+.ntab.active{color:#534AB7;border-bottom-color:#534AB7;font-weight:500}
+.cat-badge{background:#EEEDFE;color:#26215C;padding:2px 8px;border-radius:4px;font-size:11px;display:inline-block;margin-bottom:6px}
+</style>
+<div id="app">
+
+<div id="s-login" class="screen" style="max-width:400px;margin:2rem auto">
+  <div style="text-align:center;margin-bottom:1.5rem">
+    <div style="font-size:13px;color:#534AB7;font-weight:500;margin-bottom:4px">情報I 第1章</div>
+    <h2 style="font-size:20px;font-weight:500">CBT 一問一答テスト</h2>
+    <p style="font-size:12px;color:var(--color-text-secondary);margin-top:4px">情報社会と問題解決 全122問</p>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;gap:12px">
+    <div>
+      <label style="font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px">クラス番号</label>
+      <input id="i-cls" type="text" placeholder="例：3-A">
+    </div>
+    <div>
+      <label style="font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px">名前</label>
+      <input id="i-name" type="text" placeholder="例：山田 太郎">
+    </div>
+    <button class="btn btn-p" onclick="doLogin()"><i class="ti ti-player-play" aria-hidden="true"></i> 開始する</button>
+    <button class="btn" onclick="showScreen('s-alog')" style="font-size:12px;color:var(--color-text-secondary)"><i class="ti ti-shield" aria-hidden="true"></i> 管理者ログイン</button>
+  </div>
+</div>
+
+<div id="s-alog" class="screen hidden" style="max-width:380px;margin:2rem auto">
+  <h2 style="font-size:18px;font-weight:500;margin-bottom:1.5rem"><i class="ti ti-shield"></i> 管理者ログイン</h2>
+  <div class="card" style="display:flex;flex-direction:column;gap:12px">
+    <div><label style="font-size:13px;color:var(--color-text-secondary);display:block;margin-bottom:4px">パスワード</label>
+    <input id="i-apw" type="password" placeholder="管理者パスワード"></div>
+    <button class="btn btn-p" onclick="doALogin()">ログイン</button>
+    <button class="btn" onclick="showScreen('s-login')">← 戻る</button>
+  </div>
+</div>
+
+<div id="s-setup" class="screen hidden" style="max-width:520px;margin:1rem auto">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.5rem">
+    <div>
+      <h2 style="font-size:17px;font-weight:500" id="sw-name"></h2>
+      <p style="font-size:13px;color:var(--color-text-secondary)" id="sw-stat"></p>
+    </div>
+    <button class="btn btn-d" onclick="doLogout()" style="font-size:12px;padding:6px 12px">ログアウト</button>
+  </div>
+  <div class="card" style="display:flex;flex-direction:column;gap:16px">
+    <div>
+      <p style="font-size:13px;font-weight:500;margin-bottom:8px;color:var(--color-text-secondary)">分野で絞り込む</p>
+      <select id="sel-cat" style="margin-bottom:0"><option value="all">すべての分野</option></select>
+    </div>
+    <div>
+      <p style="font-size:13px;font-weight:500;margin-bottom:8px;color:var(--color-text-secondary)">出題数を選択</p>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px" id="cnt-btns"></div>
+    </div>
+    <div style="display:flex;gap:8px;padding-top:8px;border-top:0.5px solid var(--color-border-tertiary)">
+      <button class="btn btn-p" style="flex:1" onclick="startExam()"><i class="ti ti-player-play" aria-hidden="true"></i> 試験開始</button>
+      <button class="btn btn-d" onclick="resetProg()" style="font-size:12px;padding:6px 12px"><i class="ti ti-refresh" aria-hidden="true"></i> リセット</button>
+    </div>
+  </div>
+</div>
+
+<div id="s-exam" class="screen hidden" style="max-width:640px;margin:1rem auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+    <span id="e-prog" style="font-size:13px;color:var(--color-text-secondary)"></span>
+    <span id="e-user" style="font-size:12px;color:var(--color-text-secondary)"></span>
+  </div>
+  <div class="pbar"><div class="pfill" id="e-pbar"></div></div>
+  <div class="card" style="margin-top:12px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <span class="cat-badge" id="q-cat"></span>
+      <span style="font-size:12px;color:var(--color-text-secondary)" id="q-num"></span>
+    </div>
+    <p style="font-size:15px;line-height:1.7;margin-bottom:1.25rem;font-weight:500" id="q-text"></p>
+    <div id="q-ch" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+  <div style="display:flex;justify-content:space-between;margin-top:12px">
+    <button class="btn" id="b-prev" onclick="goPrev()"><i class="ti ti-arrow-left" aria-hidden="true"></i> 前へ</button>
+    <button class="btn btn-p" id="b-next" onclick="goNext()">次へ <i class="ti ti-arrow-right" aria-hidden="true"></i></button>
+    <button class="btn btn-g" id="b-sub" onclick="submitExam()" style="display:none">提出する <i class="ti ti-check" aria-hidden="true"></i></button>
+  </div>
+</div>
+
+<div id="s-result" class="screen hidden" style="max-width:680px;margin:1rem auto">
+  <h2 style="font-size:18px;font-weight:500;margin-bottom:1.5rem"><i class="ti ti-chart-bar" aria-hidden="true"></i> 結果</h2>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.5rem" id="r-metrics"></div>
+  <div id="r-list" style="display:flex;flex-direction:column;gap:10px;margin-bottom:1.5rem"></div>
+  <div style="display:flex;gap:8px">
+    <button class="btn btn-p" onclick="showScreen('s-setup');refreshSetup()">もう一度</button>
+    <button class="btn btn-d" onclick="doLogout()">ログアウト</button>
+  </div>
+</div>
+
+<div id="s-admin" class="screen hidden" style="max-width:720px;margin:1rem auto">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+    <h2 style="font-size:18px;font-weight:500"><i class="ti ti-shield" aria-hidden="true"></i> 管理者パネル</h2>
+    <button class="btn" onclick="showScreen('s-login')">← ログアウト</button>
+  </div>
+  <div class="ntabs">
+    <button class="ntab active" onclick="switchTab('ta-ov',this)">概要</button>
+    <button class="ntab" onclick="switchTab('ta-st',this)">生徒別</button>
+    <button class="ntab" onclick="switchTab('ta-q',this)">問題別</button>
+    <button class="ntab" onclick="switchTab('ta-cat',this)">分野別</button>
+  </div>
+  <div id="ta-ov"></div>
+  <div id="ta-st" class="hidden"></div>
+  <div id="ta-q" class="hidden"></div>
+  <div id="ta-cat" class="hidden"></div>
+</div>
+</div>
+
+<script>
+const APW="admin1234";
+const SK="cbt_joho1_v3";
+const COUNTS=[10,20,30,40,50];
+
+const QQ=[{"id":1,"cat":"情報の基本","q":"一般的に，人間が判断をしたり，行動を起こしたりする際に必要なものを何というか。","c":["知識","知恵","データ","情報"],"a":3,"e":"情報は、人が判断したり行動したりするときの材料となる意味のある内容を指す。"},{"id":2,"cat":"情報の基本","q":"事実や事柄などを数字や文字，記号で表現したものを何というか。","c":["データ","知識","情報","知恵"],"a":0,"e":"データは、事実や事柄を数字・文字・記号などで表したもので、分析前の素材になる。"},{"id":3,"cat":"情報の基本","q":"情報を分析し，問題解決に役立つように蓄積したものを何というか。","c":["知識","情報","データ","知恵"],"a":0,"e":"知識は、情報を整理・分析して問題解決に使える形で蓄積したものを指す。"},{"id":4,"cat":"情報の基本","q":"知識をもとに価値を創造する力となるものを何というか。","c":["知識","知恵","データ","情報"],"a":1,"e":"知恵は、知識を活用して判断し、新しい価値を生み出す力を指す。"},{"id":5,"cat":"ICTと社会","q":"さまざまな分野にICTが浸透することで進展してきた社会を何というか。","c":["POSシステム","情報社会","超スマート社会","電子マネー"],"a":1,"e":"情報社会は、ICTが社会のさまざまな分野に広がり、情報の活用が中心となる社会である。"},{"id":6,"cat":"情報の特性","q":"情報の特性の一つで，「もの」とは違い他者に与えてもなくなることはない性質を何というか。","c":["複製性","信憑性","伝播性","残存性"],"a":3,"e":"残存性は、情報を他者に伝えても自分の手元から消えてなくならない性質である。"},{"id":7,"cat":"情報の特性","q":"情報の特性の一つで，デジタル情報であれば簡単に複製でき，劣化させずに短時間で大量に複製できる性質を何というか。","c":["信憑性","伝播性","残存性","複製性"],"a":3,"e":"複製性は、デジタル情報を劣化させずに簡単かつ大量にコピーできる性質である。"},{"id":8,"cat":"情報の特性","q":"情報の特性の一つで，「もの」に比べて短時間に広く伝播させることができる性質を何というか。","c":["伝播性","信憑性","複製性","残存性"],"a":0,"e":"伝播性は、情報が短時間で広い範囲に伝わりやすい性質を表す。"},{"id":9,"cat":"情報とメディア","q":"人間をはじめとする生物が，生きていくために役立てている最も広義な情報を何というか。","c":["社会情報","機械情報","メディア","生命情報"],"a":3,"e":"生命情報は、生物が生存や活動のために利用する最も広い意味での情報である。"},{"id":10,"cat":"情報とメディア","q":"人間がコミュニケーションを行うために用いられる情報を何というか。","c":["機械情報","社会情報","メディア","生命情報"],"a":1,"e":"社会情報は、人間同士のコミュニケーションで意味を伝えるために使われる情報である。"},{"id":11,"cat":"情報とメディア","q":"意味する内容が切り離され，記号だけが独立した情報を何というか。","c":["機械情報","社会情報","生命情報","メディア"],"a":0,"e":"機械情報は、意味内容から切り離され、記号として機械的に扱われる情報である。"},{"id":12,"cat":"情報とメディア","q":"情報のやり取りを媒介するものを何というか。","c":["機械情報","メディア","社会情報","伝播メディア"],"a":1,"e":"メディアは、情報を送り手から受け手へ伝えるための媒介手段である。"},{"id":13,"cat":"情報とメディア","q":"情報の流通範囲を拡大する役割を持つメディアを何というか。","c":["成果メディア","メディア","伝播メディア","機械情報"],"a":2,"e":"伝播メディアは、情報を遠く広く流通させる役割をもつメディアである。"},{"id":14,"cat":"情報とメディア","q":"社会情報を論理的に媒介する役割を果たすメディアを何というか。","c":["成果メディア","伝播メディア","メディアリテラシー","メディア"],"a":0,"e":"成果メディアは、社会情報を論理的に媒介する役割をもつものとして扱われている。"},{"id":15,"cat":"情報とメディア","q":"マスメディアで報じられた情報をさまざまな視点で分析・評価し，情報の真偽を正しく判断する能力，また文字や画像などさまざまなメディアを活用して効果的な形態で表現する能力を何というか。","c":["伝播メディア","クロスチェック","成果メディア","メディアリテラシー"],"a":3,"e":"メディアリテラシーは、情報を批判的に読み解き、適切なメディアで表現する能力である。"},{"id":16,"cat":"情報とメディア","q":"情報の信憑性を確認するために，複数の情報源から提供された情報を比較することを何というか。","c":["メディアリテラシー","信憑性","クロスチェック","成果メディア"],"a":2,"e":"クロスチェックは、複数の情報源を照合して情報の信頼性を確かめる方法である。"},{"id":17,"cat":"情報の特性","q":"情報の正確さや信用できる度合いのことを何というか。","c":["伝播性","残存性","信憑性","複製性"],"a":2,"e":"信憑性は、情報がどの程度正確で信用できるかを表す度合いである。"},{"id":18,"cat":"SNS・ネット上の現象","q":"SNSの記事などに批判や誹謗中傷の投稿が殺到することを何というか。","c":["エコーチェンバー","フィルターバブル","電子メール","炎上"],"a":3,"e":"炎上は、SNSなどで批判や誹謗中傷が短時間に集中して広がる状態である。"},{"id":19,"cat":"SNS・ネット上の現象","q":"SNSなどで意見を投稿したとき，それに賛同する意見が返ってくる現象を何というか。","c":["電子メール","エコーチェンバー","炎上","フィルターバブル"],"a":1,"e":"エコーチェンバーは、自分と似た意見ばかりが返ってきて、意見が強化される現象である。"},{"id":20,"cat":"SNS・ネット上の現象","q":"インターネットなどでの検索履歴や閲覧履歴によって提示される情報が自動的に選別され，ユーザの好みや価値観に合わない情報から隔離されてしまう現象を何というか。","c":["フィルターバブル","エコーチェンバー","電子メール","炎上"],"a":0,"e":"フィルターバブルは、検索履歴などにより情報が自動選別され、異なる価値観の情報に触れにくくなる現象である。"},{"id":21,"cat":"ICTサービス","q":"ネットワークを使用して，手紙のように文章や写真データなどのやりとりをすること（する技術）を何というか。","c":["SNS","電子メール","遠隔会議","メッセージアプリ"],"a":1,"e":"電子メールは、ネットワークを通じて文章や添付データを手紙のように送受信する仕組みである。"},{"id":22,"cat":"ICTサービス","q":"登録された利用者同士がインターネット上で交流できるサービスのことを何というか。","c":["電子メール","SNS","遠隔会議","メッセージアプリ"],"a":1,"e":"SNSは、登録利用者同士がインターネット上で交流・発信できるサービスである。"},{"id":23,"cat":"ICTサービス","q":"インターネットを利用して，文字・画像・音声・動画などの送受信を行うアプリケーションを何というか。","c":["SNS","電子メール","遠隔会議","メッセージアプリ"],"a":3,"e":"メッセージアプリは、文字・画像・音声・動画などをインターネット経由で送受信するアプリである。"},{"id":24,"cat":"ICTサービス","q":"ネットワークを利用して遠隔地にいる人々が行う会議を何というか。","c":["SNS","遠隔授業","遠隔会議","メッセージアプリ"],"a":2,"e":"遠隔会議は、ネットワークを使って離れた場所にいる人々が行う会議である。"},{"id":25,"cat":"ICTサービス","q":"ネットワークを利用して遠隔地にいる人々が行う授業を何というか。","c":["遠隔会議","メッセージアプリ","POSシステム","遠隔授業"],"a":3,"e":"遠隔授業は、ネットワークを利用して離れた場所の学習者に行う授業である。"},{"id":26,"cat":"ICTと社会","q":"店舗内で商品を販売した時点での情報を集計・分析するなどして役立てているシステムのことを何というか。","c":["超スマート社会","電子マネー","POSシステム","IoT"],"a":2,"e":"POSシステムは、販売時点の情報を記録・集計・分析して販売管理などに活用する仕組みである。"},{"id":27,"cat":"ICTと社会","q":"お金の価値を電子的なデータで表現したもので，専用端末にかざすだけで決済を行えるものを何というか。","c":["POSシステム","IoT","超スマート社会","電子マネー"],"a":3,"e":"電子マネーは、お金の価値を電子データとして扱い、端末にかざすなどして決済できる仕組みである。"},{"id":28,"cat":"ICTと社会","q":"社会のさまざまなニーズにきめ細かに対応でき，あらゆる人が質の高いサービスを受け，年齢・性別・地域・言語といったさまざまな違いを乗り越え，活き活きと快適に暮らすことのできる社会のことを何というか。","c":["POSシステム","IoT","超スマート社会","電子マネー"],"a":2,"e":"超スマート社会は、ICTなどを活用して多様な人が質の高いサービスを受けられる社会を指す。"},{"id":29,"cat":"ICTと社会","q":"身の回りのあらゆるものがインターネットにつながる仕組みのことを何というか。","c":["ビッグデータ","電子マネー","IoT","超スマート社会"],"a":2,"e":"IoTは、身の回りのモノがインターネットにつながり、情報をやり取りする仕組みである。"},{"id":30,"cat":"AI","q":"人間の知的な活動の一部をコンピュータにさせることを目的とする技術や研究分野のことを何というか。","c":["エキスパートシステム","機械学習","深層学習","人工知能"],"a":3,"e":"人工知能は、人間の知的活動の一部をコンピュータで実現しようとする技術・研究分野である。"},{"id":31,"cat":"ICTと社会","q":"データが膨大であり，その種類が多様であり，データの更新・生成が速いといった三つの特徴があるデータのことを何というか。","c":["サイバー犯罪","IoT","情報格差","ビッグデータ"],"a":3,"e":"ビッグデータは、量が膨大で種類が多く、更新や生成の速度が速いデータ群である。"},{"id":32,"cat":"ICTと社会","q":"コンピュータウイルスを用いてシステムをダウンさせたり，不正に他人のユーザIDや暗証番号などを入手してコンピュータなどに侵入したりするなど，コンピュータや情報通信ネットワーク上で行われる犯罪を何というか。","c":["ビッグデータ","情報格差","サイバー犯罪","IoT"],"a":2,"e":"サイバー犯罪は、コンピュータやネットワークを悪用して行われる犯罪の総称である。"},{"id":33,"cat":"ICTと社会","q":"インターネットやコンピュータなどのICTを利用できる者と利用できない者との間に生じる格差を何というか。","c":["ビッグデータ","情報格差","サイバー犯罪","IoT"],"a":1,"e":"情報格差は、ICTを利用できる人と利用できない人の間に生じる格差である。"},{"id":34,"cat":"AI","q":"ディスプレイを長時間使用したことにより身体的，精神的に生じる症状のことを何というか。","c":["VDT症候群","人工知能","エキスパートシステム","機械学習"],"a":0,"e":"VDT症候群は、ディスプレイ作業の長時間化によって目・肩・精神面などに不調が出る症状である。"},{"id":35,"cat":"AI","q":"ICTの環境へ適応できずにストレスを感じてしまうことを何というか。","c":["機械学習","エキスパートシステム","人工知能","テクノ不安症"],"a":3,"e":"テクノ不安症は、ICT環境にうまく適応できず、不安やストレスを感じる状態である。"},{"id":36,"cat":"AI","q":"ICTの環境に過度に依存してしまう何というか。","c":["機械学習","深層学習","テクノ依存症","エキスパートシステム"],"a":2,"e":"テクノ依存症は、ICT機器やネットワーク環境に過度に依存してしまう状態である。"},{"id":37,"cat":"AI","q":"ICTの環境へ適応できないことへの不安や，過度に依存してしまうことなどを総じて何というか。","c":["エキスパートシステム","テクノストレス","機械学習","深層学習"],"a":1,"e":"テクノストレスは、ICTへの不適応による不安や過度な依存などを含むストレスの総称である。"},{"id":38,"cat":"AI","q":"AIをより人間の生活に役立てるため，医療や法律などのいろいろな知識を用いて自動推論を行うシステムを何というか。","c":["深層学習","他律システム","機械学習","エキスパートシステム"],"a":3,"e":"エキスパートシステムは、専門知識を用いて自動推論を行い、専門家の判断を支援するシステムである。"},{"id":39,"cat":"AI","q":"コンピュータが与えられたデータから自動的に学習し，その結果を用いてデータの背景にあるルールやパターンを発見したり，予測や判断を行ったりする技術を何というか。","c":["他律システム","機械学習","エキスパートシステム","深層学習"],"a":1,"e":"機械学習は、データから規則やパターンを学び、予測や判断に用いる技術である。"},{"id":40,"cat":"AI","q":"人間の神経細胞（ニューロン）の仕組みを模したニューラルネットワークという技術を基礎としており，自動チャットなどに応用されているものを何というか。","c":["他律システム","深層学習","エキスパートシステム","機械学習"],"a":1,"e":"深層学習は、多層のニューラルネットワークを使って特徴やパターンを学習する機械学習の一分野である。"},{"id":41,"cat":"AI","q":"システムを動かすためのルールがシステムの外部から決められているシステムのことを何というか。","c":["深層学習","他律システム","機械学習","フレーム問題"],"a":1,"e":"他律システムは、動作ルールがシステム外部からあらかじめ与えられているシステムである。"},{"id":42,"cat":"AI","q":"AIが与えられた問題を解決しようとするとき，その問題の枠組みをうまく定められずにどこまでも計算を続けてしまうことを何というか。","c":["他律システム","フレーム問題","深層学習","シンギュラリティ説"],"a":1,"e":"フレーム問題は、AIが問題解決に必要な範囲をうまく限定できず、計算が終わらなくなる問題である。"},{"id":43,"cat":"AI","q":"AIが自律的に動作することによって飛躍的に進歩し，人知をしのいで世界を変えるとした説を何というか。","c":["生成AI","シンギュラリティ説","他律システム","フレーム問題"],"a":1,"e":"シンギュラリティ説は、AIが人間の知能を超えて社会を大きく変えるとする考え方である。"},{"id":44,"cat":"AI","q":"ユーザによる入力に応じて，文章やプログラム，画像，音声，動画などを新たに生成することができるAIを何というか。","c":["シンギュラリティ説","フレーム問題","大規模言語モデル","生成AI"],"a":3,"e":"生成AIは、入力に応じて文章・画像・音声・動画・プログラムなどを新たに生成できるAIである。"},{"id":45,"cat":"AI","q":"おもに大量のテキストデータを用いて学習させた自然言語処理のモデルを何というか。","c":["シンギュラリティ説","大規模言語モデル","生成AI","ハルシネーション"],"a":1,"e":"大規模言語モデルは、大量のテキストデータで学習した自然言語処理モデルである。"},{"id":46,"cat":"AI","q":"生成AIが事実と異なる内容を出力することを何というか。","c":["生成AI","ハルシネーション","大規模言語モデル","シンギュラリティ説"],"a":1,"e":"ハルシネーションは、生成AIが事実と異なるもっともらしい内容を出力してしまう現象である。"},{"id":47,"cat":"問題解決","q":"現在の状態と，目標とするあるべき状態の差を何というか。","c":["問題","PPDACサイクル","フィードバック","問題解決"],"a":0,"e":"問題とは、現在の状態と目標とする状態との間にある差のことである。"},{"id":48,"cat":"問題解決","q":"現在の状態と，目標とするべき状態の差を解消するために解決策を立て，実行することを何というか。","c":["PPDACサイクル","問題解決","問題","フィードバック"],"a":1,"e":"問題解決は、現状と目標の差をなくすために解決策を考え、実行する一連の活動である。"},{"id":49,"cat":"問題解決","q":"他者から意見をもらったり評価を受けたりすることを何というか。","c":["問題","PPDACサイクル","問題解決","フィードバック"],"a":3,"e":"フィードバックは、他者から意見や評価を受け取り、改善に役立てることである。"},{"id":50,"cat":"問題解決","q":"データや統計を活用して5段階のフェーズを循環させる方法を何というか。","c":["PPDACサイクル","ブレインストーミング","問題解決","フィードバック"],"a":0,"e":"PPDACサイクルは、Problem・Plan・Data・Analysis・Conclusionの5段階を循環させて問題を解決する方法である。"},{"id":51,"cat":"問題解決","q":"グループで自由に考えを出し合う思考法で，批判禁止，自由な意見歓迎，質より量，意見の結合改善を認めるという四つの原則が設けられているものを何というか。","c":["ブレインストーミング","フィードバック","KJ法","PPDACサイクル"],"a":0,"e":"ブレインストーミングは、批判を避け、自由に多くのアイデアを出して組み合わせる発想法である。"},{"id":52,"cat":"問題解決","q":"収集した情報を階層化し，関係性を明らかにする手法を何というか。","c":["ブレインストーミング","トレードオフ","PPDACサイクル","KJ法"],"a":3,"e":"KJ法は、集めた情報をカードなどにまとめ、分類・階層化して関係性を明らかにする手法である。"},{"id":53,"cat":"問題解決","q":"一方を達成するために他方を犠牲にしなければならない関係のこと。両立することが難しい二つのものの関係を何というか。","c":["トレードオフ","PPDACサイクル","ブレインストーミング","KJ法"],"a":0,"e":"トレードオフは、一方を得るために他方を犠牲にしなければならない関係である。"},{"id":54,"cat":"情報収集・評価","q":"自分自身が直接経験して得たり，考察して得たりしたオリジナルな情報を何というか。","c":["一次情報","検索サイト","二次情報","引用"],"a":0,"e":"一次情報は、自分が直接経験・観察・調査して得たオリジナルの情報である。"},{"id":55,"cat":"情報収集・評価","q":"書籍やWebページなどにすでにまとめてあったり，保存されていたものから得られた情報を何というか。","c":["二次情報","検索サイト","一次情報","引用"],"a":0,"e":"二次情報は、書籍やWebページなど、すでに整理・保存された資料から得る情報である。"},{"id":56,"cat":"情報収集・評価","q":"インターネット上のWebページの中から，指定したキーワードに関連する情報を検索するサービスを何というか。","c":["二次情報","検索サイト","引用","一次情報"],"a":1,"e":"検索サイトは、指定したキーワードに関連するWebページや情報を探すサービスである。"},{"id":57,"cat":"情報収集・評価","q":"自分の著作物に，公表された他人の著作物を掲載する行為を何というか。","c":["引用","フィールドワーク","検索サイト","二次情報"],"a":0,"e":"引用は、自分の著作物の中で公表済みの他人の著作物を条件に従って利用する行為である。"},{"id":58,"cat":"情報収集・評価","q":"街頭でのアンケート調査や聞き取り調査，実物観察などによって，情報を直接収集することを何というか。","c":["自己評価","フィールドワーク","検索サイト","引用"],"a":1,"e":"フィールドワークは、現地での観察・聞き取り・アンケートなどにより直接情報を集める方法である。"},{"id":59,"cat":"情報収集・評価","q":"実際の問題解決において有効に機能するか，導いた結論はどの程度妥当であるかなどについて，本人が自分自身で評価することを何というか。","c":["総合評価","引用","フィールドワーク","自己評価"],"a":3,"e":"自己評価は、自分自身の活動や成果について、自分で妥当性や有効性を評価することである。"},{"id":60,"cat":"情報収集・評価","q":"実際の問題解決において有効に機能するか，導いた結論はどの程度妥当であるかなどについて，互いに評価し合うことを何というか。","c":["外部評価","総合評価","自己評価","フィールドワーク"],"a":1,"e":"総合評価は、問題解決の成果や過程について複数の観点から全体的に評価することを指す。"},{"id":61,"cat":"情報収集・評価","q":"実際の問題解決において有効に機能するか，導いた結論はどの程度妥当であるかなどについて，実行した人とは別の人が評価することを何というか。","c":["外部評価","フィールドワーク","自己評価","総合評価"],"a":0,"e":"外部評価は、実行した本人以外の第三者が活動や成果を評価することである。"},{"id":62,"cat":"知的財産","q":"小説を書いたり，コンピュータのプログラムを作成したり，商品を考案したりするなど，知的な創作活動から生産されたものを何というか。","c":["知的財産権","方式主義","知的財産","産業財産権"],"a":2,"e":"知的財産は、発明・著作物・デザインなど、人間の知的創作活動から生み出された成果である。"},{"id":63,"cat":"知的財産","q":"知的な創作活動から生産されたものを，他人が無断で使用して利益を得たりすることができないように，創作した人に一定期間与えられる権利を何というか。","c":["産業財産権","知的財産権","知的財産","方式主義"],"a":1,"e":"知的財産権は、知的財産を無断利用から守るために創作者などに認められる権利である。"},{"id":64,"cat":"知的財産","q":"産業に関する新しい技術やデザイン，商標について開発した人に与えられる独占的権利を何というか。","c":["知的財産権","知的財産","方式主義","産業財産権"],"a":3,"e":"産業財産権は、特許・実用新案・意匠・商標など、産業上の創作や標識を保護する権利である。"},{"id":65,"cat":"知的財産","q":"特許権，実用新案権，意匠権，商標権など，特許庁に出願して認められた時点で得ることができる方式を何というか。","c":["産業財産権","知的財産権","方式主義","知的財産"],"a":2,"e":"方式主義は、出願や登録などの手続きを経てはじめて権利が発生する考え方である。"},{"id":66,"cat":"産業財産権","q":"自然法則を利用した技術的思想の創作のうち高度なものや，発明を保護する権利を何というか。","c":["実用新案権","産業財産権","特許権","方式主義"],"a":2,"e":"特許権は、自然法則を利用した高度な技術的発明を保護する権利である。"},{"id":67,"cat":"産業財産権","q":"自然法則を利用した技術的思想の創作のうち物品の形状，構造などの考案を保護する権利を何というか。","c":["意匠権","実用新案権","方式主義","特許権"],"a":1,"e":"実用新案権は、物品の形状や構造などに関する技術的な考案を保護する権利である。"},{"id":68,"cat":"産業財産権","q":"物品の形状や模様，色彩などの視覚を通じて美感を起こさせる斬新なデザインを保護する権利を何というか。","c":["意匠権","商標権","実用新案権","特許権"],"a":0,"e":"意匠権は、物品などの形状・模様・色彩による新しいデザインを保護する権利である。"},{"id":69,"cat":"産業財産権","q":"自分が取り扱う商品やサービスと，他人が取り扱う商品やサービスとを区別するためのマークを保護する権利を何というか。","c":["実用新案権","特許権","商標権","意匠権"],"a":2,"e":"商標権は、商品やサービスを他者のものと区別するためのマークを保護する権利である。"},{"id":70,"cat":"知的財産","q":"著作物の公正な利用に留意しつつ，著作者などの権利の保護をはかることによって，文化の発展に寄与することを目的とした法律を何というか。","c":["無方式主義","著作者人格権","著作権法","著作物"],"a":2,"e":"著作権法は、著作者などの権利保護と著作物の公正利用を通じて文化の発展を目的とする法律である。"},{"id":71,"cat":"知的財産","q":"「思想又は感情を創作的に表現したものであって，文芸，学術，美術又は音楽の範囲に属するもの」と定義されているものは何か。","c":["著作者人格権","著作物","著作権法","無方式主義"],"a":1,"e":"著作物は、思想または感情を創作的に表現した文芸・学術・美術・音楽などの範囲に属するものである。"},{"id":72,"cat":"知的財産","q":"権利を得るための手続きや登録が必要ない方式を何というか。","c":["無方式主義","著作権法","著作物","著作者人格権"],"a":0,"e":"無方式主義は、登録や手続きなしに著作物の創作時点で権利が発生する考え方である。"},{"id":73,"cat":"知的財産","q":"著作者の人格的な利益を保護するための権利を何というか。","c":["著作権（財産権）","著作者人格権","無方式主義","著作物"],"a":1,"e":"著作者人格権は、著作者の名誉や作品への思いなど人格的利益を保護する権利である。"},{"id":74,"cat":"知的財産","q":"著作物の利用を許諾したり禁止したりするための権利を何というか。","c":["著作権（財産権）","著作者人格権","無方式主義","著作隣接権"],"a":0,"e":"著作権（財産権）は、著作物の利用を許可したり禁止したりできる財産的な権利である。"},{"id":75,"cat":"知的財産","q":"実演家や放送事業者など，著作物の公衆への伝達に重要な役割を果たしている者に与えられる権利を何というか。","c":["著作権（財産権）","著作者人格権","無方式主義","著作隣接権"],"a":3,"e":"著作隣接権は、実演家・レコード製作者・放送事業者など、著作物の伝達に関わる者に認められる権利である。"},{"id":76,"cat":"著作権実務","q":"ICTを活用した教育での著作物利用の円滑化を図るため，教育機関の設置者が補償金を支払うことで，授業の過程で利用する必要な公衆送信について，著作権者などに許諾を得ることなく利用できることを定めた制度を何というか。","c":["著作隣接権","著作権（財産権）","授業目的公衆送信保証金制度","引用文献"],"a":2,"e":"授業目的公衆送信保証金制度は、教育機関が補償金を支払うことで授業に必要な公衆送信を許諾なしに行える制度である。"},{"id":77,"cat":"著作権実務","q":"引用に用いられる文献のことを何というか。","c":["引用文献","参考文献","授業目的公衆送信保証金制度","著作隣接権"],"a":0,"e":"引用文献は、自分の文章などで引用として取り上げた文献のことである。"},{"id":78,"cat":"著作権実務","q":"自分の著作物を創作する際に参考にした文献を何というか。","c":["引用文献","CCライセンス","授業目的公衆送信保証金制度","参考文献"],"a":3,"e":"参考文献は、自分の著作物を作る際に参考にした資料や文献である。"},{"id":79,"cat":"著作権実務","q":"著作権者が自分の著作物を自由に利用するために守るべき条件を意思表示するものとして利用されているものを何というか。","c":["引用文献","参考文献","CCライセンス","パブリックドメイン"],"a":2,"e":"CCライセンスは、著作権者が作品利用の条件をあらかじめ示すためのライセンスである。"},{"id":80,"cat":"著作権実務","q":"知的財産権により保護されていた創作物が，権利の保護期間を経過し，社会の公共財産となって，誰でも自由に利用できるようになったものを何というか。","c":["CCライセンス","パブリックドメイン","参考文献","電子すかし"],"a":1,"e":"パブリックドメインは、保護期間の満了などにより誰でも自由に利用できる状態になった著作物などである。"},{"id":81,"cat":"著作権実務","q":"Webページに掲載した画像・動画・音声データなどに著作権侵害（不正コピーなど）を防ぐための著作者データなどを埋め込んでおく技術を何というか。","c":["参考文献","電子すかし","パブリックドメイン","CCライセンス"],"a":1,"e":"電子すかしは、画像・音声・動画などに著作者情報を埋め込み、不正コピー対策に用いる技術である。"},{"id":82,"cat":"個人情報","q":"生存する個人に関する情報であって，それ単体や，いくつかの情報を組み合わせることで個人を特定できるものを何というか。","c":["個人識別符号","個人情報保護法","基本四情報","個人情報"],"a":3,"e":"個人情報は、生存する個人を識別できる情報、または他の情報と組み合わせて個人を特定できる情報である。"},{"id":83,"cat":"個人情報","q":"個人情報の有用性に配慮しながら，個人の権利や利益を守ることを目的とした法律を何というか。","c":["個人情報保護法","個人情報","個人識別符号","基本四情報"],"a":0,"e":"個人情報保護法は、個人情報の有用性に配慮しながら個人の権利利益を守るための法律である。"},{"id":84,"cat":"個人情報","q":"DNA塩基配列や指紋などの身体的特徴，旅券番号，運転免許証番号などの個人に割り当てられる番号などのことを何というか。","c":["個人情報保護法","個人識別符号","個人情報","基本四情報"],"a":1,"e":"個人識別符号は、指紋やDNA、旅券番号など、それだけで個人を識別できる符号や番号である。"},{"id":85,"cat":"個人情報","q":"行政などで個人を特定する場合に必要な，氏名，住所，生年月日，性別の四つの情報を何というか。","c":["要配慮個人情報","個人識別符号","基本四情報","個人情報保護法"],"a":2,"e":"基本四情報は、氏名・住所・生年月日・性別の四つの基本的な個人情報である。"},{"id":86,"cat":"個人情報","q":"人種，信条，病歴，犯罪歴など，本人に対する不当な差別，偏見が生じないように，その取り扱いに特に配慮を要する個人情報を何というか。","c":["基本四情報","要配慮個人情報","個人識別符号","個人情報保護法"],"a":1,"e":"要配慮個人情報は、人種・信条・病歴など、不当な差別や偏見につながらないよう特に配慮が必要な個人情報である。"},{"id":87,"cat":"個人情報","q":"関連する商品やサービスの広告などを，あらかじめ「受け取りたい」と承諾した人にのみ提供する方式を何というか。","c":["基本四情報","要配慮個人情報","オプトイン方式","匿名加工情報"],"a":2,"e":"オプトイン方式は、事前に受け取りを承諾した人だけに広告や案内を送る方式である。"},{"id":88,"cat":"個人情報","q":"関連する商品やサービスの広告などを，あらかじめ「受け取りたくない」と意思表示した人には広告などを提供せず，それ以外の人に広告を提供する方式を何というか。","c":["要配慮個人情報","仮名加工情報","匿名加工情報","オプトアウト方式"],"a":3,"e":"オプトアウト方式は、受け取り拒否を表明した人には送らず、それ以外には広告などを送る方式である。"},{"id":89,"cat":"個人情報","q":"特定の個人を識別することができないように個人情報を加工し，当該の個人情報を復元できないようにしたものを何というか。","c":["基本四情報","要配慮個人情報","仮名加工情報","匿名加工情報"],"a":3,"e":"匿名加工情報は、特定の個人を識別できず、元の個人情報を復元できないよう加工した情報である。"},{"id":90,"cat":"個人情報","q":"個人情報の一部を削除して，他の情報と照合しないと特定の個人を識別できないように加工したものを何というか。","c":["基本四情報","仮名加工情報","要配慮個人情報","匿名加工情報"],"a":1,"e":"仮名加工情報は、一部を削除・置換し、他の情報と照合しなければ個人を識別できないようにした情報である。"},{"id":91,"cat":"プライバシー・個人の権利","q":"むやみに他人に知られたくない私生活上の個人的な情報を何というか。","c":["プライバシー","パブリシティ権","プライバシー権","肖像権"],"a":0,"e":"プライバシーは、むやみに他人に知られたくない私生活上の個人的情報である。"},{"id":92,"cat":"プライバシー・個人の権利","q":"法律に明文化されていないが，憲法十三条を根拠にして，私生活をみだりに公開されないことが認められている権利は何か。","c":["プライバシー権","パブリシティ権","プライバシー","肖像権"],"a":0,"e":"プライバシー権は、私生活をみだりに公開されない権利として認められている人格的権利である。"},{"id":93,"cat":"プライバシー・個人の権利","q":"誰にでも認められている権利で，本人の許可なく肖像を撮影されたり利用されたりしない権利を何というか。","c":["肖像権","プライバシー","パブリシティ権","プライバシー権"],"a":0,"e":"肖像権は、本人の許可なく顔や姿を撮影・利用されない権利である。"},{"id":94,"cat":"プライバシー・個人の権利","q":"有名人に認められている権利で，名前や写真などにある商業的価値を独占できる財産的な権利を何というか。","c":["個人データ","パブリシティ権","プライバシー権","肖像権"],"a":1,"e":"パブリシティ権は、有名人の氏名や肖像がもつ顧客吸引力などの商業的価値を保護する権利である。"},{"id":95,"cat":"個人情報","q":"特定の個人情報を，コンピュータなどを用いて検索することができるように体系的に構成した個人情報データベースなどを構成する個人情報のことを何というか。","c":["仮名加工情報","個人データ","要配慮個人情報","匿名加工情報"],"a":1,"e":"個人データは、検索できるよう体系的に構成された個人情報データベース等を構成する個人情報である。"},{"id":96,"cat":"不正・倫理・基本法","q":"正規のメールやWebページを装い，暗証番号やクレジットカード番号などを入力させて，それらを盗み取る詐欺のことを何というか。","c":["ソーシャルエンジニアリング","フィッシング詐欺","法令尊守","ヒューマンエラー"],"a":1,"e":"フィッシング詐欺は、本物を装ったメールやWebページでID・暗証番号・カード番号などを盗み取る詐欺である。"},{"id":97,"cat":"不正・倫理・基本法","q":"ネットワーク管理者と利用者などとの会話やその盗み聞き，暗証番号などを書いたメモの盗み見などといった，日常生活の中から人為的に機密情報を入手することを何というか。","c":["法令尊守","ソーシャルエンジニアリング","ヒューマンエラー","フィッシング詐欺"],"a":1,"e":"ソーシャルエンジニアリングは、人の心理や不注意を利用して会話・盗み見などから機密情報を得る手口である。"},{"id":98,"cat":"不正・倫理・基本法","q":"人為的ミスをなんというか。","c":["ヒューマンエラー","ソーシャルエンジニアリング","法令尊守","フィッシング詐欺"],"a":0,"e":"ヒューマンエラーは、人間の操作ミス・判断ミス・確認不足などによって起こる誤りである。"},{"id":99,"cat":"不正・倫理・基本法","q":"法律や社会規範・倫理を守ることを何というか。","c":["ソーシャルエンジニアリング","法令尊守","表現の自由","ヒューマンエラー"],"a":1,"e":"法令尊守は、法律や社会規範、倫理を守って行動することを指す。"},{"id":100,"cat":"不正・倫理・基本法","q":"憲法第二十一条第一項で規程され，「集会，結社及び言論，出版その他一切の表現の自由は，これを保障する」ことを何というか。","c":["不正アクセス禁止法","表現の自由","法令尊守","ヒューマンエラー"],"a":1,"e":"表現の自由は、言論・出版・集会・結社などの表現活動を保障する基本的人権である。"},{"id":101,"cat":"不正・倫理・基本法","q":"他人のユーザIDや暗証番号などを使用したり，プログラムの不備を攻撃して侵入したりするなど，アクセス権限のないコンピュータへのアクセスを行うことを禁止する法律を何というか。","c":["サイバーセキュリティ基本法","不正アクセス禁止法","法令尊守","表現の自由"],"a":1,"e":"不正アクセス禁止法は、他人のID・パスワードの不正利用や脆弱性攻撃による無権限アクセスを禁止する法律である。"},{"id":102,"cat":"不正・倫理・基本法","q":"サイバーセキュリティに関する施策の基本理念を定め，国および地方公共団体の責務などを明らかにし，これを総合的かつ効果的に推進することを目的とする法律を何というか。","c":["刑法","表現の自由","サイバーセキュリティ基本法","不正アクセス禁止法"],"a":2,"e":"サイバーセキュリティ基本法は、サイバーセキュリティ施策の基本理念や国・自治体の責務を定める法律である。"},{"id":103,"cat":"不正・倫理・基本法","q":"犯罪行為をした場合に，どのような刑罰が科せられるかを規定する法律を何というか。","c":["サイバーセキュリティ基本法","不正アクセス禁止法","電磁的記録","刑法"],"a":3,"e":"刑法は、犯罪にあたる行為と、それに対して科される刑罰を定める法律である。"},{"id":104,"cat":"不正・倫理・基本法","q":"刑法第七条の二で定義されている，電子的方式，磁気的方式などで作られる，電子計算機による情報処理の用に供される記録を何というか。","c":["不正アクセス禁止法","電磁的記録","刑法","サイバーセキュリティ基本法"],"a":1,"e":"電磁的記録は、電子的・磁気的方式などで作られ、コンピュータによる情報処理に使われる記録である。"},{"id":105,"cat":"消費者・ネット関連法","q":"消費者の利益を保護し，商品などの流通を適正かつ円滑にして，国民経済の健全な発展に寄与することを目的とする法律を何というか。","c":["刑法","クーリングオフ","特定商取引法","特定電子メール法"],"a":2,"e":"特定商取引法は、訪問販売や通信販売など特定の取引で消費者を守り、取引の適正化を図る法律である。"},{"id":106,"cat":"消費者・ネット関連法","q":"店頭販売や通信販売には適用されないが，一定の期間内に無条件で消費者が解約できる制度を何というか。","c":["情報流通プラットフォーム対処法","特定商取引法","特定電子メール法","クーリングオフ"],"a":3,"e":"クーリングオフは、一定期間内であれば無条件に契約を解除できる消費者保護制度である。"},{"id":107,"cat":"消費者・ネット関連法","q":"広告や宣伝のために大量の電子メールを送信することを取り締まる法律を何というか。","c":["特定電子メール法","特定商取引法","クーリングオフ","情報流通プラットフォーム対処法"],"a":0,"e":"特定電子メール法は、広告・宣伝目的の迷惑メール送信を規制する法律である。"},{"id":108,"cat":"消費者・ネット関連法","q":"インターネット上の掲示板やSNSで誹謗中傷などによる権利の侵害があった場合に，プロバイダの責任を明確化するとともに，発信者情報の開示請求権などについて定めた法律を何というか。","c":["クーリングオフ","情報流通プラットフォーム対処法","青少年インターネット環境整備法","特定電子メール法"],"a":1,"e":"情報流通プラットフォーム対処法は、ネット上の権利侵害についてプラットフォーム事業者の対応や発信者情報開示などを定める法律である。"},{"id":109,"cat":"消費者・ネット関連法","q":"青少年が安全に安心してインターネットを利用できるようにして，青少年の権利を守ることを目的とする法律を何というか。","c":["青少年インターネット環境整備法","情報流通プラットフォーム対処法","特定電子メール法","コンテンツフィルタリング"],"a":0,"e":"青少年インターネット環境整備法は、青少年が安全・安心にインターネットを利用できる環境整備を目的とする法律である。"},{"id":110,"cat":"消費者・ネット関連法","q":"有害情報を監視し，問題があれば遮断するなどの対処を行う技術を何というか。","c":["情報流通プラットフォーム対処法","特定電子メール法","コンテンツフィルタリング","青少年インターネット環境整備法"],"a":2,"e":"コンテンツフィルタリングは、有害情報を検出・監視し、必要に応じて閲覧を遮断する技術である。"},{"id":111,"cat":"情報モラル・認証","q":"情報社会で適正な活動を行うための基になる考え方と態度を何というか。","c":["暗号化","デジタル・シティズンシップ","情報モラル","情報セキュリティ"],"a":2,"e":"情報モラルは、情報社会で適正に活動するために必要な考え方や態度である。"},{"id":112,"cat":"情報モラル・認証","q":"情報モラルよりも大きな概念である，情報技術の利用を通じて，社会に積極的に関与し，参加する能力を何というか。","c":["情報モラル","情報セキュリティ","デジタル・シティズンシップ","暗号化"],"a":2,"e":"デジタル・シティズンシップは、情報技術を使って社会に主体的・積極的に参加する能力や態度を指す。"},{"id":113,"cat":"情報モラル・認証","q":"情報の盗聴や改竄，破壊などの不正行為や不慮の事故に対して，個人的，組織的，技術的な安全対策を講じることを何というか。","c":["情報セキュリティ","情報モラル","デジタル・シティズンシップ","暗号化"],"a":0,"e":"情報セキュリティは、盗聴・改ざん・破壊・事故などから情報を守るための対策全般である。"},{"id":114,"cat":"情報モラル・認証","q":"元のデータを他人にはわからなくするように処理することを何というか。","c":["デジタル・シティズンシップ","アカウント","情報セキュリティ","暗号化"],"a":3,"e":"暗号化は、元のデータを第三者に内容がわからない形に変換する処理である。"},{"id":115,"cat":"情報モラル・認証","q":"コンピュータやサービスを利用するための権利を何というか。","c":["アカウント","情報セキュリティ","ログイン・サインイン","暗号化"],"a":0,"e":"アカウントは、コンピュータやサービスを利用するために与えられる利用権や利用者情報である。"},{"id":116,"cat":"情報モラル・認証","q":"利用者を特定し利用資格があるかを確認するためにユーザIDと暗証番号などを入力し，認証することを何というか。","c":["情報セキュリティ","アカウント","ログイン・サインイン","暗号化"],"a":2,"e":"ログイン・サインインは、IDやパスワードなどで利用者を認証し、サービスを利用可能にする操作である。"},{"id":117,"cat":"セキュリティ","q":"コンピュータのシステムやソフトウェアに何らかの危害を加える悪質なプログラムのことを総称して何というか。","c":["アカウント","ログイン・サインイン","マルウェア","コンピュータウイルス"],"a":2,"e":"マルウェアは、コンピュータやソフトウェアに害を与える悪意あるプログラムの総称である。"},{"id":118,"cat":"セキュリティ","q":"マルウェアの一種で，ほかのファイルやシステムに寄生・感染する機能があるプログラムのことを特に何というか。","c":["マルウェア","セキュリティホール","ログイン・サインイン","コンピュータウイルス"],"a":3,"e":"コンピュータウイルスは、他のファイルやシステムに感染・寄生して広がるマルウェアの一種である。"},{"id":119,"cat":"セキュリティ","q":"ソフトウェアの欠陥のうち，安全性に関係するものを何というか。","c":["不正アクセス","セキュリティホール","マルウェア","コンピュータウイルス"],"a":1,"e":"セキュリティホールは、ソフトウェアなどの欠陥のうち、攻撃に悪用される可能性がある安全上の弱点である。"},{"id":120,"cat":"セキュリティ","q":"本来アクセスする権限を持たない者がIDや暗証番号などを入手し，システムの内部に侵入することを何というか。","c":["セキュリティホール","コンピュータウイルス","不正アクセス","ブラックリスト方式"],"a":2,"e":"不正アクセスは、正当な権限を持たない者がIDや暗証番号などを用いてシステムに侵入することである。"},{"id":121,"cat":"セキュリティ","q":"不適切なWebページのリストを作成し，それを閲覧できなくする方式を何というか。","c":["ホワイトリスト方式","セキュリティホール","不正アクセス","ブラックリスト方式"],"a":3,"e":"ブラックリスト方式は、不適切なWebページをリスト化し、そのページへのアクセスを禁止する方式である。"},{"id":122,"cat":"セキュリティ","q":"有益なWebページのリストを作成し，それだけが閲覧できるようにする方式を何というか。","c":["ブラックリスト方式","不正アクセス","セキュリティホール","ホワイトリスト方式"],"a":3,"e":"ホワイトリスト方式は、有益または許可されたWebページだけをリスト化し、そのページだけ閲覧可能にする方式である。"}];
+
+function ld(){try{return JSON.parse(localStorage.getItem(SK))||{users:{},records:[]}}catch{return{users:{},records:[]}}}
+function sv(d){localStorage.setItem(SK,JSON.stringify(d))}
+
+let S={user:null,qs:[],cur:0,ans:{},cnt:10,catFilter:'all'};
+
+function showScreen(id){document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+
+function doLogin(){
+  const cls=document.getElementById('i-cls').value.trim();
+  const nm=document.getElementById('i-name').value.trim();
+  if(!cls||!nm){alert('クラス番号と名前を入力してください');return;}
+  S.user={cls,name:nm,key:cls+'__'+nm};
+  let d=ld();
+  if(!d.users[S.user.key]) d.users[S.user.key]={cls,name:nm,mastered:[],sessions:[]};
+  sv(d);
+  refreshSetup();
+  showScreen('s-setup');
+}
+function doLogout(){S.user=null;showScreen('s-login')}
+function doALogin(){
+  if(document.getElementById('i-apw').value===APW){renderAdmin();showScreen('s-admin')}
+  else alert('パスワードが違います');
+}
+
+function getCats(){
+  const cats=[...new Set(QQ.map(q=>q.cat))];
+  return cats;
+}
+
+function refreshSetup(){
+  const d=ld();
+  const u=d.users[S.user.key];
+  const mastered=u?u.mastered.length:0;
+  document.getElementById('sw-name').textContent=`${S.user.cls}　${S.user.name}`;
+  const pool=getPool();
+  document.getElementById('sw-stat').textContent=`習得済み: ${mastered}問 / 残り出題可能: ${pool.length}問 / 全${QQ.length}問`;
+  const sel=document.getElementById('sel-cat');
+  sel.innerHTML='<option value="all">すべての分野（'+QQ.length+'問）</option>';
+  getCats().forEach(c=>{
+    const cnt=QQ.filter(q=>q.cat===c).length;
+    const opt=document.createElement('option');
+    opt.value=c;opt.textContent=`${c}（${cnt}問）`;
+    if(c===S.catFilter) opt.selected=true;
+    sel.appendChild(opt);
+  });
+  sel.onchange=()=>{S.catFilter=sel.value;refreshSetup()};
+  const el=document.getElementById('cnt-btns');
+  el.innerHTML='';
+  COUNTS.forEach(c=>{
+    const b=document.createElement('button');
+    b.className='btn'+(c===S.cnt?' btn-p':'');
+    b.textContent=c+'問';
+    b.onclick=()=>{S.cnt=c;refreshSetup()};
+    el.appendChild(b);
+  });
+}
+
+function getPool(){
+  const d=ld();
+  const mastered=d.users[S.user.key]?.mastered||[];
+  let pool=QQ.filter(q=>!mastered.includes(q.id));
+  if(S.catFilter!=='all') pool=pool.filter(q=>q.cat===S.catFilter);
+  return pool;
+}
+
+function resetProg(){
+  if(!confirm('習得済みの記録をリセットしますか？'))return;
+  let d=ld();
+  d.users[S.user.key].mastered=[];
+  sv(d);
+  refreshSetup();
+  alert('リセットしました');
+}
+
+function startExam(){
+  let pool=getPool();
+  if(pool.length===0){alert('この条件で出題できる問題がありません。リセットするか分野を変えてください。');return;}
+  if(pool.length<S.cnt) alert(`残り${pool.length}問のみで出題します。`);
+  const n=Math.min(S.cnt,pool.length);
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  S.qs=pool.slice(0,n);S.cur=0;S.ans={};
+  document.getElementById('e-user').textContent=`${S.user.cls} ${S.user.name}`;
+  renderQ();showScreen('s-exam');
+}
+
+function renderQ(){
+  const q=S.qs[S.cur],n=S.qs.length;
+  document.getElementById('q-cat').textContent=q.cat;
+  document.getElementById('q-num').textContent=`問 ${S.cur+1} / ${n}`;
+  document.getElementById('e-prog').textContent=`回答済み: ${Object.keys(S.ans).length} / ${n}`;
+  document.getElementById('e-pbar').style.width=((S.cur+1)/n*100)+'%';
+  document.getElementById('q-text').textContent=q.q;
+  const el=document.getElementById('q-ch');el.innerHTML='';
+  q.c.forEach((c,i)=>{
+    const b=document.createElement('button');
+    const sel=S.ans[q.id];
+    b.style.cssText='width:100%;padding:10px 14px;text-align:left;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-primary);color:var(--color-text-primary);cursor:pointer;font-size:14px;line-height:1.5;transition:background 0.15s';
+    if(sel===i){b.style.background='#EEEDFE';b.style.borderColor='#534AB7';b.style.color='#26215C';}
+    b.textContent=String.fromCharCode(65+i)+'. '+c;
+    b.onclick=()=>{S.ans[q.id]=i;renderQ()};
+    el.appendChild(b);
+  });
+  const isLast=S.cur===n-1;
+  document.getElementById('b-prev').style.visibility=S.cur===0?'hidden':'visible';
+  document.getElementById('b-next').style.display=isLast?'none':'inline-block';
+  document.getElementById('b-sub').style.display=isLast?'inline-block':'none';
+}
+function goPrev(){if(S.cur>0){S.cur--;renderQ()}}
+function goNext(){if(S.cur<S.qs.length-1){S.cur++;renderQ()}}
+
+function submitExam(){
+  const ans=Object.keys(S.ans).length,tot=S.qs.length;
+  if(ans<tot&&!confirm(`未回答が${tot-ans}問あります。提出しますか？`))return;
+  let correct=0,nm=[];
+  S.qs.forEach(q=>{if(S.ans[q.id]===q.a){correct++;nm.push(q.id);}});
+  let d=ld();const u=d.users[S.user.key];
+  nm.forEach(id=>{if(!u.mastered.includes(id))u.mastered.push(id);});
+  const sess={date:new Date().toLocaleString('ja-JP'),total:tot,correct,rate:Math.round(correct/tot*100),cat:S.catFilter};
+  u.sessions.push(sess);
+  d.records.push({cls:S.user.cls,name:S.user.name,...sess});
+  sv(d);
+  renderResult(correct,tot);showScreen('s-result');
+}
+
+function renderResult(correct,total){
+  const pct=Math.round(correct/total*100);
+  document.getElementById('r-metrics').innerHTML=`
+    <div class="metric"><div class="mv">${total}</div><div class="ml">出題数</div></div>
+    <div class="metric"><div class="mv" style="color:#3B6D11">${correct}</div><div class="ml">正解数</div></div>
+    <div class="metric"><div class="mv" style="color:#A32D2D">${total-correct}</div><div class="ml">不正解数</div></div>
+    <div class="metric"><div class="mv" style="color:#534AB7">${pct}%</div><div class="ml">正答率</div></div>`;
+  const list=document.getElementById('r-list');list.innerHTML='';
+  S.qs.forEach((q,i)=>{
+    const ok=S.ans[q.id]===q.a;
+    const d=document.createElement('div');
+    d.className='card';d.style.borderLeft=`3px solid ${ok?'#639922':'#E24B4A'}`;
+    if(ok){
+      d.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--color-text-secondary)">問${i+1} <span class="cat-badge">${q.cat}</span></span><span class="tag-ok">✓ 正解</span></div>
+      <p style="font-size:14px;font-weight:500;margin-bottom:6px">${q.q}</p>
+      <p style="font-size:13px;color:#3B6D11;margin-bottom:6px">正解: ${String.fromCharCode(65+q.a)}. ${q.c[q.a]}</p>
+      <p style="font-size:12px;color:var(--color-text-secondary);background:var(--color-background-secondary);padding:8px;border-radius:var(--border-radius-md)">💡 ${q.e}</p>`;
+    } else {
+      d.innerHTML=`<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--color-text-secondary)">問${i+1} <span class="cat-badge">${q.cat}</span></span><span class="tag-ng">✗ 不正解</span></div>
+      <p style="font-size:14px;font-weight:500">${q.q}</p>
+      <p style="font-size:12px;color:var(--color-text-secondary);margin-top:6px;padding:6px;background:var(--color-background-secondary);border-radius:var(--border-radius-md)">解答・解説は非表示です。もう一度挑戦しましょう。</p>`;
+    }
+    list.appendChild(d);
+  });
+}
+
+function switchTab(id,btn){
+  ['ta-ov','ta-st','ta-q','ta-cat'].forEach(t=>document.getElementById(t).classList.add('hidden'));
+  document.querySelectorAll('.ntab').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.remove('hidden');btn.classList.add('active');
+  if(id==='ta-ov') renderAOv();
+  else if(id==='ta-st') renderASt();
+  else if(id==='ta-q') renderAQ();
+  else if(id==='ta-cat') renderACat();
+}
+
+function renderAdmin(){renderAOv();}
+
+function renderAOv(){
+  const d=ld();
+  const users=Object.values(d.users);
+  const recs=d.records;
+  const avgR=recs.length?Math.round(recs.reduce((a,r)=>a+r.rate,0)/recs.length):0;
+  document.getElementById('ta-ov').innerHTML=`
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.5rem">
+      <div class="metric"><div class="mv">${users.length}</div><div class="ml">登録生徒数</div></div>
+      <div class="metric"><div class="mv">${recs.length}</div><div class="ml">総受験回数</div></div>
+      <div class="metric"><div class="mv" style="color:#534AB7">${avgR}%</div><div class="ml">平均正答率</div></div>
+    </div>
+    <div class="card">
+      <p style="font-size:14px;font-weight:500;margin-bottom:12px">最近の受験記録（最新20件）</p>
+      ${recs.length===0?'<p style="font-size:13px;color:var(--color-text-secondary)">まだ記録がありません</p>':
+      '<div style="overflow-x:auto"><table style="width:100%;font-size:12px;border-collapse:collapse">'+
+      '<tr style="border-bottom:0.5px solid var(--color-border-tertiary)"><th style="padding:5px 6px;text-align:left;color:var(--color-text-secondary);font-weight:500">日時</th><th style="padding:5px 6px;text-align:left;color:var(--color-text-secondary);font-weight:500">クラス</th><th style="padding:5px 6px;text-align:left;color:var(--color-text-secondary);font-weight:500">名前</th><th style="padding:5px 6px;text-align:left;color:var(--color-text-secondary);font-weight:500">分野</th><th style="padding:5px 6px;text-align:right;color:var(--color-text-secondary);font-weight:500">問題数</th><th style="padding:5px 6px;text-align:right;color:var(--color-text-secondary);font-weight:500">正解</th><th style="padding:5px 6px;text-align:right;color:var(--color-text-secondary);font-weight:500">正答率</th></tr>'+
+      recs.slice(-20).reverse().map(r=>`<tr style="border-bottom:0.5px solid var(--color-border-tertiary)"><td style="padding:5px 6px;color:var(--color-text-secondary)">${r.date}</td><td style="padding:5px 6px">${r.cls}</td><td style="padding:5px 6px">${r.name}</td><td style="padding:5px 6px;color:var(--color-text-secondary)">${r.cat==='all'?'全分野':r.cat}</td><td style="padding:5px 6px;text-align:right">${r.total}</td><td style="padding:5px 6px;text-align:right;color:#3B6D11">${r.correct}</td><td style="padding:5px 6px;text-align:right;font-weight:500;color:${r.rate>=80?'#3B6D11':r.rate>=60?'#BA7517':'#A32D2D'}">${r.rate}%</td></tr>`).join('')+
+      '</table></div>'}
+    </div>`;
+}
+
+function renderASt(){
+  const d=ld();
+  const users=Object.values(d.users);
+  const el=document.getElementById('ta-st');
+  if(!users.length){el.innerHTML='<p style="color:var(--color-text-secondary)">まだ生徒の記録がありません</p>';return;}
+  el.innerHTML='<div style="display:flex;flex-direction:column;gap:8px">'+users.map(u=>{
+    const last=u.sessions.slice(-1)[0];
+    const avgR=u.sessions.length?Math.round(u.sessions.reduce((a,s)=>a+s.rate,0)/u.sessions.length):'-';
+    const mp=Math.round(u.mastered.length/QQ.length*100);
+    return `<div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div><span style="font-weight:500">${u.name}</span><span style="font-size:12px;color:var(--color-text-secondary);margin-left:8px">${u.cls}</span></div>
+        <span style="font-size:13px;color:#534AB7;font-weight:500">習得 ${u.mastered.length}/${QQ.length}問 (${mp}%)</span>
+      </div>
+      <div class="pbar"><div class="pfill" style="width:${mp}%"></div></div>
+      <div style="display:flex;gap:16px;margin-top:6px;font-size:12px;color:var(--color-text-secondary)">
+        <span>受験: ${u.sessions.length}回</span>
+        <span>平均正答率: ${avgR}${avgR!=='-'?'%':''}</span>
+        ${last?`<span>最終: ${last.date}</span>`:''}
+      </div></div>`;
+  }).join('')+'</div>';
+}
+
+function renderAQ(){
+  const d=ld();
+  const users=Object.values(d.users);
+  const mc={};QQ.forEach(q=>mc[q.id]=0);
+  users.forEach(u=>u.mastered.forEach(id=>{if(mc[id]!==undefined)mc[id]++;}));
+  const el=document.getElementById('ta-q');
+  el.innerHTML=`<div class="card"><p style="font-size:14px;font-weight:500;margin-bottom:12px">問題別習得状況 (全${QQ.length}問)</p>
+    <div style="overflow-x:auto;max-height:400px;overflow-y:auto"><table style="width:100%;font-size:12px;border-collapse:collapse;table-layout:fixed">
+    <tr style="border-bottom:0.5px solid var(--color-border-tertiary);position:sticky;top:0;background:var(--color-background-primary)">
+      <th style="padding:5px 6px;text-align:left;color:var(--color-text-secondary);font-weight:500;width:40px">番号</th>
+      <th style="padding:5px 6px;text-align:left;color:var(--color-text-secondary);font-weight:500;width:90px">分野</th>
+      <th style="padding:5px 6px;text-align:left;color:var(--color-text-secondary);font-weight:500">問題</th>
+      <th style="padding:5px 6px;text-align:right;color:var(--color-text-secondary);font-weight:500;width:60px">習得者</th>
+      <th style="padding:5px 6px;text-align:right;color:var(--color-text-secondary);font-weight:500;width:50px">習得率</th>
+    </tr>
+    ${QQ.map(q=>{
+      const cnt=mc[q.id]||0;
+      const rate=users.length?Math.round(cnt/users.length*100):0;
+      return `<tr style="border-bottom:0.5px solid var(--color-border-tertiary)">
+        <td style="padding:5px 6px;color:var(--color-text-secondary)">${q.id}</td>
+        <td style="padding:5px 6px;color:var(--color-text-secondary);font-size:11px">${q.cat}</td>
+        <td style="padding:5px 6px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:0">${q.q}</td>
+        <td style="padding:5px 6px;text-align:right">${cnt}/${users.length}</td>
+        <td style="padding:5px 6px;text-align:right;font-weight:500;color:${rate>=80?'#3B6D11':rate>=50?'#BA7517':'#A32D2D'}">${rate}%</td>
+      </tr>`;
+    }).join('')}
+    </table></div></div>`;
+}
+
+function renderACat(){
+  const d=ld();
+  const users=Object.values(d.users);
+  const cats=getCats();
+  const el=document.getElementById('ta-cat');
+  const mc={};QQ.forEach(q=>mc[q.id]=0);
+  users.forEach(u=>u.mastered.forEach(id=>{if(mc[id]!==undefined)mc[id]++;}));
+  el.innerHTML=`<div class="card"><p style="font-size:14px;font-weight:500;margin-bottom:12px">分野別習得状況</p>
+  <div style="display:flex;flex-direction:column;gap:12px">
+  ${cats.map(cat=>{
+    const qs=QQ.filter(q=>q.cat===cat);
+    const totalMastered=qs.reduce((a,q)=>a+(mc[q.id]||0),0);
+    const maxPossible=qs.length*users.length;
+    const rate=maxPossible?Math.round(totalMastered/maxPossible*100):0;
+    return `<div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:13px;font-weight:500">${cat}</span>
+        <span style="font-size:12px;color:var(--color-text-secondary)">${qs.length}問 / 習得率 <span style="color:${rate>=80?'#3B6D11':rate>=50?'#BA7517':'#A32D2D'};font-weight:500">${rate}%</span></span>
+      </div>
+      <div class="pbar"><div class="pfill" style="width:${rate}%;background:${rate>=80?'#639922':rate>=50?'#BA7517':'#E24B4A'}"></div></div>
+    </div>`;
+  }).join('')}
+  </div></div>`;
+}
+</script>
