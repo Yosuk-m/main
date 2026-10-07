@@ -23,6 +23,10 @@
       line-height: 1.7;
     }
 
+    /* =========================
+       ヘッダー
+    ========================= */
+
     header {
       background: #1f3a5f;
       color: white;
@@ -50,6 +54,10 @@
       opacity: 0.9;
     }
 
+    /* =========================
+       メイン
+    ========================= */
+
     main {
       width: min(1180px, 92%);
       margin: 0 auto;
@@ -73,6 +81,10 @@
     .intro p {
       margin-bottom: 0;
     }
+
+    /* =========================
+       ギャラリー
+    ========================= */
 
     .gallery-title {
       display: flex;
@@ -99,6 +111,10 @@
       gap: 22px;
     }
 
+    /* =========================
+       アプリカード
+    ========================= */
+
     .app-card {
       background: white;
       border-radius: 18px;
@@ -106,7 +122,9 @@
       box-shadow: 0 5px 18px rgba(0,0,0,0.08);
       display: flex;
       flex-direction: column;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      transition:
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
     }
 
     .app-card:hover {
@@ -165,12 +183,14 @@
       flex: 1;
     }
 
-    /* 公開情報 */
+    /* =========================
+       公開情報
+    ========================= */
 
     .app-info {
       border-top: 1px solid #e5e5e5;
       padding-top: 14px;
-      margin-bottom: 16px;
+      margin-bottom: 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -202,12 +222,14 @@
     .updated {
       font-size: 12px;
       color: #888;
-      margin-top: -8px;
       margin-bottom: 14px;
       text-align: right;
+      min-height: 20px;
     }
 
-    /* アプリを開く */
+    /* =========================
+       アプリボタン
+    ========================= */
 
     .btn-app {
       display: block;
@@ -220,17 +242,22 @@
       font-weight: bold;
       background: #1f5f99;
       color: white;
-      transition: opacity 0.2s ease;
+      transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
     }
 
     .btn-app:hover {
-      opacity: 0.83;
+      opacity: 0.85;
+      transform: translateY(-1px);
     }
 
-    /* 開発中 */
+    /* =========================
+       開発中カード
+    ========================= */
 
     .coming-soon {
-      opacity: 0.7;
+      opacity: 0.72;
     }
 
     .coming-soon .card-top {
@@ -259,6 +286,10 @@
       background: #aaa;
     }
 
+    /* =========================
+       フッター
+    ========================= */
+
     footer {
       background: #23303d;
       color: #ddd;
@@ -271,11 +302,19 @@
       margin: 4px;
     }
 
+    /* =========================
+       タブレット
+    ========================= */
+
     @media (max-width: 900px) {
       .gallery {
         grid-template-columns: repeat(2, 1fr);
       }
     }
+
+    /* =========================
+       スマートフォン
+    ========================= */
 
     @media (max-width: 600px) {
       header {
@@ -305,6 +344,11 @@
 
 <body>
 
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
 <header>
 
   <div class="small-title">
@@ -324,7 +368,16 @@
 </header>
 
 
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <main>
+
+
+  <!-- =========================
+       INTRO
+  ========================= -->
 
   <section class="intro">
 
@@ -354,12 +407,17 @@
   </div>
 
 
+  <!-- ===================================================
+       APP GALLERY
+  ==================================================== -->
+
   <section class="gallery">
 
 
-    <!-- ===================================
+    <!-- =================================================
          TEAM 01
-    ==================================== -->
+         ノート共有アプリ
+    ================================================== -->
 
     <article
       class="app-card"
@@ -408,6 +466,7 @@
           class="btn-app"
           href="./team01/"
           target="_blank"
+          rel="noopener noreferrer"
         >
           アプリを使う
         </a>
@@ -417,10 +476,10 @@
     </article>
 
 
-
-    <!-- ===================================
+    <!-- =================================================
          TEAM 02
-    ==================================== -->
+         垢抜けコーディネートサポート
+    ================================================== -->
 
     <article
       class="app-card"
@@ -469,6 +528,7 @@
           class="btn-app"
           href="./team02/"
           target="_blank"
+          rel="noopener noreferrer"
         >
           アプリを使う
         </a>
@@ -478,10 +538,10 @@
     </article>
 
 
-
-    <!-- ===================================
+    <!-- =================================================
          TEAM 03
-    ==================================== -->
+         書類修正変換
+    ================================================== -->
 
     <article
       class="app-card"
@@ -531,6 +591,7 @@
           class="btn-app"
           href="./team03/"
           target="_blank"
+          rel="noopener noreferrer"
         >
           アプリを使う
         </a>
@@ -540,10 +601,10 @@
     </article>
 
 
-
-    <!-- ===================================
+    <!-- =================================================
          TEAM 04
-    ==================================== -->
+         速度計測
+    ================================================== -->
 
     <article
       class="app-card"
@@ -593,6 +654,7 @@
           class="btn-app"
           href="./team04/"
           target="_blank"
+          rel="noopener noreferrer"
         >
           アプリを使う
         </a>
@@ -602,12 +664,15 @@
     </article>
 
 
-
-    <!-- ===================================
+    <!-- =================================================
          TEAM 05
-    ==================================== -->
+         ToDoリスト
+    ================================================== -->
 
-    <article class="app-card coming-soon">
+    <article
+      class="app-card"
+      data-app="./team05/"
+    >
 
       <div class="card-top">
 
@@ -616,35 +681,55 @@
         </span>
 
         <h3 class="app-name">
-          開発中
+          ToDoリスト
         </h3>
 
       </div>
 
+
       <div class="card-body">
 
         <span class="target">
-          内容未定
+          やることを整理したい人向け
         </span>
 
         <p class="description">
-          現在アプリを開発しています。
-          内容が決まり次第公開します。
+          やるべきことを登録・整理し、
+          タスクの管理を分かりやすくするためのアプリです。
         </p>
 
-        <div class="development-status">
-          開発中
+        <div class="app-info">
+
+          <span class="status">
+            公開中
+          </span>
+
+          <span class="version">
+            Ver. 読み込み中…
+          </span>
+
         </div>
+
+        <div class="updated"></div>
+
+        <a
+          class="btn-app"
+          href="./team05/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          アプリを使う
+        </a>
 
       </div>
 
     </article>
 
 
-
-    <!-- ===================================
+    <!-- =================================================
          TEAM 06
-    ==================================== -->
+         開発中
+    ================================================== -->
 
     <article class="app-card coming-soon">
 
@@ -660,6 +745,7 @@
 
       </div>
 
+
       <div class="card-body">
 
         <span class="target">
@@ -680,10 +766,10 @@
     </article>
 
 
-
-    <!-- ===================================
+    <!-- =================================================
          TEAM 07
-    ==================================== -->
+         開発中
+    ================================================== -->
 
     <article class="app-card coming-soon">
 
@@ -699,6 +785,7 @@
 
       </div>
 
+
       <div class="card-body">
 
         <span class="target">
@@ -719,10 +806,10 @@
     </article>
 
 
-
-    <!-- ===================================
+    <!-- =================================================
          TEAM 08
-    ==================================== -->
+         開発中
+    ================================================== -->
 
     <article class="app-card coming-soon">
 
@@ -738,6 +825,7 @@
 
       </div>
 
+
       <div class="card-body">
 
         <span class="target">
@@ -757,10 +845,15 @@
 
     </article>
 
+
   </section>
 
 </main>
 
+
+<!-- =====================================================
+     FOOTER
+===================================================== -->
 
 <footer>
 
@@ -775,17 +868,25 @@
 </footer>
 
 
+<!-- =====================================================
+     各班のHTMLから情報を取得
+===================================================== -->
 
 <script>
 
-/* =======================================================
-   各班の index.html から
-   バージョン情報などを自動取得
-======================================================= */
+/*
+=========================================================
+各班の index.html から
+・バージョン
+・更新日
+を取得する
+=========================================================
+*/
 
 async function loadAppInformation(card) {
 
-  const appPath = card.dataset.app;
+  const appPath =
+    card.dataset.app;
 
   const versionElement =
     card.querySelector(".version");
@@ -797,18 +898,24 @@ async function loadAppInformation(card) {
   try {
 
     /*
-      GitHub Pagesのキャッシュによって
-      古いHTMLを取得しないように時刻を付加
+    GitHub Pages側のキャッシュを避けるため
+    現在時刻をURLにつけて取得
     */
 
     const response =
       await fetch(
-        appPath + "index.html?t=" + Date.now()
+        appPath +
+        "index.html?t=" +
+        Date.now()
       );
 
 
     if (!response.ok) {
-      throw new Error("HTMLを取得できません");
+
+      throw new Error(
+        "HTMLを取得できません"
+      );
+
     }
 
 
@@ -817,8 +924,7 @@ async function loadAppInformation(card) {
 
 
     /*
-      取得したHTML文字列を
-      DOMとして解析
+    HTML文字列を解析
     */
 
     const parser =
@@ -831,9 +937,11 @@ async function loadAppInformation(card) {
       );
 
 
-    /* =========================
-       バージョン取得
-    ========================= */
+    /*
+    =====================================
+    VERSION
+    =====================================
+    */
 
     const versionMeta =
       doc.querySelector(
@@ -844,21 +952,33 @@ async function loadAppInformation(card) {
     if (versionMeta) {
 
       const version =
-        versionMeta.getAttribute("content");
+        versionMeta.getAttribute(
+          "content"
+        );
 
       versionElement.textContent =
         "Ver. " + version;
 
-    } else {
+    }
+
+    else {
 
       /*
-        metaタグが無い場合は
-        HTML本文から
-        Ver.1.0 / Version 1.0 等を探す
+      metaタグが無い場合は
+      HTML本文から
+
+      Ver.1.0
+      Ver 1.0
+      Version 1.0
+
+      のような文字列を探す
       */
 
       const bodyText =
-        doc.body.innerText;
+        doc.body
+          ? doc.body.innerText
+          : "";
+
 
       const versionMatch =
         bodyText.match(
@@ -869,9 +989,12 @@ async function loadAppInformation(card) {
       if (versionMatch) {
 
         versionElement.textContent =
-          "Ver. " + versionMatch[1];
+          "Ver. " +
+          versionMatch[1];
 
-      } else {
+      }
+
+      else {
 
         versionElement.textContent =
           "Ver. 未設定";
@@ -881,9 +1004,11 @@ async function loadAppInformation(card) {
     }
 
 
-    /* =========================
-       更新日取得
-    ========================= */
+    /*
+    =====================================
+    UPDATED DATE
+    =====================================
+    */
 
     const updatedMeta =
       doc.querySelector(
@@ -894,18 +1019,31 @@ async function loadAppInformation(card) {
     if (updatedMeta) {
 
       const date =
-        updatedMeta.getAttribute("content");
+        updatedMeta.getAttribute(
+          "content"
+        );
 
       updatedElement.textContent =
         "更新：" + date;
 
     }
 
+    else {
 
-  } catch (error) {
+      updatedElement.textContent =
+        "";
+
+    }
+
+  }
+
+  catch (error) {
 
     versionElement.textContent =
       "Ver. 取得できません";
+
+    updatedElement.textContent =
+      "";
 
     console.log(
       appPath,
@@ -917,9 +1055,11 @@ async function loadAppInformation(card) {
 }
 
 
-/* =======================================================
-   公開中アプリをすべて取得
-======================================================= */
+/*
+=========================================================
+公開中のアプリをすべて取得
+=========================================================
+*/
 
 const appCards =
   document.querySelectorAll(
