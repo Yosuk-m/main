@@ -23,10 +23,6 @@
       line-height: 1.7;
     }
 
-    /* =========================
-       ヘッダー
-    ========================= */
-
     header {
       background: #1f3a5f;
       color: white;
@@ -54,10 +50,6 @@
       opacity: 0.9;
     }
 
-    /* =========================
-       メイン
-    ========================= */
-
     main {
       width: min(1180px, 92%);
       margin: 0 auto;
@@ -81,10 +73,6 @@
     .intro p {
       margin-bottom: 0;
     }
-
-    /* =========================
-       アプリ一覧
-    ========================= */
 
     .gallery-title {
       display: flex;
@@ -110,10 +98,6 @@
       grid-template-columns: repeat(3, 1fr);
       gap: 22px;
     }
-
-    /* =========================
-       カード
-    ========================= */
 
     .app-card {
       background: white;
@@ -181,10 +165,6 @@
       flex: 1;
     }
 
-    /* =========================
-       ボタン
-    ========================= */
-
     .buttons {
       display: grid;
       gap: 9px;
@@ -217,9 +197,17 @@
       border: 2px solid #1f5f99;
     }
 
-    /* =========================
-       フッター
-    ========================= */
+    .coming-soon {
+      opacity: 0.72;
+    }
+
+    .coming-soon .card-top {
+      background: #eeeeee;
+    }
+
+    .coming-soon .app-name {
+      color: #666;
+    }
 
     footer {
       background: #23303d;
@@ -232,10 +220,6 @@
     footer p {
       margin: 4px;
     }
-
-    /* =========================
-       スマートフォン
-    ========================= */
 
     @media (max-width: 900px) {
       .gallery {
@@ -270,17 +254,12 @@
 
 <body>
 
-  <!-- ========================
-       ヘッダー
-  ========================= -->
-
   <header>
     <div class="small-title">INFORMATION STUDY Ⅱ</div>
-
     <h1>情報Ⅱ アプリギャラリー</h1>
 
     <p>
-      高校生が身近な困りごとを発見し、
+      高校生が身近な困りごとや課題をもとに、
       生成AIを活用しながら企画・開発したWebアプリです。
       気になるアプリを実際に使ってみてください。
     </p>
@@ -289,318 +268,227 @@
 
   <main>
 
-    <!-- ========================
-         説明
-    ========================= -->
-
     <section class="intro">
       <h2>アプリを使ってみよう</h2>
 
       <p>
         各班が「誰の、どんな困りごとを解決するのか」を考え、
         コンセプト設計・試作・ユーザーテスト・改善を行っています。
-        「アプリを使う」から実際の作品を体験してください。
-        使用後は、ぜひ「評価する」から感想を送ってください。
+        「アプリを使う」から作品を体験してください。
       </p>
     </section>
 
 
     <div class="gallery-title">
       <h2>Apps</h2>
-      <span>気になるアプリを選んでください</span>
+      <span>公開されたアプリから順次追加します</span>
     </div>
 
 
-    <!-- ========================
-         アプリ一覧
-    ========================= -->
-
     <section class="gallery">
 
-
-      <!-- ===== 1班 ===== -->
+      <!-- ===== TEAM 01 ===== -->
 
       <article class="app-card">
-
         <div class="card-top">
           <span class="team">TEAM 01</span>
-          <h3 class="app-name">ノートレスキュー</h3>
+          <h3 class="app-name">ノート共有アプリ</h3>
         </div>
 
         <div class="card-body">
-
-          <span class="target">
-            授業を休んだ高校生向け
-          </span>
+          <span class="target">授業内容を確認したい生徒向け</span>
 
           <p class="description">
-            欠席した日の授業内容やノートを確認しやすくするための
-            ノート共有アプリです。
+            欠席した日や、もう一度確認したい授業のノートを
+            共有・確認しやすくするためのアプリです。
           </p>
 
           <div class="buttons">
-
-            <a
-              class="btn btn-app"
-              href="./team01/"
-              target="_blank"
-            >
+            <a class="btn btn-app" href="./team01/" target="_blank">
               アプリを使う
             </a>
 
-            <!--
-              FormsのURLが決まったら
-              href="" の中を書き換えてください
-            -->
-
-            <a
-              class="btn btn-review"
-              href="#"
-            >
+            <a class="btn btn-review" href="#">
               評価する
             </a>
-
           </div>
-
         </div>
       </article>
 
 
-
-      <!-- ===== 2班 ===== -->
+      <!-- ===== TEAM 02 ===== -->
 
       <article class="app-card">
-
         <div class="card-top">
           <span class="team">TEAM 02</span>
-          <h3 class="app-name">ことばシンプル</h3>
+          <h3 class="app-name">垢抜けコーディネートサポート</h3>
         </div>
 
         <div class="card-body">
-
-          <span class="target">
-            難しい文章が苦手な人向け
-          </span>
+          <span class="target">自分に似合う服装を知りたい人向け</span>
 
           <p class="description">
-            難しい言葉や文章を、
-            より分かりやすい表現に変えることを目指したアプリです。
+            自分に合った服装や組み合わせを考える手助けをし、
+            コーディネート選びをサポートするアプリです。
           </p>
 
           <div class="buttons">
-
-            <a
-              class="btn btn-app"
-              href="./team02/"
-              target="_blank"
-            >
+            <a class="btn btn-app" href="./team02/" target="_blank">
               アプリを使う
             </a>
 
-            <a
-              class="btn btn-review"
-              href="#"
-            >
+            <a class="btn btn-review" href="#">
               評価する
             </a>
-
           </div>
-
         </div>
       </article>
 
 
-
-      <!-- ===== 3班 ===== -->
+      <!-- ===== TEAM 03 ===== -->
 
       <article class="app-card">
-
         <div class="card-top">
           <span class="team">TEAM 03</span>
-          <h3 class="app-name">朝活サポート</h3>
+          <h3 class="app-name">書類修正変換</h3>
         </div>
 
         <div class="card-body">
-
-          <span class="target">
-            朝が苦手な高校生向け
-          </span>
+          <span class="target">文章や書類を整えたい人向け</span>
 
           <p class="description">
-            起きる時間や朝にやることを整理して、
-            朝の準備をスムーズにするためのアプリです。
+            入力した文章を確認し、
+            より読みやすい表現や適切な文章へ修正・変換することを
+            目指したアプリです。
           </p>
 
           <div class="buttons">
-
-            <a
-              class="btn btn-app"
-              href="./team03/"
-              target="_blank"
-            >
+            <a class="btn btn-app" href="./team03/" target="_blank">
               アプリを使う
             </a>
 
-            <a
-              class="btn btn-review"
-              href="#"
-            >
+            <a class="btn btn-review" href="#">
               評価する
             </a>
-
           </div>
-
         </div>
       </article>
 
 
-
-      <!-- ===== 4班 ===== -->
+      <!-- ===== TEAM 04 ===== -->
 
       <article class="app-card">
-
         <div class="card-top">
           <span class="team">TEAM 04</span>
-          <h3 class="app-name">スマホOFF</h3>
+          <h3 class="app-name">速度計測</h3>
         </div>
 
         <div class="card-body">
-
-          <span class="target">
-            勉強中にスマホを触ってしまう人向け
-          </span>
+          <span class="target">移動速度を確認したい人向け</span>
 
           <p class="description">
-            勉強時間を意識し、
-            スマートフォンから少し離れることを
-            サポートするアプリです。
+            スマートフォンなどを利用して、
+            移動しているときの速度を分かりやすく確認するための
+            計測アプリです。
           </p>
 
           <div class="buttons">
-
-            <a
-              class="btn btn-app"
-              href="./team04/"
-              target="_blank"
-            >
+            <a class="btn btn-app" href="./team04/" target="_blank">
               アプリを使う
             </a>
 
-            <a
-              class="btn btn-review"
-              href="#"
-            >
+            <a class="btn btn-review" href="#">
               評価する
             </a>
-
           </div>
-
         </div>
       </article>
 
 
+      <!-- ===== TEAM 05 ===== -->
 
-      <!-- ===== 5班 ===== -->
-
-      <article class="app-card">
-
+      <article class="app-card coming-soon">
         <div class="card-top">
           <span class="team">TEAM 05</span>
-          <h3 class="app-name">Style Finder</h3>
+          <h3 class="app-name">開発中</h3>
         </div>
 
         <div class="card-body">
-
-          <span class="target">
-            自分に似合うものを知りたい人向け
-          </span>
+          <span class="target">内容未定</span>
 
           <p class="description">
-            自分に合う色や髪型などを考えるきっかけをつくり、
-            自分らしいスタイル探しを支援するアプリです。
+            現在アプリを開発しています。
+            内容が決まり次第公開します。
           </p>
-
-          <div class="buttons">
-
-            <a
-              class="btn btn-app"
-              href="./team05/"
-              target="_blank"
-            >
-              アプリを使う
-            </a>
-
-            <a
-              class="btn btn-review"
-              href="#"
-            >
-              評価する
-            </a>
-
-          </div>
-
         </div>
       </article>
 
 
+      <!-- ===== TEAM 06 ===== -->
 
-      <!-- ===== 6班 ===== -->
-
-      <article class="app-card">
-
+      <article class="app-card coming-soon">
         <div class="card-top">
           <span class="team">TEAM 06</span>
-          <h3 class="app-name">Coming Soon</h3>
+          <h3 class="app-name">開発中</h3>
         </div>
 
         <div class="card-body">
-
-          <span class="target">
-            開発中
-          </span>
+          <span class="target">内容未定</span>
 
           <p class="description">
-            この班のアプリは現在開発中です。
-            公開までもうしばらくお待ちください。
+            現在アプリを開発しています。
+            内容が決まり次第公開します。
           </p>
-
-          <div class="buttons">
-
-            <a
-              class="btn btn-app"
-              href="./team06/"
-              target="_blank"
-            >
-              アプリを使う
-            </a>
-
-            <a
-              class="btn btn-review"
-              href="#"
-            >
-              評価する
-            </a>
-
-          </div>
-
         </div>
       </article>
 
+
+      <!-- ===== TEAM 07 ===== -->
+
+      <article class="app-card coming-soon">
+        <div class="card-top">
+          <span class="team">TEAM 07</span>
+          <h3 class="app-name">開発中</h3>
+        </div>
+
+        <div class="card-body">
+          <span class="target">内容未定</span>
+
+          <p class="description">
+            現在アプリを開発しています。
+            内容が決まり次第公開します。
+          </p>
+        </div>
+      </article>
+
+
+      <!-- ===== TEAM 08 ===== -->
+
+      <article class="app-card coming-soon">
+        <div class="card-top">
+          <span class="team">TEAM 08</span>
+          <h3 class="app-name">開発中</h3>
+        </div>
+
+        <div class="card-body">
+          <span class="target">内容未定</span>
+
+          <p class="description">
+            現在アプリを開発しています。
+            内容が決まり次第公開します。
+          </p>
+        </div>
+      </article>
 
     </section>
 
   </main>
 
 
-  <!-- ========================
-       フッター
-  ========================= -->
-
   <footer>
     <p>情報Ⅱ　生成AIを活用したアプリ開発プロジェクト</p>
     <p>生徒作品のため、動作や内容は開発途中の場合があります。</p>
   </footer>
-
 
 </body>
 </html>
