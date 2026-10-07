@@ -1,1078 +1,198 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <title>情報Ⅱ アプリギャラリー</title>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family:
-        "BIZ UDPGothic",
-        "Yu Gothic",
-        "Meiryo",
-        sans-serif;
-      background: #f4f6f8;
-      color: #222;
-      line-height: 1.7;
-    }
-
-    /* =========================
-       ヘッダー
-    ========================= */
-
-    header {
-      background: #1f3a5f;
-      color: white;
-      padding: 50px 20px 45px;
-      text-align: center;
-    }
-
-    header .small-title {
-      font-size: 15px;
-      letter-spacing: 0.15em;
-      opacity: 0.85;
-      margin-bottom: 8px;
-    }
-
-    header h1 {
-      margin: 0;
-      font-size: clamp(30px, 5vw, 50px);
-      letter-spacing: 0.04em;
-    }
-
-    header p {
-      max-width: 760px;
-      margin: 18px auto 0;
-      font-size: 16px;
-      opacity: 0.9;
-    }
-
-    /* =========================
-       メイン
-    ========================= */
-
-    main {
-      width: min(1180px, 92%);
-      margin: 0 auto;
-      padding: 45px 0 70px;
-    }
-
-    .intro {
-      background: white;
-      border-radius: 16px;
-      padding: 24px 28px;
-      margin-bottom: 35px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
-    }
-
-    .intro h2 {
-      margin-top: 0;
-      color: #1f3a5f;
-      font-size: 22px;
-    }
-
-    .intro p {
-      margin-bottom: 0;
-    }
-
-    /* =========================
-       ギャラリー
-    ========================= */
-
-    .gallery-title {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 15px;
-      margin-bottom: 18px;
-    }
-
-    .gallery-title h2 {
-      margin: 0;
-      font-size: 26px;
-      color: #1f3a5f;
-    }
-
-    .gallery-title span {
-      font-size: 14px;
-      color: #666;
-    }
-
-    .gallery {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 22px;
-    }
-
-    /* =========================
-       アプリカード
-    ========================= */
-
-    .app-card {
-      background: white;
-      border-radius: 18px;
-      overflow: hidden;
-      box-shadow: 0 5px 18px rgba(0,0,0,0.08);
-      display: flex;
-      flex-direction: column;
-      transition:
-        transform 0.2s ease,
-        box-shadow 0.2s ease;
-    }
-
-    .app-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 9px 25px rgba(0,0,0,0.12);
-    }
-
-    .card-top {
-      min-height: 125px;
-      padding: 25px 24px;
-      background: #eaf0f7;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-
-    .team {
-      display: inline-block;
-      font-size: 13px;
-      font-weight: bold;
-      color: #47627e;
-      margin-bottom: 6px;
-    }
-
-    .app-name {
-      font-size: 24px;
-      font-weight: bold;
-      color: #17324f;
-      margin: 0;
-      line-height: 1.4;
-    }
-
-    .card-body {
-      padding: 22px 24px 24px;
-      display: flex;
-      flex-direction: column;
-      flex: 1;
-    }
-
-    .target {
-      display: inline-block;
-      width: fit-content;
-      background: #eef4ff;
-      color: #315b8a;
-      border-radius: 20px;
-      padding: 5px 12px;
-      font-size: 13px;
-      font-weight: bold;
-      margin-bottom: 14px;
-    }
-
-    .description {
-      font-size: 15px;
-      color: #444;
-      margin: 0 0 18px;
-      flex: 1;
-    }
-
-    /* =========================
-       公開情報
-    ========================= */
-
-    .app-info {
-      border-top: 1px solid #e5e5e5;
-      padding-top: 14px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-    }
-
-    .status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #247044;
-    }
-
-    .status::before {
-      content: "";
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #2e9d5b;
-    }
-
-    .version {
-      font-size: 13px;
-      color: #666;
-    }
-
-    .updated {
-      font-size: 12px;
-      color: #888;
-      margin-bottom: 14px;
-      text-align: right;
-      min-height: 20px;
-    }
-
-    /* =========================
-       アプリボタン
-    ========================= */
-
-    .btn-app {
-      display: block;
-      width: 100%;
-      text-align: center;
-      text-decoration: none;
-      border-radius: 10px;
-      padding: 12px 10px;
-      font-size: 16px;
-      font-weight: bold;
-      background: #1f5f99;
-      color: white;
-      transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
-    }
-
-    .btn-app:hover {
-      opacity: 0.85;
-      transform: translateY(-1px);
-    }
-
-    /* =========================
-       開発中カード
-    ========================= */
-
-    .coming-soon {
-      opacity: 0.72;
-    }
-
-    .coming-soon .card-top {
-      background: #eeeeee;
-    }
-
-    .coming-soon .app-name {
-      color: #666;
-    }
-
-    .development-status {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-      font-weight: bold;
-      color: #777;
-      margin-top: 12px;
-    }
-
-    .development-status::before {
-      content: "";
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      background: #aaa;
-    }
-
-    /* =========================
-       フッター
-    ========================= */
-
-    footer {
-      background: #23303d;
-      color: #ddd;
-      text-align: center;
-      padding: 30px 20px;
-      font-size: 13px;
-    }
-
-    footer p {
-      margin: 4px;
-    }
-
-    /* =========================
-       タブレット
-    ========================= */
-
-    @media (max-width: 900px) {
-      .gallery {
-        grid-template-columns: repeat(2, 1fr);
-      }
-    }
-
-    /* =========================
-       スマートフォン
-    ========================= */
-
-    @media (max-width: 600px) {
-      header {
-        padding: 38px 18px 34px;
-      }
-
-      .gallery {
-        grid-template-columns: 1fr;
-      }
-
-      .gallery-title {
-        display: block;
-      }
-
-      .gallery-title span {
-        display: block;
-        margin-top: 5px;
-      }
-
-      .intro {
-        padding: 20px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>朝の準備サポートアプリ (Ver.0.1)</title>
+    <style>
+        /* スマートフォンでも見やすいシンプルなデザイン（CSS） */
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            text-align: center;
+            color: #0066cc;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="time"] {
+            font-size: 1.2rem;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #0052a3;
+        }
+        .task-list {
+            margin-top: 20px;
+        }
+        .task-item {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .task-item.active {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffc107;
+            font-weight: bold;
+        }
+        .task-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
 </head>
-
-
 <body>
 
+<div class="container">
+    <h1>朝の準備サポート</h1>
+    
+    <!-- MUST①: 家出る時間を入力する部分 -->
+    <div class="input-group">
+        <label for="departureTime">家を出る時間（目標）</label>
+        <input type="time" id="departureTime" value="08:00">
+        <button onclick="calculateSchedule()">スケジュールを作成する</button>
+    </div>
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
-<header>
-
-  <div class="small-title">
-    INFORMATION STUDY Ⅱ
-  </div>
-
-  <h1>
-    情報Ⅱ アプリギャラリー
-  </h1>
-
-  <p>
-    高校生が身近な困りごとや課題を発見し、
-    生成AIを活用しながら企画・開発したWebアプリです。
-    公開されたアプリは実際に体験できます。
-  </p>
-
-</header>
-
-
-<!-- =====================================================
-     MAIN
-===================================================== -->
-
-<main>
-
-
-  <!-- =========================
-       INTRO
-  ========================= -->
-
-  <section class="intro">
-
-    <h2>
-      アプリを使ってみよう
-    </h2>
-
-    <p>
-      各班が「誰の、どんな困りごとを解決するのか」を考え、
-      コンセプト設計・試作・ユーザーテスト・改善を行っています。
-      各アプリは開発・改善に合わせて随時更新されます。
-    </p>
-
-  </section>
-
-
-  <div class="gallery-title">
-
-    <h2>
-      Apps
-    </h2>
-
-    <span>
-      公開されたアプリから順次追加します
-    </span>
-
-  </div>
-
-
-  <!-- ===================================================
-       APP GALLERY
-  ==================================================== -->
-
-  <section class="gallery">
-
-
-    <!-- =================================================
-         TEAM 01
-         ノート共有アプリ
-    ================================================== -->
-
-    <article
-      class="app-card"
-      data-app="./team01/"
-    >
-
-      <div class="card-top">
-
-        <span class="team">
-          TEAM 01
-        </span>
-
-        <h3 class="app-name">
-          ノート共有アプリ
-        </h3>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <span class="target">
-          授業内容を確認したい生徒向け
-        </span>
-
-        <p class="description">
-          欠席した日や、もう一度確認したい授業のノートを
-          共有・確認しやすくするためのアプリです。
-        </p>
-
-        <div class="app-info">
-
-          <span class="status">
-            公開中
-          </span>
-
-          <span class="version">
-            Ver. 読み込み中…
-          </span>
-
+    <!-- MUST②: 朝やることを順番に表示する部分 -->
+    <div id="scheduleArea" style="display: none;">
+        <h2>逆算スケジュール</h2>
+        <div class="task-list" id="taskList">
+            <!-- ここにJavaScriptでタスクが追加されます -->
         </div>
-
-        <div class="updated"></div>
-
-        <a
-          class="btn-app"
-          href="./team01/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          アプリを使う
-        </a>
-
-      </div>
-
-    </article>
-
-
-    <!-- =================================================
-         TEAM 02
-         垢抜けコーディネートサポート
-    ================================================== -->
-
-    <article
-      class="app-card"
-      data-app="./team02/"
-    >
-
-      <div class="card-top">
-
-        <span class="team">
-          TEAM 02
-        </span>
-
-        <h3 class="app-name">
-          垢抜けコーディネートサポート
-        </h3>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <span class="target">
-          自分に似合う服装を知りたい人向け
-        </span>
-
-        <p class="description">
-          自分に合った服装や組み合わせを考える手助けをし、
-          コーディネート選びをサポートするアプリです。
-        </p>
-
-        <div class="app-info">
-
-          <span class="status">
-            公開中
-          </span>
-
-          <span class="version">
-            Ver. 読み込み中…
-          </span>
-
-        </div>
-
-        <div class="updated"></div>
-
-        <a
-          class="btn-app"
-          href="./team02/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          アプリを使う
-        </a>
-
-      </div>
-
-    </article>
-
-
-    <!-- =================================================
-         TEAM 03
-         書類修正変換
-    ================================================== -->
-
-    <article
-      class="app-card"
-      data-app="./team03/"
-    >
-
-      <div class="card-top">
-
-        <span class="team">
-          TEAM 03
-        </span>
-
-        <h3 class="app-name">
-          書類修正変換
-        </h3>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <span class="target">
-          文章や書類を整えたい人向け
-        </span>
-
-        <p class="description">
-          入力した文章を確認し、
-          より読みやすい表現や適切な文章へ
-          修正・変換することを目指したアプリです。
-        </p>
-
-        <div class="app-info">
-
-          <span class="status">
-            公開中
-          </span>
-
-          <span class="version">
-            Ver. 読み込み中…
-          </span>
-
-        </div>
-
-        <div class="updated"></div>
-
-        <a
-          class="btn-app"
-          href="./team03/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          アプリを使う
-        </a>
-
-      </div>
-
-    </article>
-
-
-    <!-- =================================================
-         TEAM 04
-         速度計測
-    ================================================== -->
-
-    <article
-      class="app-card"
-      data-app="./team04/"
-    >
-
-      <div class="card-top">
-
-        <span class="team">
-          TEAM 04
-        </span>
-
-        <h3 class="app-name">
-          速度計測
-        </h3>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <span class="target">
-          移動速度を確認したい人向け
-        </span>
-
-        <p class="description">
-          スマートフォンなどを利用して、
-          移動しているときの速度を
-          分かりやすく確認するための計測アプリです。
-        </p>
-
-        <div class="app-info">
-
-          <span class="status">
-            公開中
-          </span>
-
-          <span class="version">
-            Ver. 読み込み中…
-          </span>
-
-        </div>
-
-        <div class="updated"></div>
-
-        <a
-          class="btn-app"
-          href="./team04/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          アプリを使う
-        </a>
-
-      </div>
-
-    </article>
-
-
-    <!-- =================================================
-         TEAM 05
-         ToDoリスト
-    ================================================== -->
-
-    <article
-      class="app-card"
-      data-app="./team05/"
-    >
-
-      <div class="card-top">
-
-        <span class="team">
-          TEAM 05
-        </span>
-
-        <h3 class="app-name">
-          ToDoリスト
-        </h3>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <span class="target">
-          やることを整理したい人向け
-        </span>
-
-        <p class="description">
-          やるべきことを登録・整理し、
-          タスクの管理を分かりやすくするためのアプリです。
-        </p>
-
-        <div class="app-info">
-
-          <span class="status">
-            公開中
-          </span>
-
-          <span class="version">
-            Ver. 読み込み中…
-          </span>
-
-        </div>
-
-        <div class="updated"></div>
-
-        <a
-          class="btn-app"
-          href="./team05/"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          アプリを使う
-        </a>
-
-      </div>
-
-    </article>
-
-
-    <!-- =================================================
-         TEAM 06
-         開発中
-    ================================================== -->
-
-    <article class="app-card coming-soon">
-
-      <div class="card-top">
-
-        <span class="team">
-          TEAM 06
-        </span>
-
-        <h3 class="app-name">
-          開発中
-        </h3>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <span class="target">
-          内容未定
-        </span>
-
-        <p class="description">
-          現在アプリを開発しています。
-          内容が決まり次第公開します。
-        </p>
-
-        <div class="development-status">
-          開発中
-        </div>
-
-      </div>
-
-    </article>
-
-
-    <!-- =================================================
-         TEAM 07
-         開発中
-    ================================================== -->
-
-    <article class="app-card coming-soon">
-
-      <div class="card-top">
-
-        <span class="team">
-          TEAM 07
-        </span>
-
-        <h3 class="app-name">
-          開発中
-        </h3>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <span class="target">
-          内容未定
-        </span>
-
-        <p class="description">
-          現在アプリを開発しています。
-          内容が決まり次第公開します。
-        </p>
-
-        <div class="development-status">
-          開発中
-        </div>
-
-      </div>
-
-    </article>
-
-
-    <!-- =================================================
-         TEAM 08
-         開発中
-    ================================================== -->
-
-    <article class="app-card coming-soon">
-
-      <div class="card-top">
-
-        <span class="team">
-          TEAM 08
-        </span>
-
-        <h3 class="app-name">
-          開発中
-        </h3>
-
-      </div>
-
-
-      <div class="card-body">
-
-        <span class="target">
-          内容未定
-        </span>
-
-        <p class="description">
-          現在アプリを開発しています。
-          内容が決まり次第公開します。
-        </p>
-
-        <div class="development-status">
-          開発中
-        </div>
-
-      </div>
-
-    </article>
-
-
-  </section>
-
-</main>
-
-
-<!-- =====================================================
-     FOOTER
-===================================================== -->
-
-<footer>
-
-  <p>
-    情報Ⅱ　生成AIを活用したアプリ開発プロジェクト
-  </p>
-
-  <p>
-    生徒作品のため、開発・改善に伴って内容が変更される場合があります。
-  </p>
-
-</footer>
-
-
-<!-- =====================================================
-     各班のHTMLから情報を取得
-===================================================== -->
+    </div>
+</div>
 
 <script>
+    // 【仮データ】高校生が後から内容や所要時間（分）を変更しやすいように配列で定義
+    const defaultTasks = [
+        { name: "起きる・布団から出る", duration: 5 },
+        { name: "洗顔・歯磨き", duration: 10 },
+        { name: "朝ごはんを食べる", duration: 15 },
+        { name: "着替え・髪を整える", duration: 10 },
+        { name: "持ち物の最終チェック", duration: 5 }
+    ];
 
-/*
-=========================================================
-各班の index.html から
-・バージョン
-・更新日
-を取得する
-=========================================================
-*/
+    // スケジュールを逆算して表示する関数（MUST① & MUST②）
+    function calculateSchedule() {
+        const departureInput = document.getElementById('departureTime').value;
+        if (!departureInput) {
+            alert('家を出る時間を入力してください');
+            return;
+        }
 
-async function loadAppInformation(card) {
+        // 入力された時間を分解（例 "08:00" -> 時:8, 分:0）
+        const [depHours, depMinutes] = departureInput.split(':').map(Number);
+        
+        // 基準となる出発時間を今日のデートオブジェクトとして作成
+        let targetTime = new Date();
+        targetTime.setHours(depHours, depMinutes, 0, 0);
 
-  const appPath =
-    card.dataset.app;
+        const taskListDiv = document.getElementById('taskList');
+        taskListDiv.innerHTML = ''; // 表示をクリア
 
-  const versionElement =
-    card.querySelector(".version");
+        // タスクを後ろから順番に逆算していく
+        // 例：持ち物チェック(5分) -> 7:55開始
+        let schedule = [];
+        
+        for (let i = defaultTasks.length - 1; i >= 0; i--) {
+            const task = defaultTasks[i];
+            // 時間を所要分だけ戻す
+            targetTime.setMinutes(targetTime.getMinutes() - task.duration);
+            
+            // 表示用の時間を文字列にする（例 "07:55"）
+            const timeString = targetTime.toTimeString().slice(0, 5);
+            
+            // 配列の先頭に追加していく（画面には起きる順番で出したいので）
+            schedule.unshift({
+                timeStr: timeString,
+                name: task.name,
+                rawTime: new Date(targetTime) // 通知判定用に時間を保存
+            });
+        }
 
-  const updatedElement =
-    card.querySelector(".updated");
+        // 画面にタスクを表示する
+        schedule.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'task-item';
+            // 識別しやすくするために時間をデータ属性として持たせる
+            itemDiv.setAttribute('data-time', item.timeStr);
+            
+            itemDiv.innerHTML = `
+                <span>${item.name}</span>
+                <span class="task-time">${item.timeStr} 〜</span>
+            `;
+            taskListDiv.appendChild(itemDiv);
+        });
 
-
-  try {
-
-    /*
-    GitHub Pages側のキャッシュを避けるため
-    現在時刻をURLにつけて取得
-    */
-
-    const response =
-      await fetch(
-        appPath +
-        "index.html?t=" +
-        Date.now()
-      );
-
-
-    if (!response.ok) {
-
-      throw new Error(
-        "HTMLを取得できません"
-      );
-
+        // スケジュールエリアを表示する
+        document.getElementById('scheduleArea').style.display = 'block';
     }
 
+    // MUST③: 時間になったら通知する機能（1秒ごとにチェックするシステム）
+    function checkNotification() {
+        const now = new Date();
+        const currentHours = String(now.getHours()).padStart(2, '0');
+        const currentMinutes = String(now.getMinutes()).padStart(2, '0');
+        const currentTimeStr = `${currentHours}:${currentMinutes}`;
 
-    const htmlText =
-      await response.text();
-
-
-    /*
-    HTML文字列を解析
-    */
-
-    const parser =
-      new DOMParser();
-
-    const doc =
-      parser.parseFromString(
-        htmlText,
-        "text/html"
-      );
-
-
-    /*
-    =====================================
-    VERSION
-    =====================================
-    */
-
-    const versionMeta =
-      doc.querySelector(
-        'meta[name="app-version"]'
-      );
-
-
-    if (versionMeta) {
-
-      const version =
-        versionMeta.getAttribute(
-          "content"
-        );
-
-      versionElement.textContent =
-        "Ver. " + version;
-
+        // 画面上にあるタスクの時間を探す
+        const taskItems = document.querySelectorAll('.task-item');
+        taskItems.forEach(item => {
+            const taskTime = item.getAttribute('data-time');
+            
+            // 現在時刻とタスクの開始時刻が一致したら通知
+            if (taskTime === currentTimeStr) {
+                // まだ色が変わっていなければ、アクティブ状態（黄色）にする
+                if (!item.classList.contains('active')) {
+                    item.classList.add('active');
+                    
+                    // 【外部サービス・機能の制約に関する説明】
+                    // 通常の「プッシュ通知」はWebブラウザだと設定が複雑で、スマホの仕様制限も多いため、
+                    // Ver.0.1では確実にブラウザで動く「アラート画面（ポップアップ）」で代用しています。
+                    alert(`【時間です！】${item.innerText.split('〜')[0]}を始めてください！`);
+                }
+            }
+        });
     }
 
-    else {
-
-      /*
-      metaタグが無い場合は
-      HTML本文から
-
-      Ver.1.0
-      Ver 1.0
-      Version 1.0
-
-      のような文字列を探す
-      */
-
-      const bodyText =
-        doc.body
-          ? doc.body.innerText
-          : "";
-
-
-      const versionMatch =
-        bodyText.match(
-          /(?:Ver\.?|Version)\s*([0-9]+(?:\.[0-9]+)*)/i
-        );
-
-
-      if (versionMatch) {
-
-        versionElement.textContent =
-          "Ver. " +
-          versionMatch[1];
-
-      }
-
-      else {
-
-        versionElement.textContent =
-          "Ver. 未設定";
-
-      }
-
-    }
-
-
-    /*
-    =====================================
-    UPDATED DATE
-    =====================================
-    */
-
-    const updatedMeta =
-      doc.querySelector(
-        'meta[name="app-updated"]'
-      );
-
-
-    if (updatedMeta) {
-
-      const date =
-        updatedMeta.getAttribute(
-          "content"
-        );
-
-      updatedElement.textContent =
-        "更新：" + date;
-
-    }
-
-    else {
-
-      updatedElement.textContent =
-        "";
-
-    }
-
-  }
-
-  catch (error) {
-
-    versionElement.textContent =
-      "Ver. 取得できません";
-
-    updatedElement.textContent =
-      "";
-
-    console.log(
-      appPath,
-      error
-    );
-
-  }
-
-}
-
-
-/*
-=========================================================
-公開中のアプリをすべて取得
-=========================================================
-*/
-
-const appCards =
-  document.querySelectorAll(
-    ".app-card[data-app]"
-  );
-
-
-appCards.forEach(
-  loadAppInformation
-);
-
+    // 1秒（1000ミリ秒）ごとに、時間になったかチェックする時計を動かす
+    setInterval(checkNotification, 1000);
 </script>
-
 
 </body>
 </html>
