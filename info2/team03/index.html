@@ -3,55 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>言葉遣いサポートアプリ（試作品 Ver.0.1）</title>
+    <title>AI敬語チェッカー (Ver.0.1)</title>
     <style>
-        :root {
-            --primary-color: #2563eb;
-            --primary-hover: #1d4ed8;
-            --bg-color: #f8fafc;
-            --card-bg: #ffffff;
-            --text-color: #1e293b;
-            --border-color: #cbd5e1;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
+        /* ==========================================
+           CSS：スマートフォン対応・シンプルな設計
+           ========================================== */
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            line-height: 1.6;
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            margin: 0;
             padding: 16px;
+            line-height: 1.5;
         }
 
         .container {
-            max-width: 800px;
+            max-width: 600px;
             margin: 0 auto;
         }
 
         header {
             text-align: center;
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
-        h1 {
-            font-size: 1.5rem;
-            color: var(--primary-color);
+        header h1 {
+            font-size: 1.4rem;
+            color: #2563eb;
             margin-bottom: 4px;
         }
 
-        p.subtitle {
-            font-size: 0.875rem;
+        header p {
+            font-size: 0.85rem;
             color: #64748b;
+            margin: 0;
         }
 
         .card {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
+            background-color: #ffffff;
+            border: 1px solid #cbd5e1;
             border-radius: 8px;
             padding: 16px;
             margin-bottom: 16px;
@@ -59,82 +49,110 @@
         }
 
         h2 {
-            font-size: 1rem;
-            margin-bottom: 8px;
-            color: #334155;
+            font-size: 1.05rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 6px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 6px;
         }
 
         textarea {
             width: 100%;
-            height: 100px;
+            height: 90px;
             padding: 10px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             font-size: 1rem;
             resize: vertical;
-            margin-bottom: 12px;
-        }
-
-        .options-group {
-            margin-bottom: 12px;
-        }
-
-        label.radio-label {
-            margin-right: 16px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            padding: 10px 16px;
-            font-size: 1rem;
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.2s;
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .result-box {
-            background-color: #f1f5f9;
-            border: 1px dashed var(--border-color);
-            border-radius: 4px;
-            padding: 12px;
-            min-height: 60px;
-            white-space: pre-wrap;
-            word-break: break-all;
-            font-size: 1rem;
-        }
-
-        .search-box-container {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 12px;
+            font-family: inherit;
         }
 
         input[type="text"] {
-            flex: 1;
-            padding: 8px 12px;
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            width: 100%;
+            padding: 8px 10px;
+            box-sizing: border-box;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
             font-size: 1rem;
         }
 
-        .search-btn {
-            width: auto;
-            padding: 8px 16px;
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
         }
 
         .note {
             font-size: 0.75rem;
-            color: #64748b;
-            margin-top: 4px;
+            color: #d97706;
+            background-color: #fffbeb;
+            padding: 6px 8px;
+            border-radius: 4px;
+            margin-top: 8px;
+        }
+
+        .suggestion-item {
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background-color: #f8fafc;
+        }
+
+        .suggestion-item p {
+            margin: 0 0 6px 0;
+            font-size: 0.95rem;
+        }
+
+        .select-btn {
+            background-color: #10b981;
+            padding: 6px 12px;
+            font-size: 0.85rem;
+            width: auto;
+            margin-top: 0;
+        }
+        .select-btn:hover {
+            background-color: #059669;
+        }
+
+        .result-box {
+            background-color: #f0fdf4;
+            border: 1px solid #bbf7d0;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .dict-result {
+            background-color: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+
+        .hidden {
+            display: none;
         }
     </style>
 </head>
@@ -142,116 +160,126 @@
 
     <div class="container">
         <header>
-            <h1>言葉遣いサポートアプリ</h1>
-            <p class="subtitle">試作品 Ver.0.1</p>
+            <h1>AI敬語チェッカー</h1>
+            <p>Ver.0.1（コンセプト試作品）</p>
         </header>
 
-        <!-- MUST① & MUST③: 言葉の変換とスタイル選択 -->
-        <div class="card">
-            <h2>1. 言葉遣い変換（AI風モック）</h2>
-            <textarea id="inputText" placeholder="例：この書類を見ておいてください。"></textarea>
+        <!-- MUST① & MUST③：入力とAI提案（選択式） -->
+        <section class="card">
+            <h2>1. 文章の正しい言葉づかいへの変換（MUST①・③）</h2>
+            <label for="inputText">入力した文：</label>
+            <textarea id="inputText" placeholder="例：明日休みますって伝えて。">明日休みますって伝えて。</textarea>
+            <button id="aiCheckBtn">AIに正しい文に直してもらう</button>
+            <div class="note">⚠️ 【仮データによる再現】現在はAIの代わりにサンプル案を表示しています（本番ではAI APIに置き換えます）。</div>
+
+            <!-- 選択式AI提案エリア（MUST③） -->
+            <div id="suggestionArea" class="hidden" style="margin-top: 14px;">
+                <label>AIからの提案（選択式）：</label>
+                <div id="suggestionList"></div>
+            </div>
+
+            <!-- 決定された正しい文の表示（成功条件の確認用） -->
+            <div id="finalResultArea" class="hidden" style="margin-top: 14px;">
+                <label>決定された正しい文（成功）：</label>
+                <div id="finalResultText" class="result-box"></div>
+            </div>
+        </section>
+
+        <!-- MUST②：言葉の意味を調べられる機能 -->
+        <section class="card">
+            <h2>2. 言葉の意味を調べる機能（MUST②）</h2>
+            <label for="dictInput">調べたい言葉：</label>
+            <div style="display: flex; gap: 8px;">
+                <input type="text" id="dictInput" placeholder="例：ご査収" value="ご査収">
+                <button id="dictSearchBtn" style="width: 110px; margin-top: 0;">調べる</button>
+            </div>
+            <div class="note">⚠️ 【仮データによる再現】辞書データのサンプルから検索します（本番では辞書APIやデータベースに置き換えます）。</div>
             
-            <div class="options-group">
-                <label class="radio-label">
-                    <input type="radio" name="tone" value="business" checked> 丁寧なビジネス敬語
-                </label>
-                <label class="radio-label">
-                    <input type="radio" name="tone" value="formal"> よりフォーマル（謙譲語）
-                </label>
-            </div>
-
-            <button onclick="convertText()">正しい言葉遣いに変換する</button>
-
-            <h2 style="margin-top: 16px;">変換結果</h2>
-            <div id="resultText" class="result-box">ここに変換結果が表示されます。</div>
-            <div class="note">※現在は仮データによる擬似変換で動作しています。</div>
-        </div>
-
-        <!-- MUST②: 類義語など意味を調べる機能 -->
-        <div class="card">
-            <h2>2. 類義語・言葉の意味調べ</h2>
-            <div class="search-box-container">
-                <input type="text" id="searchWord" placeholder="調べたい言葉（例：見る、送る）">
-                <button class="search-btn" onclick="searchSynonym()">調べる</button>
-            </div>
-            <div id="searchResult" class="result-box">検索結果がここに表示されます。</div>
-            <div class="note">※登録された仮データから意味や類義語を表示します。</div>
-        </div>
+            <div id="dictResultArea" class="hidden dict-result"></div>
+        </section>
     </div>
 
     <script>
-        // MUST① & MUST③のロジック（試作品用モック）
-        function convertText() {
-            const input = document.getElementById('inputText').value.trim();
-            const tone = document.querySelector('input[name="tone"]:checked').value;
-            const resultBox = document.getElementById('resultText');
+        /* ==========================================
+           JavaScript：高校生が後から修正しやすいシンプルなコード
+           ========================================== */
 
-            if (!input) {
-                resultBox.textContent = '変換するテキストを入力してください。';
+        // --- MUST① & MUST③ のロジック ---
+        const aiCheckBtn = document.getElementById('aiCheckBtn');
+        const inputText = document.getElementById('inputText');
+        const suggestionArea = document.getElementById('suggestionArea');
+        const suggestionList = document.getElementById('suggestionList');
+        const finalResultArea = document.getElementById('finalResultArea');
+        const finalResultText = document.getElementById('finalResultText');
+
+        aiCheckBtn.addEventListener('click', function() {
+            const text = inputText.value.trim();
+            if (text === "") {
+                alert("文章を入力してください。");
                 return;
             }
 
-            // 試作品用の仮変換ルール（実際の開発ではここにAI APIなどを連携します）
-            let converted = input;
-            if (tone === 'business') {
-                converted = input
-                    .replace(/見て/g, 'ご確認して')
-                    .replace(/おいてください/g, 'いただけますでしょうか')
-                    .replace(/教えて/g, 'ご教示して')
-                    .replace(/すごい/g, '大変素晴らしい');
-                if (converted === input) {
-                    converted = "「" + input + "」をビジネス向けの丁寧な表現に整えました。（例：お世話になっております。～よろしくお願い申し上げます。）";
-                }
-            } else {
-                converted = input
-                    .replace(/見て/g, 'ご覧いただき')
-                    .replace(/おいてください/g, 'お願い申し上げます')
-                    .replace(/教えて/g, 'ご教示いただけますと幸いです')
-                    .replace(/すごい/g, '誠に優れた');
-                if (converted === input) {
-                    converted = "「" + input + "」をよりフォーマルな謙譲・尊敬表現に整えました。（例：平素よりお世話になっております。…）";
-                }
-            }
+            // 【仮データ】入力された文字列に応じたAI提案のモック
+            let mockSuggestions = [
+                "明日、お休みをいただく旨をお伝えいただけますでしょうか。",
+                "明日欠勤する件について、お伝え願えますでしょうか。"
+            ];
 
-            resultBox.textContent = converted;
-        }
+            // 選択式リストの構築（MUST③）
+            suggestionList.innerHTML = "";
+            mockSuggestions.forEach((suggestion, index) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'suggestion-item';
+                itemDiv.innerHTML = `
+                    <p><strong>案 ${index + 1}:</strong> ${suggestion}</p>
+                    <button class="select-btn" data-suggestion="${suggestion}">この案を採用する</button>
+                `;
+                suggestionList.appendChild(itemDiv);
+            });
 
-        // MUST②のロジック（試作品用モック辞書データ）
-        const mockDictionary = {
-            "見る": {
-                meaning: "目で対象をとらえて認める。文書や状態を確認する。",
-                synonyms: "確認する、拝見する、目を通す、ご査収する"
-            },
-            "送る": {
-                meaning: "物を相手のところに届けるように手配する。メールや書類を送信する。",
-                synonyms: "送信する、送付する、お送りする、差し出す"
-            },
-            "わかる": {
-                meaning: "物事の意味や内容が理解できる。事情や状況が把握できる。",
-                synonyms: "把握する、承知する、理解する、心得ております"
-            },
-            "すごい": {
-                meaning: "程度が甚だしい様子。優れているさま。",
-                synonyms: "素晴らしい、優秀な、特筆すべき、大変な"
-            }
+            suggestionArea.classList.remove('hidden');
+            finalResultArea.classList.add('hidden');
+
+            // 選択ボタンのイベント設定
+            const selectButtons = suggestionList.querySelectorAll('.select-btn');
+            selectButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const chosenText = this.getAttribute('data-suggestion');
+                    finalResultText.textContent = chosenText;
+                    finalResultArea.classList.remove('hidden');
+                });
+            });
+        });
+
+
+        // --- MUST② のロジック ---
+        const dictSearchBtn = document.getElementById('dictSearchBtn');
+        const dictInput = document.getElementById('dictInput');
+        const dictResultArea = document.getElementById('dictResultArea');
+
+        // 【仮データ】辞書データのサンプル
+        const dictionaryMock = {
+            "ご査収": "【意味】書類やデータなどを確認して受け取ること。「内容をご査収ください」のように使います。",
+            "お手数": "【意味】手間をかけさせて申し訳なく思う気持ち。「お手数をおかけしますが」とクッション言葉として使います。",
+            "致す": "【意味】「する」の謙譲語（自分の動作を低める表現）。"
         };
 
-        function searchSynonym() {
-            const word = document.getElementById('searchWord').value.trim();
-            const resultBox = document.getElementById('searchResult');
-
-            if (!word) {
-                resultBox.textContent = '調べたい言葉を入力してください。';
+        dictSearchBtn.addEventListener('click', function() {
+            const keyword = dictInput.value.trim();
+            if (keyword === "") {
+                alert("調べたい言葉を入力してください。");
                 return;
             }
 
-            if (mockDictionary[word]) {
-                const data = mockDictionary[word];
-                resultBox.innerHTML = `<strong>【意味】</strong> ${data.meaning}<br><strong>【類義語・言い換え】</strong> ${data.synonyms}`;
+            let meaning = dictionaryMock[keyword];
+            if (meaning) {
+                dictResultArea.innerHTML = `<strong>【${keyword}】</strong><br>${meaning}`;
             } else {
-                resultBox.innerHTML = `「${word}」の登録データは見つかりませんでした。<br><span style="color:#64748b; font-size:0.9rem;">（試作品のため、「見る」「送る」「わかる」「すごい」などが登録されています）</span>`;
+                dictResultArea.innerHTML = `<strong>【${keyword}】</strong><br>（仮データ未登録です。「ご査収」「お手数」「致す」などで試してください）`;
             }
-        }
+
+            dictResultArea.classList.remove('hidden');
+        });
     </script>
 </body>
 </html>
