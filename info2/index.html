@@ -132,7 +132,7 @@
     }
 
     .app-name {
-      font-size: 25px;
+      font-size: 24px;
       font-weight: bold;
       color: #17324f;
       margin: 0;
@@ -161,16 +161,55 @@
     .description {
       font-size: 15px;
       color: #444;
-      margin: 0 0 22px;
+      margin: 0 0 18px;
       flex: 1;
     }
 
-    .buttons {
-      display: grid;
-      gap: 9px;
+    /* 公開情報 */
+
+    .app-info {
+      border-top: 1px solid #e5e5e5;
+      padding-top: 14px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
     }
 
-    .btn {
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #247044;
+    }
+
+    .status::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #2e9d5b;
+    }
+
+    .version {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .updated {
+      font-size: 12px;
+      color: #888;
+      margin-top: -8px;
+      margin-bottom: 14px;
+      text-align: right;
+    }
+
+    /* アプリを開く */
+
+    .btn-app {
       display: block;
       width: 100%;
       text-align: center;
@@ -179,26 +218,19 @@
       padding: 12px 10px;
       font-size: 16px;
       font-weight: bold;
+      background: #1f5f99;
+      color: white;
       transition: opacity 0.2s ease;
     }
 
-    .btn:hover {
+    .btn-app:hover {
       opacity: 0.83;
     }
 
-    .btn-app {
-      background: #1f5f99;
-      color: white;
-    }
-
-    .btn-review {
-      background: white;
-      color: #1f5f99;
-      border: 2px solid #1f5f99;
-    }
+    /* 開発中 */
 
     .coming-soon {
-      opacity: 0.72;
+      opacity: 0.7;
     }
 
     .coming-soon .card-top {
@@ -207,6 +239,24 @@
 
     .coming-soon .app-name {
       color: #666;
+    }
+
+    .development-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: bold;
+      color: #777;
+      margin-top: 12px;
+    }
+
+    .development-status::before {
+      content: "";
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: #aaa;
     }
 
     footer {
@@ -252,243 +302,637 @@
   </style>
 </head>
 
+
 <body>
 
-  <header>
-    <div class="small-title">INFORMATION STUDY Ⅱ</div>
-    <h1>情報Ⅱ アプリギャラリー</h1>
+<header>
+
+  <div class="small-title">
+    INFORMATION STUDY Ⅱ
+  </div>
+
+  <h1>
+    情報Ⅱ アプリギャラリー
+  </h1>
+
+  <p>
+    高校生が身近な困りごとや課題を発見し、
+    生成AIを活用しながら企画・開発したWebアプリです。
+    公開されたアプリは実際に体験できます。
+  </p>
+
+</header>
+
+
+<main>
+
+  <section class="intro">
+
+    <h2>
+      アプリを使ってみよう
+    </h2>
 
     <p>
-      高校生が身近な困りごとや課題をもとに、
-      生成AIを活用しながら企画・開発したWebアプリです。
-      気になるアプリを実際に使ってみてください。
+      各班が「誰の、どんな困りごとを解決するのか」を考え、
+      コンセプト設計・試作・ユーザーテスト・改善を行っています。
+      各アプリは開発・改善に合わせて随時更新されます。
     </p>
-  </header>
+
+  </section>
 
 
-  <main>
+  <div class="gallery-title">
 
-    <section class="intro">
-      <h2>アプリを使ってみよう</h2>
+    <h2>
+      Apps
+    </h2>
 
-      <p>
-        各班が「誰の、どんな困りごとを解決するのか」を考え、
-        コンセプト設計・試作・ユーザーテスト・改善を行っています。
-        「アプリを使う」から作品を体験してください。
-      </p>
-    </section>
+    <span>
+      公開されたアプリから順次追加します
+    </span>
 
-
-    <div class="gallery-title">
-      <h2>Apps</h2>
-      <span>公開されたアプリから順次追加します</span>
-    </div>
+  </div>
 
 
-    <section class="gallery">
+  <section class="gallery">
 
-      <!-- ===== TEAM 01 ===== -->
 
-      <article class="app-card">
-        <div class="card-top">
-          <span class="team">TEAM 01</span>
-          <h3 class="app-name">ノート共有アプリ</h3>
+    <!-- ===================================
+         TEAM 01
+    ==================================== -->
+
+    <article
+      class="app-card"
+      data-app="./team01/"
+    >
+
+      <div class="card-top">
+
+        <span class="team">
+          TEAM 01
+        </span>
+
+        <h3 class="app-name">
+          ノート共有アプリ
+        </h3>
+
+      </div>
+
+
+      <div class="card-body">
+
+        <span class="target">
+          授業内容を確認したい生徒向け
+        </span>
+
+        <p class="description">
+          欠席した日や、もう一度確認したい授業のノートを
+          共有・確認しやすくするためのアプリです。
+        </p>
+
+        <div class="app-info">
+
+          <span class="status">
+            公開中
+          </span>
+
+          <span class="version">
+            Ver. 読み込み中…
+          </span>
+
         </div>
 
-        <div class="card-body">
-          <span class="target">授業内容を確認したい生徒向け</span>
+        <div class="updated"></div>
 
-          <p class="description">
-            欠席した日や、もう一度確認したい授業のノートを
-            共有・確認しやすくするためのアプリです。
-          </p>
+        <a
+          class="btn-app"
+          href="./team01/"
+          target="_blank"
+        >
+          アプリを使う
+        </a>
 
-          <div class="buttons">
-            <a class="btn btn-app" href="./team01/" target="_blank">
-              アプリを使う
-            </a>
+      </div>
 
-            <a class="btn btn-review" href="#">
-              評価する
-            </a>
-          </div>
-        </div>
-      </article>
+    </article>
 
 
-      <!-- ===== TEAM 02 ===== -->
 
-      <article class="app-card">
-        <div class="card-top">
-          <span class="team">TEAM 02</span>
-          <h3 class="app-name">垢抜けコーディネートサポート</h3>
-        </div>
+    <!-- ===================================
+         TEAM 02
+    ==================================== -->
 
-        <div class="card-body">
-          <span class="target">自分に似合う服装を知りたい人向け</span>
+    <article
+      class="app-card"
+      data-app="./team02/"
+    >
 
-          <p class="description">
-            自分に合った服装や組み合わせを考える手助けをし、
-            コーディネート選びをサポートするアプリです。
-          </p>
+      <div class="card-top">
 
-          <div class="buttons">
-            <a class="btn btn-app" href="./team02/" target="_blank">
-              アプリを使う
-            </a>
+        <span class="team">
+          TEAM 02
+        </span>
 
-            <a class="btn btn-review" href="#">
-              評価する
-            </a>
-          </div>
-        </div>
-      </article>
+        <h3 class="app-name">
+          垢抜けコーディネートサポート
+        </h3>
+
+      </div>
 
 
-      <!-- ===== TEAM 03 ===== -->
+      <div class="card-body">
 
-      <article class="app-card">
-        <div class="card-top">
-          <span class="team">TEAM 03</span>
-          <h3 class="app-name">書類修正変換</h3>
-        </div>
+        <span class="target">
+          自分に似合う服装を知りたい人向け
+        </span>
 
-        <div class="card-body">
-          <span class="target">文章や書類を整えたい人向け</span>
+        <p class="description">
+          自分に合った服装や組み合わせを考える手助けをし、
+          コーディネート選びをサポートするアプリです。
+        </p>
 
-          <p class="description">
-            入力した文章を確認し、
-            より読みやすい表現や適切な文章へ修正・変換することを
-            目指したアプリです。
-          </p>
+        <div class="app-info">
 
-          <div class="buttons">
-            <a class="btn btn-app" href="./team03/" target="_blank">
-              アプリを使う
-            </a>
+          <span class="status">
+            公開中
+          </span>
 
-            <a class="btn btn-review" href="#">
-              評価する
-            </a>
-          </div>
-        </div>
-      </article>
+          <span class="version">
+            Ver. 読み込み中…
+          </span>
 
-
-      <!-- ===== TEAM 04 ===== -->
-
-      <article class="app-card">
-        <div class="card-top">
-          <span class="team">TEAM 04</span>
-          <h3 class="app-name">速度計測</h3>
         </div>
 
-        <div class="card-body">
-          <span class="target">移動速度を確認したい人向け</span>
+        <div class="updated"></div>
 
-          <p class="description">
-            スマートフォンなどを利用して、
-            移動しているときの速度を分かりやすく確認するための
-            計測アプリです。
-          </p>
+        <a
+          class="btn-app"
+          href="./team02/"
+          target="_blank"
+        >
+          アプリを使う
+        </a>
 
-          <div class="buttons">
-            <a class="btn btn-app" href="./team04/" target="_blank">
-              アプリを使う
-            </a>
+      </div>
 
-            <a class="btn btn-review" href="#">
-              評価する
-            </a>
-          </div>
-        </div>
-      </article>
+    </article>
 
 
-      <!-- ===== TEAM 05 ===== -->
 
-      <article class="app-card coming-soon">
-        <div class="card-top">
-          <span class="team">TEAM 05</span>
-          <h3 class="app-name">開発中</h3>
-        </div>
+    <!-- ===================================
+         TEAM 03
+    ==================================== -->
 
-        <div class="card-body">
-          <span class="target">内容未定</span>
+    <article
+      class="app-card"
+      data-app="./team03/"
+    >
 
-          <p class="description">
-            現在アプリを開発しています。
-            内容が決まり次第公開します。
-          </p>
-        </div>
-      </article>
+      <div class="card-top">
 
+        <span class="team">
+          TEAM 03
+        </span>
 
-      <!-- ===== TEAM 06 ===== -->
+        <h3 class="app-name">
+          書類修正変換
+        </h3>
 
-      <article class="app-card coming-soon">
-        <div class="card-top">
-          <span class="team">TEAM 06</span>
-          <h3 class="app-name">開発中</h3>
-        </div>
-
-        <div class="card-body">
-          <span class="target">内容未定</span>
-
-          <p class="description">
-            現在アプリを開発しています。
-            内容が決まり次第公開します。
-          </p>
-        </div>
-      </article>
+      </div>
 
 
-      <!-- ===== TEAM 07 ===== -->
+      <div class="card-body">
 
-      <article class="app-card coming-soon">
-        <div class="card-top">
-          <span class="team">TEAM 07</span>
-          <h3 class="app-name">開発中</h3>
+        <span class="target">
+          文章や書類を整えたい人向け
+        </span>
+
+        <p class="description">
+          入力した文章を確認し、
+          より読みやすい表現や適切な文章へ
+          修正・変換することを目指したアプリです。
+        </p>
+
+        <div class="app-info">
+
+          <span class="status">
+            公開中
+          </span>
+
+          <span class="version">
+            Ver. 読み込み中…
+          </span>
+
         </div>
 
-        <div class="card-body">
-          <span class="target">内容未定</span>
+        <div class="updated"></div>
 
-          <p class="description">
-            現在アプリを開発しています。
-            内容が決まり次第公開します。
-          </p>
+        <a
+          class="btn-app"
+          href="./team03/"
+          target="_blank"
+        >
+          アプリを使う
+        </a>
+
+      </div>
+
+    </article>
+
+
+
+    <!-- ===================================
+         TEAM 04
+    ==================================== -->
+
+    <article
+      class="app-card"
+      data-app="./team04/"
+    >
+
+      <div class="card-top">
+
+        <span class="team">
+          TEAM 04
+        </span>
+
+        <h3 class="app-name">
+          速度計測
+        </h3>
+
+      </div>
+
+
+      <div class="card-body">
+
+        <span class="target">
+          移動速度を確認したい人向け
+        </span>
+
+        <p class="description">
+          スマートフォンなどを利用して、
+          移動しているときの速度を
+          分かりやすく確認するための計測アプリです。
+        </p>
+
+        <div class="app-info">
+
+          <span class="status">
+            公開中
+          </span>
+
+          <span class="version">
+            Ver. 読み込み中…
+          </span>
+
         </div>
-      </article>
+
+        <div class="updated"></div>
+
+        <a
+          class="btn-app"
+          href="./team04/"
+          target="_blank"
+        >
+          アプリを使う
+        </a>
+
+      </div>
+
+    </article>
 
 
-      <!-- ===== TEAM 08 ===== -->
 
-      <article class="app-card coming-soon">
-        <div class="card-top">
-          <span class="team">TEAM 08</span>
-          <h3 class="app-name">開発中</h3>
+    <!-- ===================================
+         TEAM 05
+    ==================================== -->
+
+    <article class="app-card coming-soon">
+
+      <div class="card-top">
+
+        <span class="team">
+          TEAM 05
+        </span>
+
+        <h3 class="app-name">
+          開発中
+        </h3>
+
+      </div>
+
+      <div class="card-body">
+
+        <span class="target">
+          内容未定
+        </span>
+
+        <p class="description">
+          現在アプリを開発しています。
+          内容が決まり次第公開します。
+        </p>
+
+        <div class="development-status">
+          開発中
         </div>
 
-        <div class="card-body">
-          <span class="target">内容未定</span>
+      </div>
 
-          <p class="description">
-            現在アプリを開発しています。
-            内容が決まり次第公開します。
-          </p>
+    </article>
+
+
+
+    <!-- ===================================
+         TEAM 06
+    ==================================== -->
+
+    <article class="app-card coming-soon">
+
+      <div class="card-top">
+
+        <span class="team">
+          TEAM 06
+        </span>
+
+        <h3 class="app-name">
+          開発中
+        </h3>
+
+      </div>
+
+      <div class="card-body">
+
+        <span class="target">
+          内容未定
+        </span>
+
+        <p class="description">
+          現在アプリを開発しています。
+          内容が決まり次第公開します。
+        </p>
+
+        <div class="development-status">
+          開発中
         </div>
-      </article>
 
-    </section>
+      </div>
 
-  </main>
+    </article>
 
 
-  <footer>
-    <p>情報Ⅱ　生成AIを活用したアプリ開発プロジェクト</p>
-    <p>生徒作品のため、動作や内容は開発途中の場合があります。</p>
-  </footer>
+
+    <!-- ===================================
+         TEAM 07
+    ==================================== -->
+
+    <article class="app-card coming-soon">
+
+      <div class="card-top">
+
+        <span class="team">
+          TEAM 07
+        </span>
+
+        <h3 class="app-name">
+          開発中
+        </h3>
+
+      </div>
+
+      <div class="card-body">
+
+        <span class="target">
+          内容未定
+        </span>
+
+        <p class="description">
+          現在アプリを開発しています。
+          内容が決まり次第公開します。
+        </p>
+
+        <div class="development-status">
+          開発中
+        </div>
+
+      </div>
+
+    </article>
+
+
+
+    <!-- ===================================
+         TEAM 08
+    ==================================== -->
+
+    <article class="app-card coming-soon">
+
+      <div class="card-top">
+
+        <span class="team">
+          TEAM 08
+        </span>
+
+        <h3 class="app-name">
+          開発中
+        </h3>
+
+      </div>
+
+      <div class="card-body">
+
+        <span class="target">
+          内容未定
+        </span>
+
+        <p class="description">
+          現在アプリを開発しています。
+          内容が決まり次第公開します。
+        </p>
+
+        <div class="development-status">
+          開発中
+        </div>
+
+      </div>
+
+    </article>
+
+  </section>
+
+</main>
+
+
+<footer>
+
+  <p>
+    情報Ⅱ　生成AIを活用したアプリ開発プロジェクト
+  </p>
+
+  <p>
+    生徒作品のため、開発・改善に伴って内容が変更される場合があります。
+  </p>
+
+</footer>
+
+
+
+<script>
+
+/* =======================================================
+   各班の index.html から
+   バージョン情報などを自動取得
+======================================================= */
+
+async function loadAppInformation(card) {
+
+  const appPath = card.dataset.app;
+
+  const versionElement =
+    card.querySelector(".version");
+
+  const updatedElement =
+    card.querySelector(".updated");
+
+
+  try {
+
+    /*
+      GitHub Pagesのキャッシュによって
+      古いHTMLを取得しないように時刻を付加
+    */
+
+    const response =
+      await fetch(
+        appPath + "index.html?t=" + Date.now()
+      );
+
+
+    if (!response.ok) {
+      throw new Error("HTMLを取得できません");
+    }
+
+
+    const htmlText =
+      await response.text();
+
+
+    /*
+      取得したHTML文字列を
+      DOMとして解析
+    */
+
+    const parser =
+      new DOMParser();
+
+    const doc =
+      parser.parseFromString(
+        htmlText,
+        "text/html"
+      );
+
+
+    /* =========================
+       バージョン取得
+    ========================= */
+
+    const versionMeta =
+      doc.querySelector(
+        'meta[name="app-version"]'
+      );
+
+
+    if (versionMeta) {
+
+      const version =
+        versionMeta.getAttribute("content");
+
+      versionElement.textContent =
+        "Ver. " + version;
+
+    } else {
+
+      /*
+        metaタグが無い場合は
+        HTML本文から
+        Ver.1.0 / Version 1.0 等を探す
+      */
+
+      const bodyText =
+        doc.body.innerText;
+
+      const versionMatch =
+        bodyText.match(
+          /(?:Ver\.?|Version)\s*([0-9]+(?:\.[0-9]+)*)/i
+        );
+
+
+      if (versionMatch) {
+
+        versionElement.textContent =
+          "Ver. " + versionMatch[1];
+
+      } else {
+
+        versionElement.textContent =
+          "Ver. 未設定";
+
+      }
+
+    }
+
+
+    /* =========================
+       更新日取得
+    ========================= */
+
+    const updatedMeta =
+      doc.querySelector(
+        'meta[name="app-updated"]'
+      );
+
+
+    if (updatedMeta) {
+
+      const date =
+        updatedMeta.getAttribute("content");
+
+      updatedElement.textContent =
+        "更新：" + date;
+
+    }
+
+
+  } catch (error) {
+
+    versionElement.textContent =
+      "Ver. 取得できません";
+
+    console.log(
+      appPath,
+      error
+    );
+
+  }
+
+}
+
+
+/* =======================================================
+   公開中アプリをすべて取得
+======================================================= */
+
+const appCards =
+  document.querySelectorAll(
+    ".app-card[data-app]"
+  );
+
+
+appCards.forEach(
+  loadAppInformation
+);
+
+</script>
+
 
 </body>
 </html>
