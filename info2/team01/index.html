@@ -7,6 +7,26 @@
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<script>
+document.addEventListener("DOMContentLoaded", async () => {
+
+  try {
+
+    const counter = new Counter({
+      workspace: "info2-app-gallery"
+    });
+
+    // TEAM01の閲覧数を1増やす
+    await counter.up("team01-views");
+
+  } catch (error) {
+
+    console.log("閲覧数の記録に失敗しました", error);
+
+  }
+
+});
+</script>
 <body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
 
     <!-- ヘッダーエリア -->
