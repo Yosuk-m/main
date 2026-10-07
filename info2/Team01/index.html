@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ノート共有アプリ (Ver.0.1 試作品)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col">
+
+    <!-- ヘッダーエリア -->
+    <header class="bg-indigo-600 text-white shadow-md">
+        <div class="max-w-4xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                📓 ノート共有アプリ <span class="text-xs bg-indigo-500 px-2 py-0.5 rounded-full">Ver.0.1 試作品</span>
+            </h1>
+            <p class="text-xs text-indigo-200">テスト直前の「困った！」を解決する</p>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ -->
+    <main class="max-w-4xl w-full mx-auto p-4 flex-grow flex flex-col gap-6">
+
+        <!-- MUST②: クラス/グループ作成・参加・切り替えエリア -->
+        <section class="bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+            <h2 class="text-sm font-semibold text-slate-500 mb-2">🏫 参加クラス / グループ</h2>
+            <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center justify-between">
+                <div class="flex items-center gap-2 flex-grow">
+                    <select id="classSelect" class="border border-slate-300 rounded-lg p-2 text-sm flex-grow focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        <!-- JavaScriptでクラス一覧を動的に挿入 -->
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="openClassModal()" class="bg-indigo-50 text-indigo-600 border border-indigo-200 hover:bg-indigo-100 text-sm px-3 py-2 rounded-lg font-medium transition">
+                        ＋ クラス作成
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- アプリのメインレイアウト（投稿フォームと一覧をタブ・検索で結ぶ） -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <!-- 左側：MUST① ノート投稿フォーム -->
+            <section class="md:col-span-1 bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col gap-4 h-fit">
+                <h2 class="text-md font-bold text-slate-700 border-b pb-2">✏️ ノートを投稿する</h2>
+                <form id="postForm" class="flex flex-col gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">科目</label>
+                        <select id="postSubject" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" required>
+                            <option value="数学">数学</option>
+                            <option value="英語">英語</option>
+                            <option value="国語">国語</option>
+                            <option value="理科">理科</option>
+                            <option value="社会">社会</option>
+                            <option value="情報">情報</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">タグ（例: テスト範囲, 3章）</label>
+                        <input type="text" id="postTag" placeholder="カンマ区切り等で入力" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">ノート画像</label>
+                        <input type="file" id="postImage" accept="image/*" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" required>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">メモ・ポイント</label>
+                        <textarea id="postMemo" rows="2" placeholder="ここがテストに出るらしい！" class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-lg text-sm shadow transition">
+                        投稿する
+                    </button>
+                </form>
+            </section>
+
+            <!-- 右側：MUST①＆③ 検索・閲覧・拡大エリア -->
+            <section class="md:col-span-2 flex flex-col gap-4">
+                
+                <!-- 検索・フィルターエリア (MUST③) -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex flex-col sm:flex-row gap-3 items-center justify-between">
+                    <div class="w-full sm:w-auto flex-grow">
+                        <input type="text" id="searchInput" placeholder="🔍 タグやキーワードで検索..." class="w-full border border-slate-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    <div class="w-full sm:w-auto flex items-center gap-2">
+                        <select id="filterSubject" class="w-full sm:w-auto border border-slate-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                            <option value="すべて">全科目表示</option>
+                            <option value="数学">数学</option>
+                            <option value="英語">英語</option>
+                            <option value="国語">国語</option>
+                            <option value="理科">理科</option>
+                            <option value="社会">社会</option>
+                            <option value="情報">情報</option>
+                            <option value="その他">その他</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- ノート一覧カードエリア (MUST①) -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 flex-grow">
+                    <h2 class="text-md font-bold text-slate-700 border-b pb-2 mb-4 flex justify-between items-center">
+                        <span>📖 共有されたノート一覧</span>
+                        <span id="noteCount" class="text-xs font-normal text-slate-500">0件</span>
+                    </h2>
+                    
+                    <!-- ノートがない場合の表示 -->
+                    <div id="noNotesMessage" class="hidden text-center py-10 text-slate-400 text-sm">
+                        投稿されたノートがまだありません。<br>最初のノートを投稿してみよう！
+                    </div>
+
+                    <!-- カードを並べるグリッド -->
+                    <div id="notesContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- JavaScriptでカードが動的に挿入されます -->
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </main>
+
+    <!-- MUST③: 画像拡大表示用モーダル -->
+    <div id="imageModal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-2xl w-full p-4 flex flex-col gap-3 relative max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b pb-2">
+                <h3 id="modalTitle" class="font-bold text-slate-700 text-sm">ノート画像詳細</h3>
+                <button onclick="closeImageModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2">✕</button>
+            </div>
+            <div class="flex justify-center bg-slate-100 rounded-lg overflow-hidden">
+                <img id="modalImg" src="" alt="拡大画像" class="max-h-[60vh] object-contain">
+            </div>
+            <p id="modalMemo" class="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100"></p>
+        </div>
+    </div>
+
+    <!-- クラス作成用モーダル (MUST②) -->
+    <div id="classModal" class="fixed inset-0 bg-black/50 hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl max-w-md w-full p-6 flex flex-col gap-4 shadow-lg">
+            <h3 class="font-bold text-slate-800 text-base">新しいクラス/グループを作成</h3>
+            <p class="text-xs text-slate-500">参加したいクラス名を入力してください（例: 「3年2組数学係」「放課後勉強会」など）</p>
+            <input type="text" id="newClassNameInput" placeholder="クラス名を入力" class="border border-slate-300 rounded-lg p-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+            <div class="flex justify-end gap-2 mt-2">
+                <button onclick="closeClassModal()" class="px-4 py-2 text-sm bg-slate-100 text-slate-600 rounded-lg hover:bg-slate-200">キャンセル</button>
+                <button onclick="createNewClass()" class="px-4 py-2 text-sm bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">作成して参加</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- フッター -->
+    <footer class="text-center py-4 text-xs text-slate-400">
+        情報Ⅱ オリジナルWebアプリ試作品 (Ver.0.1)
+    </footer>
+
+    <!-- JavaScript ロジック -->
+    <script>
+        // --- 1. アプリの状態管理 (LocalStorageを使用) ---
+        // クラス一覧の初期データ
+        let classes = JSON.parse(localStorage.getItem('sharenote_classes')) || [
+            { id: 'class_1a', name: '1年A組 全体ノート' },
+            { id: 'class_test_group', name: 'テスト対策・放課後グループ' }
+        ];
+
+        // 現在選択中のクラスID
+        let currentClassId = localStorage.getItem('sharenote_current_class') || (classes.length > 0 ? classes[0].id : '');
+
+        // ノートデータ全体（localStorageに保存）
+        // 構造: { classId: [ {id, subject, tag, image, memo, date}, ... ] }
+        let allNotes = JSON.parse(localStorage.getItem('sharenote_notes')) || {};
+
+        // --- 2. 起動時の初期化処理 ---
+        window.onload = function() {
+            renderClassSelect();
+            renderNotes();
+
+            // フォーム送信イベント（MUST①）
+            document.getElementById('postForm').addEventListener('submit', handlePostNote);
+
+            // 検索・フィルターの入力イベント（MUST③）
+            document.getElementById('searchInput').addEventListener('input', renderNotes);
+            document.getElementById('filterSubject').addEventListener('change', renderNotes);
+
+            // クラス切り替えイベント（MUST②）
+            document.getElementById('classSelect').addEventListener('change', function(e) {
+                currentClassId = e.target.value;
+                localStorage.setItem('sharenote_current_class', currentClassId);
+                renderNotes();
+            });
+        };
+
+        // --- 3. クラス管理機能 (MUST②) ---
+        function renderClassSelect() {
+            const select = document.getElementById('classSelect');
+            select.innerHTML = '';
+            classes.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.name;
+                if (c.id === currentClassId) {
+                    opt.selected = true;
+                }
+                select.appendChild(opt);
+            });
+        }
+
+        function openClassModal() {
+            document.getElementById('newClassNameInput').value = '';
+            document.getElementById('classModal').classList.remove('hidden');
+        }
+
+        function closeClassModal() {
+            document.getElementById('classModal').classList.add('hidden');
+        }
+
+        function createNewClass() {
+            const nameInput = document.getElementById('newClassNameInput');
+            const name = nameInput.value.trim();
+            if (!name) {
+                alertCustom('クラス名を入力してください');
+                return;
+            }
+
+            const newId = 'class_' + Date.now();
+            classes.push({ id: newId, name: name });
+            localStorage.setItem('sharenote_classes', JSON.stringify(classes));
+
+            currentClassId = newId;
+            localStorage.setItem('sharenote_current_class', currentClassId);
+
+            closeClassModal();
+            renderClassSelect();
+            renderNotes();
+        }
+
+        // --- 4. ノート投稿機能 (MUST①) ---
+        function handlePostNote(e) {
+            e.preventDefault();
+
+            const subject = document.getElementById('postSubject').value;
+            const tag = document.getElementById('postTag').value.trim();
+            const memo = document.getElementById('postMemo').value.trim();
+            const imageInput = document.getElementById('postImage');
+
+            if (imageInput.files && imageInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(uploadEvent) {
+                    const imageDataUrl = uploadEvent.target.result;
+
+                    // ノートデータのオブジェクト作成
+                    const newNote = {
+                        id: Date.now(),
+                        subject: subject,
+                        tag: tag,
+                        image: imageDataUrl,
+                        memo: memo,
+                        date: new Date().toLocaleDateString()
+                    };
+
+                    // 現在のクラスの配列に保存
+                    if (!allNotes[currentClassId]) {
+                        allNotes[currentClassId] = [];
+                    }
+                    allNotes[currentClassId].unshift(kfUnshift(newNote)); // 最新を上に追加
+
+                    // LocalStorageに保存
+                    localStorage.setItem('sharenote_notes', JSON.stringify(allNotes));
+
+                    // フォームをリセットして一覧を再描画
+                    document.getElementById('postForm').reset();
+                    renderNotes();
+                };
+                reader.readAsDataURL(imageInput.files[0]);
+            }
+        }
+
+        // 配列の先頭に追加するヘルパー（unshiftの代わり）
+        function kfUnshift(note) {
+            if (!allNotes[currentClassId]) allNotes[currentClassId] = [];
+            allNotes[currentClassId].unshift(note);
+            // LocalStorage更新は呼び出し元で行う
+            return note;
+        }
+
+        // --- 5. 閲覧・検索・フィルタリング・拡大機能 (MUST①, ③) ---
+        function renderNotes() {
+            const container = document.getElementById('notesContainer');
+            const noNotesMsg = document.getElementById('noNotesMessage');
+            const searchKeyword = document.getElementById('searchInput').value.toLowerCase();
+            const filterSubj = document.getElementById('filterSubject').value;
+
+            container.innerHTML = '';
+
+            // 現在のクラスのノートを取得（なければ空配列）
+            const notesList = allNotes[currentClassId] || [];
+
+            // 検索と科目フィルターの適用 (MUST③)
+            const filteredNotes = notesList.filter(note => {
+                const matchesSubject = (filterSubj === 'すべて' || note.subject === filterSubj);
+                const matchesSearch = note.tag.toLowerCase().includes(searchKeyword) || 
+                                      note.memo.toLowerCase().includes(searchKeyword) ||
+                                      note.subject.toLowerCase().includes(searchKeyword);
+                return matchesSubject && matchesSearch;
+            });
+
+            document.getElementById('noteCount').textContent = filteredNotes.length + '件';
+
+            if (filteredNotes.length === 0) {
+                noNotesMsg.classList.remove('hidden');
+                return;
+            } else {
+                noNotesMsg.classList.add('hidden');
+            }
+
+            // カードを1件ずつ生成して描画
+            filteredNotes.forEach(note => {
+                const card = document.createElement('div');
+                card.className = 'border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col bg-slate-50 hover:shadow transition';
+
+                // タグのパース・表示用HTML
+                let tagsHtml = '';
+                if (note.tag) {
+                    const tags = note.tag.split(/[、,]/);
+                    tags.forEach(t => {
+                        if(t.trim()) {
+                            tagsHtml += `<span class="bg-indigo-50 text-indigo-600 text-xs px-2 py-0.5 rounded-full font-medium">#${t.trim()}</span>`;
+                        }
+                    });
+                }
+
+                card.innerHTML = `
+                    <div class="relative h-40 bg-slate-200 cursor-pointer overflow-hidden group" onclick="openImageModal('${note.image}', '${note.subject}', '${note.memo}')">
+                        <img src="${note.image}" alt="ノート画像" class="w-full h-full object-cover group-hover:scale-105 transition duration-200">
+                        <div class="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition flex items-center justify-center text-white text-xs font-bold">
+                            🔍 クリックで拡大
+                        </div>
+                        <span class="absolute top-2 left-2 bg-indigo-600 text-white text-xs px-2 py-1 rounded-md font-bold shadow">
+                            ${note.subject}
+                        </span>
+                    </div>
+                    <div class="p-3 flex flex-col gap-2 flex-grow">
+                        <div class="flex flex-wrap gap-1">
+                            ${tagsHtml}
+                        </div>
+                        <p class="text-xs text-slate-600 line-clamp-2 flex-grow">${note.memo ? escapeHtml(note.memo) : '（メモなし）'}</p>
+                        <div class="text-[10px] text-slate-400 text-right mt-auto">投稿日: ${note.date}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
