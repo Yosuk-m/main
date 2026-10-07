@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>CYBER VELO & WALK - Futuristic Holographic Telemetry</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            black: '#030806',
+                            dark: '#07140e',
+                            panel: 'rgba(8, 24, 16, 0.85)',
+                            border: 'rgba(0, 255, 128, 0.3)',
+                            green: '#00ff66',
+                            bright: '#00ffcc',
+                            muted: '#008a44',
+                            warning: '#ffaa00',
+                            danger: '#ff2255'
+                        }
+                    },
+                    fontFamily: {
+                        orbitron: ['Orbitron', 'sans-serif'],
+                        tech: ['Share Tech Mono', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #030806;
+            color: #00ff66;
+            font-family: 'Share Tech Mono', monospace;
+            overflow-x: hidden;
+            touch-action: manipulation;
+            padding-top: env(safe-area-inset-top);
+            padding-bottom: env(safe-area-inset-bottom);
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        
+        .text-glow {
+            text-shadow: 0 0 10px rgba(0, 255, 102, 0.75), 0 0 20px rgba(0, 255, 204, 0.4);
+        }
+        .text-glow-bright {
+            text-shadow: 0 0 12px rgba(0, 255, 204, 0.9), 0 0 25px rgba(0, 255, 204, 0.6);
+        }
+        .border-glow {
+            box-shadow: 0 0 15px rgba(0, 255, 102, 0.3), inset 0 0 10px rgba(0, 255, 102, 0.15);
+        }
+        .box-glow {
+            box-shadow: 0 0 30px rgba(0, 255, 102, 0.25);
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 0, 0, 0.35) 50%,
+                rgba(0, 0, 0, 0.35)
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+            opacity: 0.6;
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0; left: 0; width: 200%; height: 200%;
+            background-image: 
+                linear-gradient(to right, rgba(0, 255, 102, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 255, 102, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            transform: perspective(500px) rotateX(60deg) translateY(-100px);
+            animation: gridMove 15s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+            100% { transform: perspective(500px) rotateX(60deg) translateY(40px); }
+        }
+
+        .holo-beam {
+            background: linear-gradient(180deg, rgba(0, 255, 204, 0.15) 0%, rgba(0, 255, 102, 0) 100%);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+
+        .cyber-panel {
+            background: rgba(7, 20, 14, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(0, 255, 102, 0.3);
+            border-radius: 12px;
+            position: relative;
+            clip-path: polygon(
+                0 10px, 10px 0, 
+                calc(100% - 10px) 0, 100% 10px, 
+                100% calc(100% - 10px), calc(100% - 10px) 100%, 
+                10px 100%, 0 calc(100% - 10px)
+            );
+        }
+
+        .cyber-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 8px; height: 8px;
+            border-top: 2px solid #00ffcc;
+            border-left: 2px solid #00ffcc;
+        }
+
+        .cyber-panel::after {
+            content: '';
+            position: absolute;
+            bottom: 0; right: 0; width: 8px; height: 8px;
+            border-bottom: 2px solid #00ffcc;
+            border-right: 2px solid #00ffcc;
+        }
+
+        .cyber-switch input:checked + .cyber-slider {
+            background-color: rgba(0, 255, 102, 0.3);
+            border-color: #00ff66;
+        }
+        .cyber-switch input:checked + .cyber-slider:before {
+            transform: translateX(20px);
+            background-color: #00ffcc;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between relative selection:bg-cyber-green selection:text-black pb-4">
+
+    <div class="scanline"></div>
+    <div class="cyber-grid"></div>
+
+    <header class="relative z-10 w-full p-3 sm:p-4 border-b border-cyber-border bg-cyber-dark/80 backdrop-blur-md">
+        <div class="max-w-6xl mx-auto flex flex-wrap justify-between items-center gap-2">
+            <div class="flex items-center gap-3">
+                <i id="header-mode-icon" class="fa-solid fa-bicycle text-2xl text-cyber-bright text-glow"></i>
+                <div>
+                    <h1 class="font-orbitron font-black text-lg sm:text-xl tracking-wider text-cyber-bright text-glow">CYBER<span id="header-mode-title" class="text-white">VELO</span> HUD</h1>
+                    <p class="text-[10px] sm:text-xs text-cyber-muted tracking-widest uppercase">HOLOGRAPHIC TELEMETRY v4.0</p>
+                </div>
+            </div>
+
+            <!-- Activity Mode Selector -->
+            <div class="flex items-center gap-1 bg-cyber-black/80 p-1 rounded-lg border border-cyber-border">
+                <button id="mode-bike-btn" class="px-2.5 sm:px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-orbitron font-bold transition bg-cyber-green/20 text-cyber-bright border border-cyber-green">
+                    <i class="fa-solid fa-bicycle"></i>
+                    <span>サイクリング</span>
+                </button>
+                <button id="mode-walk-btn" class="px-2.5 sm:px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-orbitron font-bold transition text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-person-walking"></i>
+                    <span>ウォーキング</span>
+                </button>
+            </div>
+
+            <div class="flex items-center gap-2 sm:gap-4">
+                <!-- GPS Status Badge -->
+                <div id="gps-status-badge" class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyber-border bg-cyber-black/60 text-xs">
+                    <span id="gps-dot" class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                    <span id="gps-text" class="text-gray-400 font-bold uppercase tracking-wider">GPS: Off</span>
+                </div>
+
+                <!-- Settings Button -->
+                <button id="open-settings-btn" class="p-2 px-3 border border-cyber-border rounded hover:border-cyber-green hover:bg-cyber-green/10 text-cyber-bright transition flex items-center gap-2">
+                    <i class="fa-solid fa-gear"></i>
+                    <span class="hidden sm:inline text-xs font-bold uppercase">設定</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-6xl mx-auto w-full px-3 sm:px-4 pt-2 flex-1 flex flex-col justify-around gap-4">
+
+        <!-- Top Section: Hologram Display & Central Gauge -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-4 items-center">
+            
+            <!-- Left Panel: Cadence / Rhythm Box -->
+            <div class="lg:col-span-3 order-2 lg:order-1 flex flex-col gap-3">
+                <div class="cyber-panel p-3.5 sm:p-4">
+                    <div id="cadence-label" class="text-xs text-cyber-muted uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-circle-notch animate-spin text-cyber-bright"></i>
+                        タイヤ回転数 (RPM)
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span id="cadence-value" class="font-orbitron text-3xl sm:text-4xl font-extrabold text-cyber-bright text-glow-bright">0</span>
+                        <span id="cadence-unit" class="text-sm text-cyber-green font-bold">RPM</span>
+                    </div>
+                    <div class="w-full bg-cyber-black rounded-full h-1.5 mt-2 border border-cyber-border/40 overflow-hidden">
+                        <div id="cadence-bar" class="bg-cyber-bright h-full transition-all duration-300 shadow-[0_0_8px_#00ffcc]" style="width: 0%"></div>
+                    </div>
+                </div>
+
+                <!-- Step Counter Panel -->
+                <div id="step-count-panel" class="hidden cyber-panel p-3.5 sm:p-4">
+                    <div class="text-xs text-cyber-muted uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                        <i class="fa-solid fa-shoe-prints text-cyber-bright"></i>
+                        歩数カウンター
+                    </div>
+                    <div class="flex items-baseline gap-1">
+                        <span id="step-count-value" class="font-orbitron text-2xl sm:text-3xl font-bold text-white">0</span>
+                        <span class="text-xs text-cyber-green">歩</span>
+                    </div>
+                </div>
+
+                <!-- Spec Specs Panel -->
+                <div class="cyber-panel p-3.5 sm:p-4">
+                    <div id="spec-panel-title" class="text-xs text-cyber-muted uppercase tracking-wider mb-1">ホログラム・ロードバイク</div>
+                    <div id="spec-display-name" class="font-orbitron text-sm sm:text-base font-bold text-white">スポーツロード (700C)</div>
+                    <div class="text-xs text-cyber-muted mt-1 flex justify-between">
+                        <span id="spec-param-1-label">タイヤ周長:</span>
+                        <span id="spec-param-1-value" class="text-cyber-green font-bold">2070 mm</span>
+                    </div>
+                    <div class="text-xs text-cyber-muted mt-1 flex justify-between">
+                        <span id="spec-param-2-label">フレーム構造:</span>
+                        <span id="spec-param-2-value" class="text-cyber-bright font-bold">エアロカーボン</span>
+                    </div>
+                </div>
+
+                <!-- Camera Angle Controls -->
+                <div class="cyber-panel p-2.5 sm:p-3 flex justify-around items-center">
+                    <span class="text-xs text-cyber-muted uppercase">視点切替:</span>
+                    <button id="cam-preset-1" class="px-2 py-1 text-xs border border-cyber-border rounded hover:border-cyber-green text-cyber-bright font-bold">3D斜め</button>
+                    <button id="cam-preset-2" class="px-2 py-1 text-xs border border-cyber-border rounded hover:border-cyber-green text-cyber-bright font-bold">側面</button>
+                    <button id="cam-preset-3" class="px-2 py-1 text-xs border border-cyber-border rounded hover:border-cyber-green text-cyber-bright font-bold">正面</button>
+                </div>
+            </div>
+
+            <!-- Center Panel: 3D Hologram Container -->
+            <div class="lg:col-span-6 order-1 lg:order-2 flex flex-col items-center justify-center relative">
+                <div class="relative w-full max-w-[360px] sm:max-w-[420px] aspect-square flex items-center justify-center">
+                    
+                    <div class="absolute bottom-6 w-3/4 h-28 holo-beam pointer-events-none opacity-40 animate-pulse"></div>
+                    <canvas id="speedometer-canvas" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
+                    <div id="hologram-container" class="w-full h-full rounded-full cursor-grab active:cursor-grabbing z-0"></div>
+
+                    <!-- Speed Display Overlay -->
+                    <div class="absolute bottom-8 sm:bottom-10 left-0 right-0 flex flex-col items-center text-center z-20 pointer-events-none">
+                        <div id="speed-kmh" class="font-orbitron font-black text-5xl sm:text-7xl text-white tracking-tighter text-glow-bright leading-none">
+                            0.0
+                        </div>
+                        <div class="text-cyber-bright font-orbitron text-xs sm:text-sm font-bold tracking-widest mt-0.5">
+                            KM/H
+                        </div>
+
+                        <div class="mt-1.5 pt-1 px-4 border-t border-cyber-border/40 flex items-center gap-1.5 bg-cyber-dark/60 rounded-full backdrop-blur-sm">
+                            <span class="text-xs text-cyber-muted uppercase">毎秒:</span>
+                            <span id="speed-ms" class="font-orbitron font-bold text-sm sm:text-base text-cyber-green">0.00</span>
+                            <span class="text-xs text-cyber-muted">m/s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Trip Stats -->
+            <div class="lg:col-span-3 order-3 flex flex-col gap-3">
+                <div class="grid grid-cols-2 lg:grid-cols-1 gap-3">
+                    <div class="cyber-panel p-3.5 sm:p-4">
+                        <div class="text-xs text-cyber-muted uppercase tracking-wider mb-1">最高速度</div>
+                        <div class="flex items-baseline gap-1">
+                            <span id="max-speed" class="font-orbitron text-xl sm:text-2xl font-bold text-white">0.0</span>
+                            <span class="text-xs text-cyber-green">km/h</span>
+                        </div>
+                    </div>
+
+                    <div class="cyber-panel p-3.5 sm:p-4">
+                        <div class="text-xs text-cyber-muted uppercase tracking-wider mb-1">平均速度</div>
+                        <div class="flex items-baseline gap-1">
+                            <span id="avg-speed" class="font-orbitron text-xl sm:text-2xl font-bold text-white">0.0</span>
+                            <span class="text-xs text-cyber-green">km/h</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="cyber-panel p-3.5 sm:p-4 flex justify-between items-center">
+                    <div>
+                        <div class="text-xs text-cyber-muted uppercase tracking-wider">移動距離</div>
+                        <div class="flex items-baseline gap-1 mt-0.5">
+                            <span id="trip-distance" class="font-orbitron text-xl sm:text-2xl font-bold text-cyber-bright text-glow">0.00</span>
+                            <span class="text-xs text-cyber-green">km</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-route text-cyber-muted text-xl sm:text-2xl"></i>
+                </div>
+
+                <div class="cyber-panel p-3.5 sm:p-4 flex justify-between items-center">
+                    <div>
+                        <div class="text-xs text-cyber-muted uppercase tracking-wider">消費カロリー</div>
+                        <div class="flex items-baseline gap-1 mt-0.5">
+                            <span id="calories-burned" class="font-orbitron text-xl sm:text-2xl font-bold text-cyber-bright">0</span>
+                            <span class="text-xs text-cyber-green">kcal</span>
+                        </div>
+                    </div>
+                    <i class="fa-solid fa-fire text-cyber-muted text-xl sm:text-2xl"></i>
+                </div>
+
+                <div class="cyber-panel p-3.5 sm:p-4 flex justify-between items-center">
+                    <div>
+                        <div class="text-xs text-cyber-muted uppercase tracking-wider">経過時間</div>
+                        <div id="trip-timer" class="font-orbitron text-xl sm:text-2xl font-bold text-white mt-0.5">00:00:00</div>
+                    </div>
+                    <i class="fa-solid fa-stopwatch text-cyber-muted text-xl sm:text-2xl"></i>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Controls Bar -->
+        <div class="flex flex-wrap items-center justify-center gap-2 sm:gap-4 py-2">
+            <button id="toggle-tracking-btn" class="cyber-panel px-6 sm:px-8 py-3 bg-cyber-green/20 hover:bg-cyber-green/30 border-cyber-green text-cyber-bright font-orbitron font-bold text-base sm:text-lg tracking-wider transition hover:scale-105 active:scale-95 flex items-center gap-2 sm:gap-3 border-glow min-h-[48px]">
+                <i id="tracking-icon" class="fa-solid fa-play"></i>
+                <span id="tracking-text">計測開始</span>
+            </button>
+
+            <button id="download-trip-btn" class="cyber-panel px-4 sm:px-5 py-3 bg-cyber-black hover:bg-cyber-panel border-cyber-border hover:border-cyber-bright text-cyber-bright font-orbitron font-semibold text-xs sm:text-sm tracking-wider transition flex items-center gap-2 min-h-[48px]">
+                <i class="fa-solid fa-file-arrow-down text-cyber-bright"></i>
+                <span>データ保存</span>
+            </button>
+
+            <button id="reset-trip-btn" class="cyber-panel px-4 sm:px-6 py-3 bg-cyber-black hover:bg-cyber-panel border-cyber-border hover:border-cyber-green text-gray-300 hover:text-white font-orbitron font-semibold text-xs sm:text-sm tracking-wider transition flex items-center gap-2 min-h-[48px]">
+                <i class="fa-solid fa-rotate-right"></i>
+                <span>リセット</span>
+            </button>
+
+            <button id="sim-mode-btn" class="cyber-panel px-4 py-3 bg-cyber-black border-cyber-border hover:border-cyber-warning text-cyber-warning text-xs font-bold uppercase transition flex items-center gap-2 min-h-[48px]">
+                <i class="fa-solid fa-flask"></i>
+                <span id="sim-status-text">テストシミュレータ: OFF</span>
+            </button>
+        </div>
+
+        <!-- Simulator Slider Drawer -->
+        <div id="sim-controls" class="hidden cyber-panel p-4 max-w-xl mx-auto w-full border-cyber-warning/40 bg-cyber-dark/90">
+            <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold text-cyber-warning flex items-center gap-2">
+                    <i class="fa-solid fa-sliders"></i> 手動速度テストシミュレータ
+                </span>
+                <span id="sim-speed-val" class="font-orbitron font-bold text-cyber-bright">25 km/h</span>
+            </div>
+            <input id="sim-slider" type="range" min="0" max="60" step="0.5" value="25" class="w-full accent-cyber-green bg-cyber-black h-2 rounded-lg cursor-pointer min-h-[24px]">
+        </div>
+
+    </main>
+
+    <!-- Download Modal -->
+    <div id="download-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="cyber-panel max-w-md w-full p-6 bg-cyber-dark border-cyber-bright box-glow">
+            <div class="flex justify-between items-center border-b border-cyber-border pb-3 mb-4">
+                <h3 class="font-orbitron font-bold text-lg text-cyber-bright flex items-center gap-2">
+                    <i class="fa-solid fa-file-arrow-down"></i> 走行データダウンロード
+                </h3>
+                <button id="close-download-btn" class="text-cyber-muted hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-3">
+                <p class="text-xs text-gray-300">記録されたログデータを好みのフォーマットでエクスポートできます。</p>
+                
+                <div id="download-log-summary" class="p-3 bg-cyber-black/60 rounded border border-cyber-border text-xs text-cyber-bright space-y-1">
+                    <div>記録ポイント数: <span id="download-point-count" class="font-orbitron font-bold text-white">0</span></div>
+                    <div>総移動距離: <span id="download-distance" class="font-orbitron font-bold text-white">0.00 km</span></div>
+                    <div>経過時間: <span id="download-duration" class="font-orbitron font-bold text-white">00:00:00</span></div>
+                </div>
+
+                <div class="grid grid-cols-1 gap-2.5 pt-2">
+                    <button id="dl-gpx-btn" class="cyber-panel p-3 bg-cyber-green/10 hover:bg-cyber-green/20 border-cyber-green text-cyber-bright font-orbitron font-bold text-xs flex items-center justify-between transition">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-map-location-dot text-base"></i> GPXファイル (.gpx)
+                        </span>
+                        <span class="text-[10px] text-cyber-muted">Strava / Maps用</span>
+                    </button>
+
+                    <button id="dl-csv-btn" class="cyber-panel p-3 bg-cyber-bright/10 hover:bg-cyber-bright/20 border-cyber-bright text-cyber-bright font-orbitron font-bold text-xs flex items-center justify-between transition">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-file-csv text-base"></i> CSVログデータ (.csv)
+                        </span>
+                        <span class="text-[10px] text-cyber-muted">表計算 / 分析用</span>
+                    </button>
+
+                    <button id="dl-json-btn" class="cyber-panel p-3 bg-cyber-black hover:bg-cyber-panel border-cyber-border hover:border-cyber-bright text-gray-200 font-orbitron font-bold text-xs flex items-center justify-between transition">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-file-code text-base"></i> JSONデータ (.json)
+                        </span>
+                        <span class="text-[10px] text-cyber-muted">全詳細データ</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md hidden">
+        <div class="cyber-panel max-w-md w-full p-6 bg-cyber-dark border-cyber-bright box-glow max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-cyber-border pb-3 mb-4">
+                <h3 class="font-orbitron font-bold text-lg text-cyber-bright flex items-center gap-2">
+                    <i class="fa-solid fa-gear"></i> システム設定
+                </h3>
+                <button id="close-settings-btn" class="text-cyber-muted hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 text-xs">
+                <!-- Bike Settings Section -->
+                <div id="settings-bike-section" class="space-y-2">
+                    <label class="block text-cyber-bright font-bold uppercase mb-1">タイヤプリセット / 周長 (mm)</label>
+                    <select id="tire-preset-select" class="w-full bg-cyber-black border border-cyber-border p-2 rounded text-white focus:border-cyber-green outline-none">
+                        <option value="2070" selected>700c x 23c (2070 mm)</option>
+                        <option value="2096">700c x 25c (2096 mm)</option>
+                        <option value="2136">700c x 28c (2136 mm)</option>
+                        <option value="2075">26" x 1.95 (2075 mm)</option>
+                        <option value="2288">29" x 2.25 (2288 mm)</option>
+                        <option value="custom">カスタム入力...</option>
+                    </select>
+                    <div id="custom-circ-container" class="hidden mt-2">
+                        <input id="custom-circ-input" type="number" value="2070" placeholder="周長 (mm)" class="w-full bg-cyber-black border border-cyber-border p-2 rounded text-white">
+                    </div>
+                </div>
+
+                <!-- Walk Settings Section -->
+                <div id="settings-walk-section" class="hidden space-y-2">
+                    <label class="block text-cyber-bright font-bold uppercase mb-1">設定歩幅 (cm)</label>
+                    <input id="stride-length-input" type="number" value="75" class="w-full bg-cyber-black border border-cyber-border p-2 rounded text-white">
+                </div>
+
+                <!-- Weight Settings -->
+                <div class="space-y-2">
+                    <label class="block text-cyber-bright font-bold uppercase mb-1">体重 (kg) [カロリー計算用]</label>
+                    <input id="user-weight-input" type="number" value="65" class="w-full bg-cyber-black border border-cyber-border p-2 rounded text-white">
+                </div>
+
+                <!-- Speed Alert Settings -->
+                <div id="speed-alert-settings-box" class="space-y-2 border-t border-cyber-border/40 pt-3">
+                    <div class="flex justify-between items-center">
+                        <label class="text-cyber-bright font-bold uppercase">速度警告アラート (サイクリング時のみ)</label>
+                        <span id="speed-alert-val" class="font-orbitron font-bold text-cyber-warning">40 km/h</span>
+                    </div>
+                    <input id="speed-alert-input" type="range" min="20" max="80" step="1" value="40" class="w-full accent-cyber-warning bg-cyber-black h-2 rounded-lg cursor-pointer">
+                </div>
+
+                <!-- Audio Toggle -->
+                <div class="flex justify-between items-center border-t border-cyber-border/40 pt-3">
+                    <span class="text-cyber-bright font-bold uppercase">警告音 (戦闘機アラーム)</span>
+                    <label class="cyber-switch relative inline-flex items-center cursor-pointer">
+                        <input id="audio-alert-toggle" type="checkbox" checked class="sr-only">
+                        <div class="w-10 h-5 bg-cyber-black border border-cyber-border rounded-full cyber-slider transition-colors duration-200 ease-in-out relative before:content-[''] before:absolute before:top-0.5 before:left-0.5 before:bg-cyber-muted before:w-4 before:h-4 before:rounded-full before:transition-transform"></div>
+                    </label>
+                </div>
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-cyber-border flex justify-end">
+                <button id="save-settings-btn" class="cyber-panel px-6 py-2 bg-cyber-green/20 hover:bg-cyber-green/30 border-cyber-green text-cyber-bright font-orbitron font-bold text-sm">
+                    保存して閉じる
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentMode = 'bike'; // 'bike' or 'walk'
+        let tracking = false;
+        let simMode = false;
+        let watchId = null;
+        let timerInterval = null;
+        let simInterval = null;
+        let wakeLock = null;
+
+        let currentSpeedKmh = 0;
+        let maxSpeedKmh = 0;
+        let totalDistanceMeters = 0;
+        let totalActiveSeconds = 0;
+        let speedHistory = [];
+        let calculatedCadence = 0; // RPM for bike, SPM for walk
+        let totalSteps = 0;
+        let totalCalories = 0;
+
+        let lastPosition = null;
+        let tripTrackLog = [];
+
+        let tireCircumferenceMm = 2070;
+        let strideLengthCm = 75;
+        let userWeightKg = 65;
+        let tireName = "スポーツロード";
+        let speedAlertLimit = 40;
+        let audioAlertEnabled = true;
+
+        let audioCtx = null;
+        let audioAlertCooldown = 0;
+
+        // DOM elements
+        const headerModeIcon = document.getElementById('header-mode-icon');
+        const headerModeTitle = document.getElementById('header-mode-title');
+        const modeBikeBtn = document.getElementById('mode-bike-btn');
+        const modeWalkBtn = document.getElementById('mode-walk-btn');
+
+        const speedKmhEl = document.getElementById('speed-kmh');
+        const speedMsEl = document.getElementById('speed-ms');
+        
+        const cadenceLabelEl = document.getElementById('cadence-label');
+        const cadenceValueEl = document.getElementById('cadence-value');
+        const cadenceUnitEl = document.getElementById('cadence-unit');
+        const cadenceBarEl = document.getElementById('cadence-bar');
+
+        const stepCountPanel = document.getElementById('step-count-panel');
+        const stepCountValueEl = document.getElementById('step-count-value');
+
+        const specPanelTitle = document.getElementById('spec-panel-title');
+        const specDisplayName = document.getElementById('spec-display-name');
+        const specParam1Label = document.getElementById('spec-param-1-label');
+        const specParam1Value = document.getElementById('spec-param-1-value');
+        const specParam2Label = document.getElementById('spec-param-2-label');
+        const specParam2Value = document.getElementById('spec-param-2-value');
+
+        const maxSpeedEl = document.getElementById('max-speed');
+        const avgSpeedEl = document.getElementById('avg-speed');
+        const tripDistanceEl = document.getElementById('trip-distance');
+        const caloriesBurnedEl = document.getElementById('calories-burned');
+        const tripTimerEl = document.getElementById('trip-timer');
+        const gpsStatusBadge = document.getElementById('gps-status-badge');
+        const gpsDot = document.getElementById('gps-dot');
+        const gpsText = document.getElementById('gps-text');
+
+        const toggleTrackingBtn = document.getElementById('toggle-tracking-btn');
+        const trackingIcon = document.getElementById('tracking-icon');
+        const trackingText = document.getElementById('tracking-text');
+        const resetTripBtn = document.getElementById('reset-trip-btn');
+
+        const downloadTripBtn = document.getElementById('download-trip-btn');
+        const downloadModal = document.getElementById('download-modal');
+        const closeDownloadBtn = document.getElementById('close-download-btn');
+        const downloadPointCount = document.getElementById('download-point-count');
+        const downloadDistance = document.getElementById('download-distance');
+        const downloadDuration = document.getElementById('download-duration');
+        const dlGpxBtn = document.getElementById('dl-gpx-btn');
+        const dlCsvBtn = document.getElementById('dl-csv-btn');
+        const dlJsonBtn = document.getElementById('dl-json-btn');
+
+        const simModeBtn = document.getElementById('sim-mode-btn');
+        const simControls = document.getElementById('sim-controls');
+        const simSlider = document.getElementById('sim-slider');
+        const simSpeedVal = document.getElementById('sim-speed-val');
+        const simStatusText = document.getElementById('sim-status-text');
+
+        const settingsModal = document.getElementById('settings-modal');
+        const openSettingsBtn = document.getElementById('open-settings-btn');
+        const closeSettingsBtn = document.getElementById('close-settings-btn');
+        const saveSettingsBtn = document.getElementById('save-settings-btn');
+        const tirePresetSelect = document.getElementById('tire-preset-select');
+        const customCircContainer = document.getElementById('custom-circ-container');
+        const customCircInput = document.getElementById('custom-circ-input');
+        const strideLengthInput = document.getElementById('stride-length-input');
+        const userWeightInput = document.getElementById('user-weight-input');
+        const speedAlertInput = document.getElementById('speed-alert-input');
+        const speedAlertVal = document.getElementById('speed-alert-val');
+        const audioAlertToggle = document.getElementById('audio-alert-toggle');
+
+        const canvas = document.getElementById('speedometer-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeCanvas() {
+            const rect = canvas.getBoundingClientRect();
+            if (!rect || rect.width <= 0 || rect.height <= 0) return;
+            canvas.width = rect.width * (window.devicePixelRatio || 1);
+            canvas.height = rect.height * (window.devicePixelRatio || 1);
+            ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+            drawSpeedometer(currentSpeedKmh);
+        }
+
+        function drawSpeedometer(speed) {
+            const width = canvas.getBoundingClientRect().width;
+            const height = canvas.getBoundingClientRect().height;
+            if (width <= 0 || height <= 0) return;
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.max(1, Math.min(width, height) / 2 - 16);
+            if (radius <= 1) return;
+
+            ctx.clearRect(0, 0, width, height);
+
+            const startAngle = 0.75 * Math.PI;
+            const endAngle = 2.25 * Math.PI;
+            const maxGaugeSpeed = currentMode === 'bike' ? 60 : 15;
+
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, startAngle, endAngle);
+            ctx.strokeStyle = 'rgba(0, 255, 102, 0.15)';
+            ctx.lineWidth = 8;
+            ctx.stroke();
+
+            const totalTicks = 24;
+            for (let i = 0; i <= totalTicks; i++) {
+                const angle = startAngle + (i / totalTicks) * (endAngle - startAngle);
+                const isMajor = i % 4 === 0;
+                const tickLen = isMajor ? 12 : 6;
+
+                const innerR1 = Math.max(0, radius - 10);
+                const innerR2 = Math.max(0, radius - 10 - tickLen);
+
+                const x1 = centerX + Math.cos(angle) * innerR1;
+                const y1 = centerY + Math.sin(angle) * innerR1;
+                const x2 = centerX + Math.cos(angle) * innerR2;
+                const y2 = centerY + Math.sin(angle) * innerR2;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = isMajor ? '#00ffcc' : 'rgba(0, 255, 102, 0.3)';
+                ctx.lineWidth = isMajor ? 2 : 1;
+                ctx.stroke();
+            }
+
+            const clampedSpeed = Math.min(Math.max(speed, 0), maxGaugeSpeed);
+            const currentAngle = startAngle + (clampedSpeed / maxGaugeSpeed) * (endAngle - startAngle);
+
+            if (clampedSpeed > 0 && currentAngle > startAngle) {
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, radius, startAngle, currentAngle);
+                ctx.strokeStyle = (currentMode === 'bike' && speed >= speedAlertLimit) ? '#ff2255' : '#00ff66';
+                ctx.lineWidth = 10;
+                ctx.lineCap = 'round';
+                ctx.shadowColor = ctx.strokeStyle;
+                ctx.shadowBlur = 10;
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        let scene, camera, renderer;
+        let bikeGroup, frontWheel, rearWheel, pedalsGroup;
+        let humanGroup;
+        let leftHipJoint, rightHipJoint, leftKneeJoint, rightKneeJoint, leftAnkleJoint, rightAnkleJoint;
+        let leftShoulderJoint, rightShoulderJoint, leftElbowJoint, rightElbowJoint;
+        let torsoSpineJoint, headJoint;
+        let holoParticles;
+        let isMouseDown = false, mouseX = 0, mouseY = 0;
+
+        function initHologram3D() {
+            const container = document.getElementById('hologram-container');
+            const width = container.clientWidth || 300;
+            const height = container.clientHeight || 300;
+
+            scene = new THREE.Scene();
+
+            camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+            camera.position.set(3.5, 2.0, 4.5);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+            renderer.setSize(width, height);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            container.appendChild(renderer.domElement);
+
+            const greenGlowMat = new THREE.MeshBasicMaterial({ color: 0x00ff66, wireframe: true, transparent: true, opacity: 0.85 });
+            const brightCyanMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, wireframe: true, transparent: true, opacity: 0.95 });
+            const solidGlowMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, transparent: true, opacity: 0.5 });
+            const jointNodeMat = new THREE.MeshBasicMaterial({ color: 0x00ffcc, wireframe: false, transparent: true, opacity: 0.8 });
+
+            // Pedestal
+            const pedestalGroup = new THREE.Group();
+            const baseMesh = new THREE.Mesh(new THREE.CylinderGeometry(2.2, 2.5, 0.15, 32), greenGlowMat);
+            baseMesh.position.y = -1.2;
+            pedestalGroup.add(baseMesh);
+
+            const gridHelper = new THREE.PolarGridHelper(2.2, 16, 8, 32, 0x00ffcc, 0x008a44);
+            gridHelper.position.y = -1.12;
+            pedestalGroup.add(gridHelper);
+            scene.add(pedestalGroup);
+
+            // 1. Sports Bike Hologram
+            bikeGroup = new THREE.Group();
+            const wheelRadius = 0.8;
+
+            function createSportsWheel() {
+                const wheelGroup = new THREE.Group();
+                const rim = new THREE.Mesh(new THREE.TorusGeometry(wheelRadius, 0.04, 8, 32), brightCyanMat);
+                wheelGroup.add(rim);
+
+                const diskGeo = new THREE.CylinderGeometry(wheelRadius * 0.85, wheelRadius * 0.85, 0.02, 24);
+                diskGeo.rotateX(Math.PI / 2);
+                wheelGroup.add(new THREE.Mesh(diskGeo, solidGlowMat));
+
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2;
+                    const spokeGeo = new THREE.BufferGeometry().setFromPoints([
+                        new THREE.Vector3(0, 0, 0),
+                        new THREE.Vector3(Math.cos(angle) * wheelRadius, Math.sin(angle) * wheelRadius, 0)
+                    ]);
+                    wheelGroup.add(new THREE.Line(spokeGeo, greenGlowMat));
+                }
+
+                const hubGeo = new THREE.CylinderGeometry(0.12, 0.12, 0.15, 12);
+                hubGeo.rotateX(Math.PI / 2);
+                wheelGroup.add(new THREE.Mesh(hubGeo, brightCyanMat));
+                return wheelGroup;
+            }
+
+            rearWheel = createSportsWheel();
+            rearWheel.position.set(-1.3, -0.3, 0);
+            bikeGroup.add(rearWheel);
+
+            frontWheel = createSportsWheel();
+            frontWheel.position.set(1.3, -0.3, 0);
+            bikeGroup.add(frontWheel);
+
+            const frameGroup = new THREE.Group();
+            function createTube(p1, p2, radius = 0.035) {
+                const distance = p1.distanceTo(p2);
+                const mesh = new THREE.Mesh(new THREE.CylinderGeometry(radius, radius, distance, 8), brightCyanMat);
+                const midPoint = new THREE.Vector3().addVectors(p1, p2).multiplyScalar(0.5);
+                mesh.position.copy(midPoint);
+                const orientation = new THREE.Matrix4();
+                orientation.lookAt(p2, p1, new THREE.Vector3(0, 1, 0));
+                mesh.rotation.copy(new THREE.Euler().setFromRotationMatrix(orientation));
+                mesh.rotateX(Math.PI / 2);
+                return mesh;
+            }
+
+            const bbNode = new THREE.Vector3(-0.3, -0.3, 0);
+            const rearNode = new THREE.Vector3(-1.3, -0.3, 0);
+            const seatNode = new THREE.Vector3(-0.5, 0.5, 0);
+            const headNode = new THREE.Vector3(0.9, 0.65, 0);
+            const headLowNode = new THREE.Vector3(0.8, 0.2, 0);
+            const frontNode = new THREE.Vector3(1.3, -0.3, 0);
+
+            frameGroup.add(createTube(bbNode, rearNode, 0.025));
+            frameGroup.add(createTube(seatNode, rearNode, 0.02));
+            frameGroup.add(createTube(bbNode, seatNode, 0.04));
+            frameGroup.add(createTube(bbNode, headLowNode, 0.05));
+            frameGroup.add(createTube(seatNode, headNode, 0.035));
+            frameGroup.add(createTube(headLowNode, headNode, 0.04));
+            frameGroup.add(createTube(headLowNode, frontNode, 0.03));
+
+            const barGeo = new THREE.TorusGeometry(0.22, 0.025, 8, 16, Math.PI * 1.2);
+            const leftBar = new THREE.Mesh(barGeo, brightCyanMat);
+            leftBar.position.set(0.9, 0.65, 0.2);
+            leftBar.rotation.y = Math.PI / 2;
+            frameGroup.add(leftBar);
+
+            const rightBar = new THREE.Mesh(barGeo, brightCyanMat);
+            rightBar.position.set(0.9, 0.65, -0.2);
+            rightBar.rotation.y = Math.PI / 2;
+            frameGroup.add(rightBar);
+
+            const saddleGeo = new THREE.ConeGeometry(0.18, 0.45, 4);
+            saddleGeo.rotateX(Math.PI / 2);
+            saddleGeo.rotateY(Math.PI / 2);
+            const saddle = new THREE.Mesh(saddleGeo, greenGlowMat);
+            saddle.position.set(-0.55, 0.62, 0);
+            saddle.scale.set(0.8, 0.3, 1.2);
+            frameGroup.add(saddle);
+
+            pedalsGroup = new THREE.Group();
+            pedalsGroup.position.copy(bbNode);
+            const crankDisk = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.18, 0.02, 16).rotateX(Math.PI / 2), brightCyanMat);
+            pedalsGroup.add(crankDisk);
+
+            bikeGroup.add(frameGroup);
+            bikeGroup.add(pedalsGroup);
+            scene.add(bikeGroup);
+
+            // 2. Humanoid Hologram
+            humanGroup = new THREE.Group();
+            humanGroup.position.y = -1.1;
+
+            const pelvisMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.18, 0.18, 12), brightCyanMat);
+            pelvisMesh.position.y = 0.95;
+            humanGroup.add(pelvisMesh);
+
+            torsoSpineJoint = new THREE.Group();
+            torsoSpineJoint.position.set(0, 0.95, 0);
+
+            const chestMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.20, 0.45, 14), greenGlowMat);
+            chestMesh.position.y = 0.28;
+            torsoSpineJoint.add(chestMesh);
+
+            const coreSpineMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.5, 8), brightCyanMat);
+            coreSpineMesh.position.y = 0.25;
+            torsoSpineJoint.add(coreSpineMesh);
+
+            const neckMesh = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.08, 0.12, 10), brightCyanMat);
+            neckMesh.position.y = 0.55;
+            torsoSpineJoint.add(neckMesh);
+
+            headJoint = new THREE.Group();
+            headJoint.position.set(0, 0.65, 0);
+            const skullMesh = new THREE.Mesh(new THREE.IcosahedronGeometry(0.16, 2), brightCyanMat);
+            skullMesh.scale.set(1.0, 1.25, 1.15);
+            headJoint.add(skullMesh);
+
+            const jawMesh = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.18, 5), greenGlowMat);
+            jawMesh.rotation.x = Math.PI;
+            jawMesh.position.set(0, -0.08, 0.04);
+            headJoint.add(jawMesh);
+            torsoSpineJoint.add(headJoint);
+
+            humanGroup.add(torsoSpineJoint);
+
+            function createJointSphere(radius = 0.055) {
+                return new THREE.Mesh(new THREE.SphereGeometry(radius, 10, 10), jointNodeMat);
+            }
+
+            // Left Leg
+            leftHipJoint = new THREE.Group();
+            leftHipJoint.position.set(0, 0.92, 0.13);
+            leftHipJoint.add(createJointSphere(0.065));
+
+            const leftThigh = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.065, 0.48, 12), greenGlowMat);
+            leftThigh.position.y = -0.24;
+            leftHipJoint.add(leftThigh);
+
+            leftKneeJoint = new THREE.Group();
+            leftKneeJoint.position.set(0, -0.48, 0);
+            leftKneeJoint.add(createJointSphere(0.055));
+
+            const leftCalf = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.045, 0.48, 12), greenGlowMat);
+            leftCalf.position.y = -0.24;
+            leftKneeJoint.add(leftCalf);
+
+            leftAnkleJoint = new THREE.Group();
+            leftAnkleJoint.position.set(0, -0.48, 0);
+            leftAnkleJoint.add(createJointSphere(0.045));
+
+            const leftFoot = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.22), brightCyanMat);
+            leftFoot.position.set(0, -0.03, 0.07);
+            leftAnkleJoint.add(leftFoot);
+
+            leftKneeJoint.add(leftAnkleJoint);
+            leftHipJoint.add(leftKneeJoint);
+            humanGroup.add(leftHipJoint);
+
+            // Right Leg
+            rightHipJoint = new THREE.Group();
+            rightHipJoint.position.set(0, 0.92, -0.13);
+            rightHipJoint.add(createJointSphere(0.065));
+
+            const rightThigh = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.065, 0.48, 12), greenGlowMat);
+            rightThigh.position.y = -0.24;
+            rightHipJoint.add(rightThigh);
+
+            rightKneeJoint = new THREE.Group();
+            rightKneeJoint.position.set(0, -0.48, 0);
+            rightKneeJoint.add(createJointSphere(0.055));
+
+            const rightCalf = new THREE.Mesh(new THREE.CylinderGeometry(0.065, 0.045, 0.48, 12), greenGlowMat);
+            rightCalf.position.y = -0.24;
+            rightKneeJoint.add(rightCalf);
+
+            rightAnkleJoint = new THREE.Group();
+            rightAnkleJoint.position.set(0, -0.48, 0);
+            rightAnkleJoint.add(createJointSphere(0.045));
+
+            const rightFoot = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.06, 0.22), brightCyanMat);
+            rightFoot.position.set(0, -0.03, 0.07);
+            rightAnkleJoint.add(rightFoot);
+
+            rightKneeJoint.add(rightAnkleJoint);
+            rightHipJoint.add(rightKneeJoint);
+            humanGroup.add(rightHipJoint);
+
+            // Arms
+            leftShoulderJoint = new THREE.Group();
+            leftShoulderJoint.position.set(0, 0.44, 0.28);
+            torsoSpineJoint.add(leftShoulderJoint);
+            leftShoulderJoint.add(createJointSphere(0.055));
+
+            const leftUpperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.045, 0.38, 10), greenGlowMat);
+            leftUpperArm.position.y = -0.19;
+            leftShoulderJoint.add(leftUpperArm);
+
+            leftElbowJoint = new THREE.Group();
+            leftElbowJoint.position.set(0, -0.38, 0);
+            leftElbowJoint.add(createJointSphere(0.045));
+
+            const leftForearm = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.035, 0.36, 10), greenGlowMat);
+            leftForearm.position.y = -0.18;
+            leftElbowJoint.add(leftForearm);
+
+            const leftHand = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.08, 0.07), brightCyanMat);
+            leftHand.position.y = -0.40;
+            leftElbowJoint.add(leftHand);
+
+            leftShoulderJoint.add(leftElbowJoint);
+
+            rightShoulderJoint = new THREE.Group();
+            rightShoulderJoint.position.set(0, 0.44, -0.28);
+            torsoSpineJoint.add(rightShoulderJoint);
+            rightShoulderJoint.add(createJointSphere(0.055));
+
+            const rightUpperArm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.045, 0.38, 10), greenGlowMat);
+            rightUpperArm.position.y = -0.19;
+            rightShoulderJoint.add(rightUpperArm);
+
+            rightElbowJoint = new THREE.Group();
+            rightElbowJoint.position.set(0, -0.38, 0);
+            rightElbowJoint.add(createJointSphere(0.045));
+
+            const rightForearm = new THREE.Mesh(new THREE.CylinderGeometry(0.045, 0.035, 0.36, 10), greenGlowMat);
+            rightForearm.position.y = -0.18;
+            rightElbowJoint.add(rightForearm);
+
+            const rightHand = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.08, 0.07), brightCyanMat);
+            rightHand.position.y = -0.40;
+            rightElbowJoint.add(rightHand);
+
+            rightShoulderJoint.add(rightElbowJoint);
+
+            humanGroup.visible = false;
+            scene.add(humanGroup);
+
+            // Particles
+            const particleCount = 120;
+            const particleGeo = new THREE.BufferGeometry();
+            const positions = new Float32Array(particleCount * 3);
+            for (let i = 0; i < particleCount * 3; i += 3) {
+                positions[i] = (Math.random() - 0.5) * 3.5;
+                positions[i + 1] = (Math.random() - 0.5) * 2.0;
+                positions[i + 2] = (Math.random() - 0.5) * 2.0;
+            }
+            particleGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            holoParticles = new THREE.Points(particleGeo, new THREE.PointsMaterial({ color: 0x00ffcc, size: 0.04, transparent: true, opacity: 0.6 }));
+            scene.add(holoParticles);
+
+            // Controls
+            container.addEventListener('mousedown', (e) => { isMouseDown = true; mouseX = e.clientX; mouseY = e.clientY; });
+            window.addEventListener('mouseup', () => isMouseDown = false);
+            container.addEventListener('mousemove', (e) => {
+                if (!isMouseDown) return;
+                const deltaX = e.clientX - mouseX;
+                const deltaY = e.clientY - mouseY;
+                scene.rotation.y += deltaX * 0.01;
+                scene.rotation.x += deltaY * 0.005;
+                mouseX = e.clientX;
+                mouseY = e.clientY;
+            });
+
+            container.addEventListener('touchstart', (e) => { if (e.touches.length === 1) { isMouseDown = true; mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; } });
+            container.addEventListener('touchend', () => isMouseDown = false);
+            container.addEventListener('touchmove', (e) => {
+                if (!isMouseDown || e.touches.length !== 1) return;
+                const deltaX = e.touches[0].clientX - mouseX;
+                const deltaY = e.touches[0].clientY - mouseY;
+                scene.rotation.y += deltaX * 0.01;
+                scene.rotation.x += deltaY * 0.005;
+                mouseX = e.touches[0].clientX;
+                mouseY = e.touches[0].clientY;
+            });
+
+            animateHologram();
+        }
+
+        let walkAnimTime = 0;
+        function animateHologram() {
+            requestAnimationFrame(animateHologram);
+
+            if (currentMode === 'bike') {
+                const rotSpeed = (calculatedCadence / 60) * (Math.PI * 2) * 0.016;
+                frontWheel.rotation.z -= rotSpeed;
+                rearWheel.rotation.z -= rotSpeed;
+                if (pedalsGroup) pedalsGroup.rotation.z -= rotSpeed * 0.4;
+            } else if (currentMode === 'walk') {
+                if (currentSpeedKmh > 0.1) {
+                    const spmRate = calculatedCadence || 100;
+                    walkAnimTime += (spmRate / 60) * 0.07;
+
+                    const hipCycle = Math.sin(walkAnimTime);
+                    const hipSwing = hipCycle * 0.45;
+
+                    leftHipJoint.rotation.z = -hipSwing;
+                    const leftKneeFlex = Math.max(0, Math.sin(walkAnimTime + Math.PI * 0.25)) * 0.7;
+                    leftKneeJoint.rotation.z = leftKneeFlex;
+                    leftAnkleJoint.rotation.z = -leftKneeFlex * 0.4;
+
+                    rightHipJoint.rotation.z = hipSwing;
+                    const rightKneeFlex = Math.max(0, Math.sin(walkAnimTime + Math.PI * 1.25)) * 0.7;
+                    rightKneeJoint.rotation.z = rightKneeFlex;
+                    rightAnkleJoint.rotation.z = -rightKneeFlex * 0.4;
+
+                    leftShoulderJoint.rotation.z = hipSwing * 0.6;
+                    leftElbowJoint.rotation.z = -Math.abs(Math.cos(walkAnimTime)) * 0.3 - 0.2;
+
+                    rightShoulderJoint.rotation.z = -hipSwing * 0.6;
+                    rightElbowJoint.rotation.z = -Math.abs(Math.sin(walkAnimTime)) * 0.3 - 0.2;
+
+                    torsoSpineJoint.rotation.y = Math.sin(walkAnimTime) * 0.08;
+                    headJoint.rotation.y = -Math.sin(walkAnimTime) * 0.05;
+                    humanGroup.position.y = -1.1 + Math.abs(Math.sin(walkAnimTime * 2)) * 0.04;
+                } else {
+                    leftHipJoint.rotation.z = 0.05;
+                    rightHipJoint.rotation.z = -0.05;
+                    leftKneeJoint.rotation.z = 0;
+                    rightKneeJoint.rotation.z = 0;
+                    leftAnkleJoint.rotation.z = 0;
+                    rightAnkleJoint.rotation.z = 0;
+
+                    leftShoulderJoint.rotation.z = 0;
+                    rightShoulderJoint.rotation.z = 0;
+                    leftElbowJoint.rotation.z = -0.15;
+                    rightElbowJoint.rotation.z = -0.15;
+
+                    torsoSpineJoint.rotation.y = 0;
+                    headJoint.rotation.y = 0;
+                    humanGroup.position.y = -1.1;
+                }
+            }
+
+            const time = Date.now() * 0.002;
+            if (bikeGroup) bikeGroup.position.y = Math.sin(time) * 0.05;
+            if (holoParticles) holoParticles.rotation.y += 0.002;
+
+            renderer.render(scene, camera);
+        }
+
+        document.getElementById('cam-preset-1').addEventListener('click', () => scene.rotation.set(0, 0.6, 0));
+        document.getElementById('cam-preset-2').addEventListener('click', () => scene.rotation.set(0, Math.PI / 2, 0));
+        document.getElementById('cam-preset-3').addEventListener('click', () => scene.rotation.set(0, 0, 0));
+
+        function triggerAudioAlert() {
+            if (!audioAlertEnabled || currentMode !== 'bike') return;
+            const now = Date.now();
+            if (now - audioAlertCooldown < 250) return;
+            audioAlertCooldown = now;
+
+            try {
+                if (!audioCtx) {
+                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                }
+                if (audioCtx.state === 'suspended') {
+                    audioCtx.resume();
+                }
+
+                const currTime = audioCtx.currentTime;
+                const osc1 = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc1.type = 'sawtooth';
+                osc2.type = 'square';
+
+                osc1.frequency.setValueAtTime(1020, currTime);
+                osc1.frequency.exponentialRampToValueAtTime(440, currTime + 0.18);
+
+                osc2.frequency.setValueAtTime(1280, currTime);
+                osc2.frequency.exponentialRampToValueAtTime(520, currTime + 0.18);
+
+                gain.gain.setValueAtTime(0.2, currTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, currTime + 0.18);
+
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                osc1.start(currTime);
+                osc2.start(currTime);
+                osc1.stop(currTime + 0.18);
+                osc2.stop(currTime + 0.18);
+            } catch (e) {
+                console.error("Audio trigger error:", e);
+            }
+        }
+
+        function updateTelemetry(speedKmh) {
+            currentSpeedKmh = speedKmh;
+            const speedMs = speedKmh / 3.6;
+
+            speedKmhEl.textContent = speedKmh.toFixed(1);
+            speedMsEl.textContent = speedMs.toFixed(2);
+
+            if (currentMode === 'bike') {
+                const circumferenceMeters = tireCircumferenceMm / 1000;
+                calculatedCadence = 0;
+                if (circumferenceMeters > 0 && speedKmh > 0) {
+                    calculatedCadence = Math.round((speedMs * 60) / circumferenceMeters);
+                }
+                cadenceValueEl.textContent = calculatedCadence;
+                cadenceBarEl.style.width = `${Math.min((calculatedCadence / 350) * 100, 100)}%`;
+            } else {
+                const strideMeters = strideLengthCm / 100;
+                calculatedCadence = 0;
+                if (strideMeters > 0 && speedKmh > 0) {
+                    calculatedCadence = Math.round((speedMs * 60) / strideMeters);
+                }
+                cadenceValueEl.textContent = calculatedCadence;
+                cadenceBarEl.style.width = `${Math.min((calculatedCadence / 180) * 100, 100)}%`;
+
+                if (strideMeters > 0) {
+                    totalSteps = Math.floor(totalDistanceMeters / strideMeters);
+                    stepCountValueEl.textContent = totalSteps.toLocaleString();
+                }
+            }
+
+            // Calories (METs)
+            if (tracking && speedKmh > 0.5) {
+                let mets = 3.5;
+                if (currentMode === 'bike') {
+                    if (speedKmh < 15) mets = 4.0;
+                    else if (speedKmh < 22) mets = 6.8;
+                    else mets = 10.0;
+                } else {
+                    if (speedKmh < 4) mets = 2.8;
+                    else if (speedKmh < 6) mets = 3.8;
+                    else mets = 6.0;
+                }
+                const calPerSec = (mets * userWeightKg * 3.5) / 12000;
+                totalCalories += calPerSec;
+                caloriesBurnedEl.textContent = Math.round(totalCalories);
+            }
+
+            if (speedKmh > maxSpeedKmh) {
+                maxSpeedKmh = speedKmh;
+                maxSpeedEl.textContent = maxSpeedKmh.toFixed(1);
+            }
+
+            if (tracking && speedKmh > 0.5) {
+                speedHistory.push(speedKmh);
+                const avgSpeed = speedHistory.reduce((a, b) => a + b, 0) / speedHistory.length;
+                avgSpeedEl.textContent = avgSpeed.toFixed(1);
+            }
+
+            // SPEED ALERT WARNING
+            if (currentMode === 'bike' && speedKmh >= speedAlertLimit) {
+                speedKmhEl.classList.add('text-cyber-danger');
+                speedKmhEl.classList.remove('text-white');
+                triggerAudioAlert();
+            } else {
+                speedKmhEl.classList.remove('text-cyber-danger');
+                speedKmhEl.classList.add('text-white');
+            }
+
+            drawSpeedometer(speedKmh);
+        }
+
+        function setMode(mode) {
+            currentMode = mode;
+            if (mode === 'bike') {
+                modeBikeBtn.className = "px-2.5 sm:px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-orbitron font-bold transition bg-cyber-green/20 text-cyber-bright border border-cyber-green";
+                modeWalkBtn.className = "px-2.5 sm:px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-orbitron font-bold transition text-gray-400 hover:text-white";
+
+                headerModeIcon.className = "fa-solid fa-bicycle text-2xl text-cyber-bright text-glow";
+                headerModeTitle.textContent = "VELO";
+
+                cadenceLabelEl.innerHTML = '<i class="fa-solid fa-circle-notch animate-spin text-cyber-bright"></i> タイヤ回転数 (RPM)';
+                cadenceUnitEl.textContent = "RPM";
+
+                stepCountPanel.classList.add('hidden');
+                document.getElementById('settings-bike-section').classList.remove('hidden');
+                document.getElementById('settings-walk-section').classList.add('hidden');
+                document.getElementById('speed-alert-settings-box').classList.remove('opacity-40');
+
+                specPanelTitle.textContent = "ホログラム・ロードバイク";
+                specDisplayName.textContent = `${tireName} (${tireCircumferenceMm}mm)`;
+                specParam1Label.textContent = "タイヤ周長:";
+                specParam1Value.textContent = `${tireCircumferenceMm} mm`;
+                specParam2Label.textContent = "フレーム構造:";
+                specParam2Value.textContent = "エアロカーボン";
+
+                simSlider.max = 60;
+                simSlider.value = Math.min(simSlider.value, 60);
+
+                if (bikeGroup) bikeGroup.visible = true;
+                if (humanGroup) humanGroup.visible = false;
+            } else {
+                modeWalkBtn.className = "px-2.5 sm:px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-orbitron font-bold transition bg-cyber-green/20 text-cyber-bright border border-cyber-green";
+                modeBikeBtn.className = "px-2.5 sm:px-3 py-1.5 rounded flex items-center gap-1.5 text-xs font-orbitron font-bold transition text-gray-400 hover:text-white";
+
+                headerModeIcon.className = "fa-solid fa-person-walking text-2xl text-cyber-bright text-glow";
+                headerModeTitle.textContent = "WALK";
+
+                cadenceLabelEl.innerHTML = '<i class="fa-solid fa-shoe-prints text-cyber-bright"></i> 歩行ピッチ (SPM)';
+                cadenceUnitEl.textContent = "SPM";
+
+                stepCountPanel.classList.remove('hidden');
+                document.getElementById('settings-bike-section').classList.add('hidden');
+                document.getElementById('settings-walk-section').classList.remove('hidden');
+                document.getElementById('speed-alert-settings-box').classList.add('opacity-40');
+
+                specPanelTitle.textContent = "ホログラム・ヒューマノイド";
+                specDisplayName.textContent = "リアル・サイバーウォーカースーツ";
+                specParam1Label.textContent = "設定歩幅:";
+                specParam1Value.textContent = `${strideLengthCm} cm`;
+                specParam2Label.textContent = "関節構造:";
+                specParam2Value.textContent = "解剖学マルチジョイント";
+
+                simSlider.max = 15;
+                if (simSlider.value > 15) simSlider.value = 6;
+
+                if (bikeGroup) bikeGroup.visible = false;
+                if (humanGroup) humanGroup.visible = true;
+            }
+
+            simSpeedVal.textContent = `${simSlider.value} km/h`;
+            updateTelemetry(currentSpeedKmh);
+        }
+
+        function calculateDistance(lat1, lon1, lat2, lon2) {
+            const R = 6371e3;
+            const φ1 = lat1 * Math.PI / 180;
+            const φ2 = lat2 * Math.PI / 180;
+            const Δφ = (lat2 - lat1) * Math.PI / 180;
+            const Δλ = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(Δφ / 2) * Math.sin(Δφ / 2) + Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+            return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        }
+
+        function handlePositionUpdate(position) {
+            updateGpsStatus('active', 'GPS: 受信中');
+            let speedKmh = 0;
+
+            if (position.coords.speed !== null && !isNaN(position.coords.speed) && position.coords.speed >= 0) {
+                speedKmh = position.coords.speed * 3.6;
+            } else if (lastPosition) {
+                const distMeters = calculateDistance(lastPosition.coords.latitude, lastPosition.coords.longitude, position.coords.latitude, position.coords.longitude);
+                const timeSec = (position.timestamp - lastPosition.timestamp) / 1000;
+                if (timeSec > 0) speedKmh = (distMeters / timeSec) * 3.6;
+            }
+
+            if (tracking && lastPosition) {
+                const stepDistance = calculateDistance(lastPosition.coords.latitude, lastPosition.coords.longitude, position.coords.latitude, position.coords.longitude);
+                if (stepDistance > 1.0) {
+                    totalDistanceMeters += stepDistance;
+                    tripDistanceEl.textContent = (totalDistanceMeters / 1000).toFixed(2);
+                }
+            }
+
+            if (tracking) {
+                tripTrackLog.push({
+                    timestamp: new Date().toISOString(),
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude,
+                    alt: position.coords.altitude || 0,
+                    speedKmh: speedKmh,
+                    distanceMeters: totalDistanceMeters,
+                    cadence: calculatedCadence,
+                    mode: currentMode
+                });
+            }
+
+            lastPosition = position;
+            updateTelemetry(speedKmh);
+        }
+
+        function handleGpsError(err) {
+            console.warn(`GPS Error (${err.code}): ${err.message}`);
+            updateGpsStatus('error', 'GPS: エラー');
+        }
+
+        function updateGpsStatus(state, message) {
+            gpsText.textContent = message;
+            if (state === 'active') {
+                gpsDot.className = "w-2.5 h-2.5 rounded-full bg-cyber-bright animate-ping";
+                gpsStatusBadge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyber-green bg-cyber-green/10 text-xs text-cyber-bright";
+            } else if (state === 'sim') {
+                gpsDot.className = "w-2.5 h-2.5 rounded-full bg-cyber-warning";
+                gpsStatusBadge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyber-warning bg-cyber-warning/10 text-xs text-cyber-warning";
+            } else {
+                gpsDot.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+                gpsStatusBadge.className = "flex items-center gap-2 px-3 py-1.5 rounded-full border border-cyber-border bg-cyber-black/60 text-xs text-gray-400";
+            }
+        }
+
+        async function requestWakeLock() {
+            if ('wakeLock' in navigator) {
+                try {
+                    wakeLock = await navigator.wakeLock.request('screen');
+                } catch (err) {
+                    console.log(`Wake Lock Error: ${err.message}`);
+                }
+            }
+        }
+
+        function releaseWakeLock() {
+            if (wakeLock !== null) {
+                wakeLock.release().then(() => {
+                    wakeLock = null;
+                });
+            }
+        }
+
+        function startTracking() {
+            tracking = true;
+            requestWakeLock();
+            toggleTrackingBtn.classList.add('bg-red-500/20', 'border-red-500', 'text-red-400');
+            toggleTrackingBtn.classList.remove('bg-cyber-green/20', 'border-cyber-green', 'text-cyber-bright');
+            trackingIcon.className = "fa-solid fa-pause";
+            trackingText.textContent = "一時停止";
+
+            if (!timerInterval) {
+                timerInterval = setInterval(() => {
+                    totalActiveSeconds++;
+                    const hrs = String(Math.floor(totalActiveSeconds / 3600)).padStart(2, '0');
+                    const mins = String(Math.floor((totalActiveSeconds % 3600) / 60)).padStart(2, '0');
+                    const secs = String(totalActiveSeconds % 60).padStart(2, '0');
+                    tripTimerEl.textContent = `${hrs}:${mins}:${secs}`;
+                }, 1000);
+            }
+
+            if (!simMode) {
+                if ("geolocation" in navigator) {
+                    watchId = navigator.geolocation.watchPosition(
+                        handlePositionUpdate,
+                        handleGpsError,
+                        { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+                    );
+                } else {
+                    alert("お使いの端末はGPS位置情報をサポートしていません。テストシミュレータをご利用ください。");
+                }
+            }
+        }
+
+        function stopTracking() {
+            tracking = false;
+            releaseWakeLock();
+            toggleTrackingBtn.classList.remove('bg-red-500/20', 'border-red-500', 'text-red-400');
+            toggleTrackingBtn.classList.add('bg-cyber-green/20', 'border-cyber-green', 'text-cyber-bright');
+            trackingIcon.className = "fa-solid fa-play";
+            trackingText.textContent = "計測開始";
+
+            if (timerInterval) { clearInterval(timerInterval); timerInterval = null; }
+            if (watchId !== null) { navigator.geolocation.clearWatch(watchId); watchId = null; }
+
+            if (!simMode) {
+                updateGpsStatus('off', 'GPS: OFF');
+                updateTelemetry(0);
+            }
+        }
+
+        function resetTrip() {
+            stopTracking();
+            currentSpeedKmh = 0;
+            maxSpeedKmh = 0;
+            totalDistanceMeters = 0;
+            totalActiveSeconds = 0;
+            totalSteps = 0;
+            totalCalories = 0;
+            speedHistory = [];
+            tripTrackLog = [];
+            lastPosition = null;
+
+            maxSpeedEl.textContent = "0.0";
+            avgSpeedEl.textContent = "0.0";
+            tripDistanceEl.textContent = "0.00";
+            caloriesBurnedEl.textContent = "0";
+            stepCountValueEl.textContent = "0";
+            tripTimerEl.textContent = "00:00:00";
+            updateTelemetry(0);
+        }
+
+        function toggleSimulationMode() {
+            simMode = !simMode;
+            if (simMode) {
+                simModeBtn.classList.add('border-cyber-warning', 'bg-cyber-warning/20');
+                simControls.classList.remove('hidden');
+                simStatusText.textContent = "テストシミュレータ: ON";
+                updateGpsStatus('sim', 'SIMULATOR');
+
+                if (simInterval) clearInterval(simInterval);
+                simInterval = setInterval(() => {
+                    if (simMode) {
+                        const targetSpeed = parseFloat(simSlider.value);
+                        const jitter = (Math.random() - 0.5) * 0.4;
+                        const speed = Math.max(0, targetSpeed + (targetSpeed > 0 ? jitter : 0));
+                        
+                        updateTelemetry(speed);
+
+                        if (tracking) {
+                            const distMeters = (speed / 3.6);
+                            totalDistanceMeters += distMeters;
+                            tripDistanceEl.textContent = (totalDistanceMeters / 1000).toFixed(2);
+
+                            const baseLat = lastPosition ? lastPosition.coords.latitude : 35.6812;
+                            const baseLng = lastPosition ? lastPosition.coords.longitude : 139.7671;
+                            const nextLat = baseLat + (Math.random() - 0.5) * 0.0001;
+                            const nextLng = baseLng + (Math.random() - 0.5) * 0.0001;
+
+                            tripTrackLog.push({
+                                timestamp: new Date().toISOString(),
+                                lat: nextLat,
+                                lng: nextLng,
+                                alt: 10,
+                                speedKmh: speed,
+                                distanceMeters: totalDistanceMeters,
+                                cadence: calculatedCadence,
+                                mode: currentMode
+                            });
+
+                            lastPosition = { coords: { latitude: nextLat, longitude: nextLng } };
+                        }
+                    }
+                }, 1000);
+
+            } else {
+                simModeBtn.classList.remove('border-cyber-warning', 'bg-cyber-warning/20');
+                simControls.classList.add('hidden');
+                simStatusText.textContent = "テストシミュレータ: OFF";
+                if (simInterval) clearInterval(simInterval);
+                
+                if (tracking) {
+                    stopTracking();
+                    startTracking();
+                } else {
+                    updateGpsStatus('off', 'GPS: OFF');
+                    updateTelemetry(0);
+                }
+            }
+        }
+
+        function downloadFile(filename, text, mimeType) {
+            const blob = new Blob([text], { type: mimeType });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 100);
+        }
+
+        function exportGPX() {
+            const dateStr = new Date().toISOString();
+            let trkpts = tripTrackLog.map(pt => 
+                `      <trkpt lat="${pt.lat}" lon="${pt.lng}">\n` +
+                `        <ele>${pt.alt}</ele>\n` +
+                `        <time>${pt.timestamp}</time>\n` +
+                `        <extensions>\n` +
+                `          <speed>${(pt.speedKmh / 3.6).toFixed(2)}</speed>\n` +
+                `        </extensions>\n` +
+                `      </trkpt>`
+            ).join('\n');
+
+            if (!trkpts) {
+                trkpts = `      <trkpt lat="35.6812" lon="139.7671"><time>${dateStr}</time></trkpt>`;
+            }
+
+            const gpxContent = `<?xml version="1.0" encoding="UTF-8"?>\n` +
+                `<gpx version="1.1" creator="CYBER VELO &amp; WALK HUD" xmlns="http://www.topografix.com/GPX/1/1">\n` +
+                `  <metadata>\n` +
+                `    <name>CYBER HUD Telemetry Track</name>\n` +
+                `    <time>${dateStr}</time>\n` +
+                `  </metadata>\n` +
+                `  <trk>\n` +
+                `    <name>${currentMode === 'bike' ? 'Cycling Track' : 'Walking Track'}</name>\n` +
+                `    <trkseg>\n` +
+                `${trkpts}\n` +
+                `    </trkseg>\n` +
+                `  </trk>\n` +
+                `</gpx>`;
+
+            downloadFile(`cyber_hud_track_${Date.now()}.gpx`, gpxContent, 'application/gpx+xml');
+        }
+
+        function exportCSV() {
+            let csv = "Timestamp,Mode,Speed_kmh,Speed_ms,Distance_m,Cadence_RPM_SPM,Calories_kcal\n";
+            if (tripTrackLog.length > 0) {
+                tripTrackLog.forEach(pt => {
+                    csv += `"${pt.timestamp}","${pt.mode}",${pt.speedKmh.toFixed(2)},${(pt.speedKmh/3.6).toFixed(2)},${pt.distanceMeters.toFixed(1)},${pt.cadence},${Math.round(totalCalories)}\n`;
+                });
+            } else {
+                csv += `"${new Date().toISOString()}","${currentMode}",${currentSpeedKmh.toFixed(2)},${(currentSpeedKmh/3.6).toFixed(2)},${totalDistanceMeters.toFixed(1)},${calculatedCadence},${Math.round(totalCalories)}\n`;
+            }
+
+            downloadFile(`cyber_hud_log_${Date.now()}.csv`, csv, 'text/csv;charset=utf-8;');
+        }
+
+        function exportJSON() {
+            const summaryData = {
+                app: "CYBER VELO & WALK HUD v4.0",
+                exportedAt: new Date().toISOString(),
+                mode: currentMode,
+                summary: {
+                    activeSeconds: totalActiveSeconds,
+                    distanceKm: (totalDistanceMeters / 1000).toFixed(2),
+                    maxSpeedKmh: maxSpeedKmh.toFixed(1),
+                    avgSpeedKmh: (speedHistory.length > 0 ? (speedHistory.reduce((a,b)=>a+b,0)/speedHistory.length) : 0).toFixed(1),
+                    caloriesBurnedKcal: Math.round(totalCalories),
+                    totalSteps: totalSteps
+                },
+                trackPoints: tripTrackLog
+            };
+
+            downloadFile(`cyber_hud_report_${Date.now()}.json`, JSON.stringify(summaryData, null, 2), 'application/json');
+        }
+
+        downloadTripBtn.addEventListener('click', () => {
+            const hrs = String(Math.floor(totalActiveSeconds / 3600)).padStart(2, '0');
+            const mins = String(Math.floor((totalActiveSeconds % 3600) / 60)).padStart(2, '0');
+            const secs = String(totalActiveSeconds % 60).padStart(2, '0');
+
+            downloadPointCount.textContent = tripTrackLog.length;
+            downloadDistance.textContent = `${(totalDistanceMeters / 1000).toFixed(2)} km`;
+            downloadDuration.textContent = `${hrs}:${mins}:${secs}`;
+            downloadModal.classList.remove('hidden');
+        });
+
+        closeDownloadBtn.addEventListener('click', () => downloadModal.classList.add('hidden'));
+        dlGpxBtn.addEventListener('click', exportGPX);
+        dlCsvBtn.addEventListener('click', exportCSV);
+        dlJsonBtn.addEventListener('click', exportJSON);
+
+        modeBikeBtn.addEventListener('click', () => setMode('bike'));
+        modeWalkBtn.addEventListener('click', () => setMode('walk'));
+
+        toggleTrackingBtn.addEventListener('click', () => {
+            if (tracking) stopTracking();
+            else startTracking();
+        });
+
+        resetTripBtn.addEventListener('click', resetTrip);
+        simModeBtn.addEventListener('click', toggleSimulationMode);
+
+        simSlider.addEventListener('input', (e) => {
+            simSpeedVal.textContent = `${e.target.value} km/h`;
+            if (simMode) updateTelemetry(parseFloat(e.target.value));
+        });
+
+        openSettingsBtn.addEventListener('click', () => settingsModal.classList.remove('hidden'));
+        closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
+
+        tirePresetSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                customCircContainer.classList.remove('hidden');
+            } else {
+                customCircContainer.classList.add('hidden');
+                tireCircumferenceMm = parseInt(e.target.value);
+                tireName = e.target.options[e.target.selectedIndex].text.split('(')[0].trim();
+            }
+        });
+
+        speedAlertInput.addEventListener('input', (e) => {
+            speedAlertVal.textContent = `${e.target.value} km/h`;
+        });
+
+        saveSettingsBtn.addEventListener('click', () => {
+            if (tirePresetSelect.value === 'custom') {
+                tireCircumferenceMm = parseInt(customCircInput.value) || 2070;
+                tireName = "カスタム";
+            } else {
+                tireCircumferenceMm = parseInt(tirePresetSelect.value);
+            }
+
+            strideLengthCm = parseInt(strideLengthInput.value) || 75;
+            userWeightKg = parseInt(userWeightInput.value) || 65;
+
+            speedAlertLimit = parseInt(speedAlertInput.value);
+            audioAlertEnabled = audioAlertToggle.checked;
+
+            setMode(currentMode);
+            settingsModal.classList.add('hidden');
+        });
+
+        window.onload = () => {
+            initHologram3D();
+            resizeCanvas();
+            setMode('bike');
+            window.addEventListener('resize', resizeCanvas);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<!-- saved from url=(0062)file:///C:/Users/TEMP/Downloads/gemini-code-1790572571167.html -->
+<html lang="ja"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>垢抜けコーディネート サポートアプリ Ver.0.1</title>
+    <style>
+        :root {
+            --primary-color: #ff6b81;
+            --bg-color: #f9f9f9;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --border-color: #ddd;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--card-bg);
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 1.2rem;
+            margin: 0;
+            color: var(--primary-color);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 15px;
+        }
+
+        /* タブ切り替えボタン */
+        .tabs {
+            display: flex;
+            background-color: #e4e4e4;
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            background: none;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--card-bg);
+            color: var(--primary-color);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* セクション共通スタイル */
+        .section {
+            display: none;
+            background-color: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        h2 {
+            font-size: 1.1rem;
+            margin-top: 0;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 5px;
+        }
+
+        /* フォーム要素 */
+        label {
+            display: block;
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        button.action-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px;
+            width: 100%;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+
+        button.action-btn:hover {
+            opacity: 0.9;
+        }
+
+        /* 結果・リスト表示 */
+        .result-box, .item-card, .history-card {
+            background-color: #fff5f6;
+            border: 1px solid #ffd1d6;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .item-list {
+            margin-top: 15px;
+        }
+
+        .item-item {
+            background: #fafafa;
+            border: 1px solid var(--border-color);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>垢抜けコーデ サポート (Ver.0.1)</h1>
+    </header>
+
+    <div class="container">
+        <!-- タブナビゲーション -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('diag')">MUST③ 診断</button>
+            <button class="tab-btn" onclick="switchTab('search')">MUST② 探す</button>
+            <button class="tab-btn" onclick="switchTab('history')">MUST① 履歴</button>
+        </div>
+
+        <!-- MUST③：骨格や顔のタイプが診断できる -->
+        <div id="diag-section" class="section active">
+            <h2>骨格・顔タイプ診断＆コーデ提案</h2>
+            <p>アンケートに答えて、あなたに似合うファッションを見つけよう！</p>
+            
+            <label for="body-type">骨格タイプ：</label>
+            <select id="body-type">
+                <option value="ストレート">骨格ストレート (立体感・筋肉質)</option>
+                <option value="ウェーブ">骨格ウェーブ (華奢・柔らかい)</option>
+                <option value="ナチュラル">骨格ナチュラル (フレーム感・スタイリッシュ)</option>
+            </select>
+
+            <label for="skin-color">肌の色・系統：</label>
+            <select id="skin-color">
+                <option value="イエベ">イエローベース (温かみのある肌)</option>
+                <option value="ブルベ">ブルーベース (透明感のある肌)</option>
+            </select>
+
+            <label for="fashion-style">好みの系統：</label>
+            <select id="fashion-style">
+                <option value="きれいめ">きれいめ・大人っぽい</option>
+                <option value="カジュアル">カジュアル・普段着</option>
+                <option value="ストリート">ストリート・トレンド</option>
+            </select>
+
+            <button class="action-btn" onclick="runDiagnosis()">診断してコーデを提案してもらう</button>
+
+            <div id="diag-result" style="display: block;" class="result-box">
+                <h3 style="margin-top:0; color:var(--primary-color);">【おすすめコーディネート結果】</h3>
+                <p id="result-text">骨格【ストレート】・肌色【イエベ】・系統【きれいめ】に合わせたおすすめコーデ：ジャストサイズのきれいめシャツやVネックで上半身をすっきりと見せるのが正解です！</p>
+            </div>
+        </div>
+
+        <!-- MUST②：自分が探しているアイテムがすぐ見つかる -->
+        <div id="search-section" class="section">
+            <h2>アイテム検索</h2>
+            <p>欲しいアイテムキーワードを入力してすぐに見つけよう！</p>
+            
+            <input type="text" id="search-keyword" placeholder="例: 白シャツ、パーカー、スニーカー など" oninput="filterItems()">
+
+            <div class="item-list" id="item-list-container">
+                <div class="item-item">
+                    <span><strong>オーバーサイズ白Tシャツ</strong> <small>(トップス)</small></span>
+                    <span style="font-size:0.8rem; background:#ffeaa7; padding:2px 6px; border-radius:4px;">カジュアル</span>
+                </div>
+            
+                <div class="item-item">
+                    <span><strong>テーパードパンツ（黒）</strong> <small>(ボトムス)</small></span>
+                    <span style="font-size:0.8rem; background:#ffeaa7; padding:2px 6px; border-radius:4px;">きれいめ</span>
+                </div>
+            
+                <div class="item-item">
+                    <span><strong>厚底スニーカー</strong> <small>(シューズ)</small></span>
+                    <span style="font-size:0.8rem; background:#ffeaa7; padding:2px 6px; border-radius:4px;">ストリート</span>
+                </div>
+            
+                <div class="item-item">
+                    <span><strong>チェスターコート</strong> <small>(アウター)</small></span>
+                    <span style="font-size:0.8rem; background:#ffeaa7; padding:2px 6px; border-radius:4px;">きれいめ</span>
+                </div>
+            
+                <div class="item-item">
+                    <span><strong>デニムジャケット</strong> <small>(アウター)</small></span>
+                    <span style="font-size:0.8rem; background:#ffeaa7; padding:2px 6px; border-radius:4px;">カジュアル</span>
+                </div>
+            
+                <div class="item-item">
+                    <span><strong>プリーツスカート</strong> <small>(ボトムス)</small></span>
+                    <span style="font-size:0.8rem; background:#ffeaa7; padding:2px 6px; border-radius:4px;">きれいめ</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- MUST①：過去のコーデを見れるようにする -->
+        <div id="history-section" class="section">
+            <h2>過去のコーディネート履歴</h2>
+            <p>これまでに保存・提案されたコーデの履歴です。</p>
+            
+            <div id="history-container">
+                <div class="history-card">
+                    <small style="color:#666;">2026/9/28</small>
+                    <p style="margin: 5px 0 0 0;">骨格:ストレート / 肌色:イエベ / 系統:きれいめ</p>
+                </div>
+            </div>
+            <button class="action-btn" style="background-color: #666;" onclick="clearHistory()">履歴をリセット</button>
+        </div>
+    </div>
+
+    <script>
+        // サンプル用アイテムデータ（MUST②用）
+        const allItems = [
+            { name: "オーバーサイズ白Tシャツ", category: "トップス", tag: "カジュアル" },
+            { name: "テーパードパンツ（黒）", category: "ボトムス", tag: "きれいめ" },
+            { name: "厚底スニーカー", category: "シューズ", tag: "ストリート" },
+            { name: "チェスターコート", category: "アウター", tag: "きれいめ" },
+            { name: "デニムジャケット", category: "アウター", tag: "カジュアル" },
+            { name: "プリーツスカート", category: "ボトムス", tag: "きれいめ" }
+        ];
+
+        // タブ切り替え関数
+        function switchTab(tabName) {
+            document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+            if (tabName === 'diag') {
+                document.getElementById('diag-section').classList.add('active');
+                event.currentTarget.classList.add('active');
+            } else if (tabName === 'search') {
+                document.getElementById('search-section').classList.add('active');
+                event.currentTarget.classList.add('active');
+                renderItems(allItems); // 初期表示
+            } else if (tabName === 'history') {
+                document.getElementById('history-section').classList.add('active');
+                event.currentTarget.classList.add('active');
+                renderHistory();
+            }
+        }
+
+        // MUST③：診断実行と履歴保存（MUST①連携）
+        function runDiagnosis() {
+            const body = document.getElementById('body-type').value;
+            const skin = document.getElementById('skin-color').value;
+            const style = document.getElementById('fashion-style').value;
+
+            let advice = `骨格【${body}】・肌色【${skin}】・系統【${style}】に合わせたおすすめコーデ：`;
+            if (body === 'ストレート') {
+                advice += "ジャストサイズのきれいめシャツやVネックで上半身をすっきりと見せるのが正解です！";
+            } else if (body === 'ウェーブ') {
+                advice += "柔らかい素材やハイウエストのボトムスを使って、重心を高く見せるコーデが似合います！";
+            } else {
+                advice += "ゆったりしたシルエットやレイヤード（重ね着）でフレーム感を活かすスタイリングがおすすめです！";
+            }
+
+            // 結果を表示
+            document.getElementById('result-text').innerText = advice;
+            document.getElementById('diag-result').style.display = 'block';
+
+            // 履歴に保存（MUST①）
+            saveHistory({
+                date: new Date().toLocaleDateString(),
+                content: `骨格:${body} / 肌色:${skin} / 系統:${style}`
+            });
+        }
+
+        // MUST②：アイテム検索・絞り込み
+        function filterItems() {
+            const keyword = document.getElementById('search-keyword').value.toLowerCase();
+            const filtered = allItems.filter(item => 
+                item.name.toLowerCase().includes(keyword) || item.category.toLowerCase().includes(keyword) || item.tag.toLowerCase().includes(keyword)
+            );
+            renderItems(filtered);
+        }
+
+        function renderItems(items) {
+            const container = document.getElementById('item-list-container');
+            if (items.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888;">該当するアイテムが見つかりませんでした。</p>';
+                return;
+            }
+            container.innerHTML = items.map(item => `
+                <div class="item-item">
+                    <span><strong>${item.name}</strong> <small>(${item.category})</small></span>
+                    <span style="font-size:0.8rem; background:#ffeaa7; padding:2px 6px; border-radius:4px;">${item.tag}</span>
+                </div>
+            `).join('');
+        }
+
+        // MUST①：過去のコーデ履歴管理（localStorage利用）
+        function saveHistory(newItem) {
+            let history = JSON.parse(localStorage.getItem('coord_history')) || [];
+            history.unshift(newItem); // 先頭に追加
+            localStorage.setItem('coord_history', JSON.stringify(history));
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            let history = JSON.parse(localStorage.getItem('coord_history')) || [];
+            
+            if (history.length === 0) {
+                container.innerHTML = '<p style="text-align:center; color:#888;">まだ過去の履歴がありません。診断を行ってみましょう！</p>';
+                return;
+            }
+
+            container.innerHTML = history.map((h, index) => `
+                <div class="history-card">
+                    <small style="color:#666;">${h.date}</small>
+                    <p style="margin: 5px 0 0 0;">${h.content}</p>
+                </div>
+            `).join('');
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('coord_history');
+            renderHistory();
+        }
+    </script>
+
+</body></html>
