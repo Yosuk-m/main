@@ -24,20 +24,20 @@
     }
 
     /* =========================
-       ヘッダー
+       HEADER
     ========================= */
 
     header {
       background: #1f3a5f;
       color: white;
-      padding: 50px 20px 45px;
+      padding: 52px 20px 46px;
       text-align: center;
     }
 
     header .small-title {
-      font-size: 15px;
-      letter-spacing: 0.15em;
-      opacity: 0.85;
+      font-size: 14px;
+      letter-spacing: 0.16em;
+      opacity: 0.8;
       margin-bottom: 8px;
     }
 
@@ -48,14 +48,14 @@
     }
 
     header p {
-      max-width: 760px;
+      max-width: 780px;
       margin: 18px auto 0;
       font-size: 16px;
-      opacity: 0.9;
+      opacity: 0.92;
     }
 
     /* =========================
-       メイン
+       MAIN
     ========================= */
 
     main {
@@ -69,7 +69,7 @@
       border-radius: 16px;
       padding: 24px 28px;
       margin-bottom: 35px;
-      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
     }
 
     .intro h2 {
@@ -83,7 +83,7 @@
     }
 
     /* =========================
-       ギャラリー
+       GALLERY TITLE
     ========================= */
 
     .gallery-title {
@@ -105,6 +105,10 @@
       color: #666;
     }
 
+    /* =========================
+       GALLERY
+    ========================= */
+
     .gallery {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -112,14 +116,14 @@
     }
 
     /* =========================
-       アプリカード
+       APP CARD
     ========================= */
 
     .app-card {
       background: white;
       border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
       display: flex;
       flex-direction: column;
       transition:
@@ -129,11 +133,11 @@
 
     .app-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 9px 25px rgba(0,0,0,0.12);
+      box-shadow: 0 9px 25px rgba(0, 0, 0, 0.12);
     }
 
     .card-top {
-      min-height: 125px;
+      min-height: 128px;
       padding: 25px 24px;
       background: #eaf0f7;
       display: flex;
@@ -147,6 +151,7 @@
       font-weight: bold;
       color: #47627e;
       margin-bottom: 6px;
+      letter-spacing: 0.05em;
     }
 
     .app-name {
@@ -184,13 +189,13 @@
     }
 
     /* =========================
-       公開情報
+       APP INFO
     ========================= */
 
     .app-info {
       border-top: 1px solid #e5e5e5;
       padding-top: 14px;
-      margin-bottom: 10px;
+      margin-bottom: 8px;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -217,6 +222,7 @@
     .version {
       font-size: 13px;
       color: #666;
+      text-align: right;
     }
 
     .updated {
@@ -228,7 +234,7 @@
     }
 
     /* =========================
-       アプリボタン
+       BUTTON
     ========================= */
 
     .btn-app {
@@ -237,7 +243,7 @@
       text-align: center;
       text-decoration: none;
       border-radius: 10px;
-      padding: 12px 10px;
+      padding: 13px 10px;
       font-size: 16px;
       font-weight: bold;
       background: #1f5f99;
@@ -253,11 +259,15 @@
     }
 
     /* =========================
-       開発中カード
+       COMING SOON
     ========================= */
 
     .coming-soon {
       opacity: 0.72;
+    }
+
+    .coming-soon:hover {
+      transform: none;
     }
 
     .coming-soon .card-top {
@@ -269,13 +279,14 @@
     }
 
     .development-status {
+      border-top: 1px solid #e5e5e5;
+      padding-top: 14px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
       font-size: 14px;
       font-weight: bold;
       color: #777;
-      margin-top: 12px;
     }
 
     .development-status::before {
@@ -287,7 +298,7 @@
     }
 
     /* =========================
-       フッター
+       FOOTER
     ========================= */
 
     footer {
@@ -303,7 +314,7 @@
     }
 
     /* =========================
-       タブレット
+       TABLET
     ========================= */
 
     @media (max-width: 900px) {
@@ -313,10 +324,11 @@
     }
 
     /* =========================
-       スマートフォン
+       SMARTPHONE
     ========================= */
 
     @media (max-width: 600px) {
+
       header {
         padding: 38px 18px 34px;
       }
@@ -337,13 +349,13 @@
       .intro {
         padding: 20px;
       }
+
     }
   </style>
 </head>
 
 
 <body>
-
 
 <!-- =====================================================
      HEADER
@@ -362,7 +374,7 @@
   <p>
     高校生が身近な困りごとや課題を発見し、
     生成AIを活用しながら企画・開発したWebアプリです。
-    公開されたアプリは実際に体験できます。
+    公開された作品を実際に体験できます。
   </p>
 
 </header>
@@ -374,11 +386,6 @@
 
 <main>
 
-
-  <!-- =========================
-       INTRO
-  ========================= -->
-
   <section class="intro">
 
     <h2>
@@ -388,7 +395,7 @@
     <p>
       各班が「誰の、どんな困りごとを解決するのか」を考え、
       コンセプト設計・試作・ユーザーテスト・改善を行っています。
-      各アプリは開発・改善に合わせて随時更新されます。
+      各アプリは開発状況に応じて随時更新されます。
     </p>
 
   </section>
@@ -407,16 +414,11 @@
   </div>
 
 
-  <!-- ===================================================
-       APP GALLERY
-  ==================================================== -->
-
   <section class="gallery">
 
 
     <!-- =================================================
          TEAM 01
-         ノート共有アプリ
     ================================================== -->
 
     <article
@@ -478,7 +480,6 @@
 
     <!-- =================================================
          TEAM 02
-         垢抜けコーディネートサポート
     ================================================== -->
 
     <article
@@ -540,7 +541,6 @@
 
     <!-- =================================================
          TEAM 03
-         書類修正変換
     ================================================== -->
 
     <article
@@ -603,7 +603,6 @@
 
     <!-- =================================================
          TEAM 04
-         速度計測
     ================================================== -->
 
     <article
@@ -666,7 +665,6 @@
 
     <!-- =================================================
          TEAM 05
-         ToDoリスト
     ================================================== -->
 
     <article
@@ -728,7 +726,6 @@
 
     <!-- =================================================
          TEAM 06
-         開発中
     ================================================== -->
 
     <article class="app-card coming-soon">
@@ -768,10 +765,12 @@
 
     <!-- =================================================
          TEAM 07
-         開発中
     ================================================== -->
 
-    <article class="app-card coming-soon">
+    <article
+      class="app-card"
+      data-app="./team07/"
+    >
 
       <div class="card-top">
 
@@ -780,7 +779,7 @@
         </span>
 
         <h3 class="app-name">
-          開発中
+          数学バトルゲーム
         </h3>
 
       </div>
@@ -789,17 +788,37 @@
       <div class="card-body">
 
         <span class="target">
-          内容未定
+          数学をゲーム感覚で学びたい人向け
         </span>
 
         <p class="description">
-          現在アプリを開発しています。
-          内容が決まり次第公開します。
+          数学の問題に正解してモンスターを攻撃し、
+          敵を倒しながらポイントやレベルを上げていく
+          学習バトルゲームです。
         </p>
 
-        <div class="development-status">
-          開発中
+        <div class="app-info">
+
+          <span class="status">
+            公開中
+          </span>
+
+          <span class="version">
+            Ver. 読み込み中…
+          </span>
+
         </div>
+
+        <div class="updated"></div>
+
+        <a
+          class="btn-app"
+          href="./team07/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          アプリを使う
+        </a>
 
       </div>
 
@@ -808,10 +827,12 @@
 
     <!-- =================================================
          TEAM 08
-         開発中
     ================================================== -->
 
-    <article class="app-card coming-soon">
+    <article
+      class="app-card"
+      data-app="./team08/"
+    >
 
       <div class="card-top">
 
@@ -820,7 +841,7 @@
         </span>
 
         <h3 class="app-name">
-          開発中
+          推し活サポートアプリ
         </h3>
 
       </div>
@@ -829,17 +850,37 @@
       <div class="card-body">
 
         <span class="target">
-          内容未定
+          ライブ遠征を楽しみたい人向け
         </span>
 
         <p class="description">
-          現在アプリを開発しています。
-          内容が決まり次第公開します。
+          東京ドーム周辺のマップ・おすすめスポット・
+          スケジュールをまとめて確認し、
+          ライブ遠征をサポートするアプリです。
         </p>
 
-        <div class="development-status">
-          開発中
+        <div class="app-info">
+
+          <span class="status">
+            公開中
+          </span>
+
+          <span class="version">
+            Ver. 読み込み中…
+          </span>
+
         </div>
+
+        <div class="updated"></div>
+
+        <a
+          class="btn-app"
+          href="./team08/"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          アプリを使う
+        </a>
 
       </div>
 
@@ -862,14 +903,15 @@
   </p>
 
   <p>
-    生徒作品のため、開発・改善に伴って内容が変更される場合があります。
+    生徒作品のため、開発・改善に伴って
+    内容が変更される場合があります。
   </p>
 
 </footer>
 
 
 <!-- =====================================================
-     各班のHTMLから情報を取得
+     APP INFORMATION LOADER
 ===================================================== -->
 
 <script>
@@ -877,9 +919,18 @@
 /*
 =========================================================
 各班の index.html から
-・バージョン
-・更新日
-を取得する
+
+・app-version
+・app-updated
+
+を取得する。
+
+metaタグがない場合は、
+
+<title>
+本文
+
+から Ver.0.1 などを検索する。
 =========================================================
 */
 
@@ -895,11 +946,19 @@ async function loadAppInformation(card) {
     card.querySelector(".updated");
 
 
+  if (
+    !appPath ||
+    !versionElement
+  ) {
+    return;
+  }
+
+
   try {
 
     /*
-    GitHub Pages側のキャッシュを避けるため
-    現在時刻をURLにつけて取得
+    GitHub Pagesのキャッシュ対策として
+    現在時刻をパラメータにつける
     */
 
     const response =
@@ -924,7 +983,7 @@ async function loadAppInformation(card) {
 
 
     /*
-    HTML文字列を解析
+    HTMLをDOMとして解析
     */
 
     const parser =
@@ -938,9 +997,9 @@ async function loadAppInformation(card) {
 
 
     /*
-    =====================================
+    =====================================================
     VERSION
-    =====================================
+    =====================================================
     */
 
     const versionMeta =
@@ -965,14 +1024,17 @@ async function loadAppInformation(card) {
 
       /*
       metaタグが無い場合は
-      HTML本文から
 
-      Ver.1.0
-      Ver 1.0
-      Version 1.0
+      title
+      +
+      本文
 
-      のような文字列を探す
+      から探す
       */
+
+      const titleText =
+        doc.title || "";
+
 
       const bodyText =
         doc.body
@@ -980,8 +1042,14 @@ async function loadAppInformation(card) {
           : "";
 
 
+      const searchText =
+        titleText +
+        " " +
+        bodyText;
+
+
       const versionMatch =
-        bodyText.match(
+        searchText.match(
           /(?:Ver\.?|Version)\s*([0-9]+(?:\.[0-9]+)*)/i
         );
 
@@ -1005,9 +1073,9 @@ async function loadAppInformation(card) {
 
 
     /*
-    =====================================
+    =====================================================
     UPDATED DATE
-    =====================================
+    =====================================================
     */
 
     const updatedMeta =
@@ -1016,7 +1084,10 @@ async function loadAppInformation(card) {
       );
 
 
-    if (updatedMeta) {
+    if (
+      updatedMeta &&
+      updatedElement
+    ) {
 
       const date =
         updatedMeta.getAttribute(
@@ -1028,7 +1099,7 @@ async function loadAppInformation(card) {
 
     }
 
-    else {
+    else if (updatedElement) {
 
       updatedElement.textContent =
         "";
@@ -1042,10 +1113,12 @@ async function loadAppInformation(card) {
     versionElement.textContent =
       "Ver. 取得できません";
 
-    updatedElement.textContent =
-      "";
+    if (updatedElement) {
+      updatedElement.textContent = "";
+    }
 
     console.log(
+      "取得エラー:",
       appPath,
       error
     );
@@ -1057,7 +1130,7 @@ async function loadAppInformation(card) {
 
 /*
 =========================================================
-公開中のアプリをすべて取得
+公開中アプリすべてについて実行
 =========================================================
 */
 
