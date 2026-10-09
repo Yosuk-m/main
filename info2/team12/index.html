@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>おこずかい管理アプリ Ver.0.1</title>
+    <style>
+        /* ==========================================
+           CSS（見た目の設定）
+           スマートフォン対応を意識したシンプルなデザイン
+           ========================================== */
+        body {
+            font-family: sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        .balance-box {
+            text-align: center;
+            background-color: #e8f4fd;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .balance-amount {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .history-list li {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>おこずかい管理アプリ</h1>
+
+        <!-- MUST①：おこずかいを入力する機能 -->
+        <div class="section">
+            <label for="total-input">はじめのおこずかいを設定</label>
+            <input type="number" id="total-input" placeholder="例: 5000">
+            <button id="set-total-btn">おこずかいを決定する</button>
+        </div>
+
+        <!-- 残りのお金表示する機能 -->
+        <div class="section balance-box">
+            <label>残りのお金</label>
+            <div class="balance-amount"><span id="remaining-display">0</span> 円</div>
+        </div>
+
+        <!-- MUST②：使った金額を記録する機能 -->
+        <div class="section">
+            <label for="spend-name">使った理由（品名など）</label>
+            <input type="text" id="spend-name" placeholder="例: ジュース">
+            
+            <label for="spend-input">使った金額</label>
+            <input type="number" id="spend-input" placeholder="例: 150">
+            
+            <button id="spend-btn">使った金額を記録する</button>
+        </div>
+
+        <!-- 記録の履歴表示（動作確認用） -->
+        <div class="section">
+            <label>使った履歴</label>
+            <ul id="history-list" class="history-list">
+                <li style="color: #888; text-align: center;">まだ記録はありません</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        /* ==========================================
+           JavaScript（プログラムの処理）
+           ========================================== */
+
+        // データの状態を管理する変数
+        let totalBudget = 0; // はじめのおこずかい
+        let spentTotal = 0;  // 使った金額の合計
+        let historyData = []; // 履歴データを保存する配列
+
+        // HTMLの要素を取得する
+        const totalInput = document.getElementById('total-input');
+        const setTotalBtn = document.getElementById('set-total-btn');
+        const remainingDisplay = document.getElementById('remaining-display');
+        
+        const spendNameInput = document.getElementById('spend-name');
+        const spendInput = document.getElementById('spend-input');
+        const spendBtn = document.getElementById('spend-btn');
+        const historyList = document.getElementById('history-list');
+
+        // MUST①：おこずかいを入力する機能の処理
+        setTotalBtn.addEventListener('click', function() {
+            const val = parseInt(totalInput.value);
+            if (isNaN(val) || val < 0) {
+                alert('正しい金額を入力してください。');
+                return;
+            }
+            totalBudget = val;
+            updateDisplay();
+            alert('おこずかいを設定しました！');
+        });
+
+        // MUST②：使った金額を記録する機能 ＆ MUST③：残りのお金表示する機能の処理
+        spendBtn.addEventListener('click', function() {
+            const name = spendNameInput.value.trim() || '使ったお金';
+            const val = parseInt(spendInput.value);
+
+            if (isNaN(val) || val <= 0) {
+                alert('使った正しい金額を入力してください。');
+                return;
+            }
+
+            // 使った合計に加算
+            spentTotal += val;
+
+            // 履歴の配列に追加
+            historyData.push({ name: name, amount: val });
+
+            // 画面を更新
+            updateDisplay();
+            updateHistory();
+
+            // 入力欄をクリア
+            spendNameInput.value = '';
+            spendInput.value = '';
+        });
+
+        // 画面の数字（残りのお金）を更新する関数
+        function updateDisplay() {
+            const remaining = totalBudget - spentTotal;
+            remainingDisplay.textContent = remaining;
+
+            // マイナスになった場合の注意喚起（見た目の変更など）
+            if (remaining < 0) {
+                remainingDisplay.style.color = '#e74c3c'; // 赤色にする
+            } else {
+                remainingDisplay.style.color = '#2980b9'; // 青色にする
+            }
+        }
+
+        // 履歴リストを更新する関数
+        function updateHistory() {
+            if (historyData.length === 0) {
+                historyList.innerHTML = '<li style="color: #888; text-align: center;">まだ記録はありません</li>';
+                return;
+            }
+
+            // リストの中身を一度空にして、最新の配列から組み立て直す
+            historyList.innerHTML = '';
+            for (let i = 0; i < historyData.length; i++) {
+                const item = historyData[i];
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${item.name}</span><span>-${item.amount}円</span>`;
+                historyList.appendChild(li);
+            }
+        }
+    </script>
+</body>
+</html>
