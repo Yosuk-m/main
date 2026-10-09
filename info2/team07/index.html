@@ -3,303 +3,369 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>数学バトルゲーム（試作品Ver.0.1）</title>
-    <!-- Tailwind CSS (見た目を整えるための外部スタイルシート) -->
+    <title>数学学習バトルRPG 試作品Ver.0.1</title>
+    <!-- Tailwind CSSを読み込み -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #a7f3d0; /* さわやかなミントグリーンベース */
+            background-image: 
+                radial-gradient(circle at 20% 30%, rgba(255, 182, 193, 0.4) 0%, transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(186, 230, 253, 0.5) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(254, 240, 138, 0.3) 0%, transparent 60%);
+            overflow-x: hidden;
+        }
+
+        /* 浮遊するハートやきらめきのコンテナ */
+        .sparkle-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .floating-item {
+            position: absolute;
+            animation: floatUp 6s linear infinite;
+            opacity: 0.7;
+        }
+
+        @keyframes floatUp {
+            0% {
+                transform: translateY(105vh) scale(0.8) rotate(0deg);
+                opacity: 0;
+            }
+            20% {
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* モンスターのふわふわアニメーション */
+        @keyframes monsterFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+        .monster-animate {
+            animation: monsterFloat 3s ease-in-out infinite;
+        }
+    </style>
 </head>
-<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col items-center justify-center p-4">
+<body class="text-slate-700 font-sans min-h-screen flex flex-col items-center justify-center p-4 relative">
 
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 space-y-6">
+    <!-- 背景のキラキラ・ハートエフェクト描画用コンテナ -->
+    <div class="sparkle-bg" id="sparkle-container"></div>
+
+    <!-- メインアプリカード（パステル調・ポップなデザイン） -->
+    <div class="w-full max-w-md bg-white/90 backdrop-blur-md rounded-3xl shadow-xl p-5 border-4 border-pink-200 flex flex-col gap-4 relative z-10">
         
-        <!-- ヘッダー情報（ステータス表示） -->
-        <div class="flex justify-between items-center border-b pb-4">
+        <!-- ヘッダー：ステータス表示 (MUST③関連) -->
+        <header class="flex justify-between items-center bg-pink-50 p-3 rounded-2xl border-2 border-pink-100 shadow-inner">
             <div>
-                <span class="text-sm text-slate-500 block">レベル</span>
-                <span id="levelText" class="text-2xl font-bold text-indigo-600">1</span>
+                <h1 class="text-base font-bold text-pink-600 flex items-center gap-1">✨ すうがくバトルRPG</h1>
+                <p class="text-[10px] text-pink-400 font-medium">Ver.0.1 試作品</p>
             </div>
-            <div>
-                <span class="text-sm text-slate-500 block">ポイント</span>
-                <span id="pointsText" class="text-2xl font-bold text-emerald-600">0</span> <span class="text-xs text-slate-400">/ <span id="nextLevelText">100</span>pt</span>
+            <div class="text-right bg-white px-3 py-1.5 rounded-xl border border-pink-200 shadow-sm">
+                <div class="text-xs font-bold text-indigo-600">Lv. <span id="player-level">1</span></div>
+                <div class="text-[10px] text-amber-500 font-semibold">Pt: <span id="player-points">0</span> / <span id="next-level-pts">100</span></div>
             </div>
-            <div>
-                <span class="text-sm text-slate-500 block">撃破数</span>
-                <span id="defeatText" class="text-2xl font-bold text-amber-600">0</span>
-            </div>
-        </div>
+        </header>
 
-        <!-- 敵キャラクター・戦闘画面エリア (MUST①：敵を倒す機能) -->
-        <div class="bg-slate-900 text-white rounded-xl p-5 text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[180px]">
-            <div id="enemyEmoji" class="text-6xl mb-2">👾</div>
-            <h2 id="enemyName" class="text-lg font-bold mb-1">スライム算</h2>
+        <!-- メイン画面：ゲームエリア (MUST①, ②関連) -->
+        <main class="flex flex-col gap-4">
             
-            <!-- 敵のHPバー -->
-            <div class="w-full bg-slate-700 rounded-full h-4 mt-2 overflow-hidden">
-                <div id="enemyHpBar" class="bg-red-500 h-full transition-all duration-300" style="width: 100%;"></div>
-            </div>
-            <p class="text-xs text-slate-400 mt-1">HP: <span id="enemyCurrentHp">2</span> / <span id="enemyMaxHp">2</span></p>
-        </div>
+            <!-- バトル・敵ステータス表示エリア (MUST①) -->
+            <section class="bg-gradient-to-br from-pink-50 to-sky-50 p-4 rounded-2xl border-2 border-sky-100 flex flex-col gap-3 shadow-sm">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <!-- 敵モンスターの絵文字アイコン -->
+                        <span id="enemy-icon" class="text-3xl monster-animate inline-block">👾</span>
+                        <span id="enemy-name" class="font-bold text-pink-600 text-base">スライム方程式</span>
+                    </div>
+                    <span class="text-[11px] bg-pink-100 text-pink-700 font-bold px-2.5 py-1 rounded-full border border-pink-200">きょうてき</span>
+                </div>
+                
+                <!-- 敵のHPバー -->
+                <div class="w-full bg-white rounded-full h-4 overflow-hidden border-2 border-pink-200 shadow-inner p-0.5">
+                    <div id="enemy-hp-bar" class="bg-gradient-to-r from-pink-400 to-rose-500 h-full rounded-full transition-all duration-300" style="width: 100%;"></div>
+                </div>
+                <div class="text-right text-[11px] text-slate-500 font-medium">
+                    HP: <span id="enemy-hp">50</span> / <span id="enemy-max-hp">50</span>
+                </div>
 
-        <!-- メッセージ・フィードバック表示 -->
-        <div id="messageArea" class="bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-lg text-sm text-center font-medium">
-            正しいこたえを選んで、モンスターをたおそう！
-        </div>
+                <!-- 演出・メッセージ表示エリア -->
+                <div id="battle-message" class="bg-white/90 p-3 rounded-xl text-xs text-slate-700 font-medium min-h-[50px] flex items-center justify-center text-center border border-sky-200 shadow-sm">
+                    モンスターが現れた！数学の力で倒そう！
+                </div>
+            </section>
 
-        <!-- 問題・選択肢エリア (MUST③：いくつか選択肢を出す) -->
-        <div id="quizArea" class="space-y-4">
-            <div class="bg-slate-50 border p-4 rounded-xl text-center">
-                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">もんだい</span>
-                <p id="questionText" class="text-lg font-bold mt-1 text-slate-800">ここに問題が表示されます</p>
-            </div>
+            <!-- 問題・選択肢エリア (MUST②) -->
+            <section id="quiz-section" class="bg-sky-50/80 p-4 rounded-2xl border-2 border-sky-100 flex flex-col gap-3 shadow-sm">
+                <div class="text-[11px] text-indigo-500 font-bold tracking-wider uppercase flex items-center gap-1">💡 【問題 / 解き方の選択】</div>
+                <div id="question-text" class="text-xs sm:text-sm font-bold text-slate-800 min-h-[45px] leading-relaxed">
+                    ここに問題文が表示されます。
+                </div>
 
-            <!-- 選択肢ボタンエリア -->
-            <div id="choicesContainer" class="space-y-2">
-                <!-- JavaScriptでボタンを自動で作ります -->
-            </div>
-        </div>
+                <!-- 選択肢ボタンを配置するコンテナ (薄い水色・ピンク基調) -->
+                <div id="choices-container" class="flex flex-col gap-2 mt-1">
+                    <!-- JavaScriptで動的に選択肢ボタンが生成されます -->
+                </div>
+            </section>
 
-        <!-- 次の敵へ進むボタン（敵を倒した時に表示） -->
-        <div id="actionArea" class="hidden">
-            <button onclick="nextEnemy()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow transition">
-                つぎの敵へすすむ
+            <!-- 次へ進むボタン -->
+            <button id="next-btn" onclick="nextStage()" class="hidden w-full bg-gradient-to-r from-emerald-400 to-teal-500 hover:from-emerald-500 hover:to-teal-600 active:scale-95 text-white font-bold py-3 px-4 rounded-2xl shadow-md transition-all text-sm border border-emerald-300">
+                次の問題へ進む 🚀
             </button>
-        </div>
-
+        </main>
+        
+        <!-- フッター情報 -->
+        <footer class="text-center text-[11px] text-slate-400 font-medium mt-1">
+            高校情報Ⅱ 試作品プロジェクト（ミント＆パステルVer）
+        </footer>
     </div>
 
     <script>
         // ==========================================
-        // 【仮データ】数学の問題リスト
-        // 特殊な記号（^など）を使わず、日本語や数字で分かりやすく表現しています。
-        // ここを書き換えるだけで、自由に行う問題を追加・変更できます。
+        // 【仮データ定義】数学問題データ（MUST①、②用）
+        // ※高校生が後から書き換えやすいように分離しています
         // ==========================================
-        var questionsData = [
+        const questionDataList = [
             {
-                question: "方程式「x + 3 = 7」の x の値はいくつ？",
-                choices: ["2", "4", "5", "10"],
-                answer: "4",
-                explanation: "両辺から3をひくと、x = 7 - 3 = 4 になります。"
+                id: 1,
+                enemyName: "一次方程式のスライム",
+                enemyIcon: "🟢",
+                enemyMaxHp: 50,
+                question: "方程式 2x + 4 = 10 を解くとき、最初にやるべき正しい変形はどれ？",
+                choices: [
+                    { text: "両辺を2で割る", isCorrect: false, feedback: "惜しい！まずはxのついた項を単独にするため、定数項を移項するのが先決です。" },
+                    { text: "両辺から4を引く（移項する）", isCorrect: true, feedback: "正解！左辺の +4 を右辺に移項して 2x = 6 にします！ダメージを与えた！" },
+                    { text: "両辺に4を足す", isCorrect: false, feedback: "不正解。それだと数式が成り立たなくなってしまいます。" }
+                ]
             },
             {
-                question: "「2の2乗（2×2）」の値はいくつ？",
-                choices: ["2", "4", "6", "8"],
-                answer: "4",
-                explanation: "2の2乗は 2 × 2 なので、答えは 4 です。"
+                id: 2,
+                enemyName: "因数分解ゴブリン",
+                enemyIcon: "👺",
+                enemyMaxHp: 70,
+                question: "式 x^2 + 5x + 6 を因数分解しなさい。正しい組み合わせはどれ？",
+                choices: [
+                    { text: "(x + 1)(x + 6)", isCorrect: false, feedback: "不正解。展開すると x^2 + 7x + 6 になってしまいます。" },
+                    { text: "(x + 2)(x + 3)", isCorrect: true, feedback: "正解！かけて6、足して5になる組み合わせは 2 と 3 です！大ダメージ！" },
+                    { text: "(x - 2)(x - 3)", isCorrect: false, feedback: "不正解。展開すると定数項が +6 ですが、一次の係数が -5 になります。" }
+                ]
             },
             {
-                question: "三角形の内角の和（ぜんぶ足した角度）は何度？",
-                choices: ["90度", "180度", "270度", "360度"],
-                answer: "180度",
-                explanation: "どんな三角形でも内角の和はいつでも180度です。"
-            },
-            {
-                question: "関数「y = 2x + 1」の傾き（変化の割合）はいくつ？",
-                choices: ["1", "2", "3", "x"],
-                answer: "2",
-                explanation: "y = ax + b の形では、x の係数である a の部分が傾きになります。"
+                id: 3,
+                enemyName: "二次関数のドラゴン",
+                enemyIcon: "🐲",
+                enemyMaxHp: 100,
+                question: "放物線 y = x^2 - 4x + 3 の頂点の座標として正しいものはどれ？",
+                choices: [
+                    { text: "(2, -1)", isCorrect: true, feedback: "正解！平方完成すると y = (x - 2)^2 - 1 となり、頂点は (2, -1) です！見事撃破！" },
+                    { text: "(-2, 3)", isCorrect: false, feedback: "不正解。平方完成の符号に気をつけよう。" },
+                    { text: "(4, 3)", isCorrect: false, feedback: "不正解。標準形に変形してみよう。" }
+                ]
             }
         ];
 
         // ==========================================
-        // ゲームの状態を保存する変数
+        // 【状態管理変数】プレイヤーとゲームの進行状況 (MUST③関連)
         // ==========================================
-        var currentLevel = 1;         // プレイヤーのレベル (MUST②)
-        var currentPoints = 0;        // 現在のポイント (MUST②)
-        var pointsToNextLevel = 100;  // 次のレベルに必要なポイント
-        var defeatCount = 0;          // 敵を倒した数 (MUST①)
+        let currentStageIndex = 0; // 現在の問題・敵のインデックス
+        let playerLevel = 1;       // プレイヤーレベル
+        let playerPoints = 0;      // 獲得ポイント
+        let nextLevelPoints = 100; // 次のレベルに必要なポイント
+        let currentEnemyHp = 50;   // 現在の敵のHP
+        let currentEnemyMaxHp = 50;// 現在の敵の最大HP
+        let isAnswered = false;    // すでに回答済みかどうかのフラグ
 
-        // 現在の敵の情報
-        var currentEnemy = {
-            name: "スライム算",
-            emoji: "👾",
-            maxHp: 2,
-            hp: 2
-        };
-
-        var currentQuestion = null;   // 今出ている問題
-        var isAnswerLocked = false;   // 連続クリック防止用ロック
+        // DOM要素の取得
+        const elPlayerLevel = document.getElementById('player-level');
+        const elPlayerPoints = document.getElementById('player-points');
+        const elNextLevelPts = document.getElementById('next-level-pts');
+        const elEnemyName = document.getElementById('enemy-name');
+        const elEnemyIcon = document.getElementById('enemy-icon');
+        const elEnemyHpBar = document.getElementById('enemy-hp-bar');
+        const elEnemyHp = document.getElementById('enemy-hp');
+        const elEnemyMaxHp = document.getElementById('enemy-max-hp');
+        const elBattleMessage = document.getElementById('battle-message');
+        const elQuestionText = document.getElementById('question-text');
+        const elChoicesContainer = document.getElementById('choices-container');
+        const elNextBtn = document.getElementById('next-btn');
 
         // ==========================================
-        // ページを読み込んだときに最初に動くプログラム
+        // 背景のキラキラ・ハートを動的に生成する関数
+        // ==========================================
+        function createSparkles() {
+            const container = document.getElementById('sparkle-container');
+            const items = ['💖', '✨', '⭐', '💫', '🌸', '✨'];
+            
+            setInterval(() => {
+                const item = document.createElement('div');
+                item.className = 'floating-item text-sm sm:text-base';
+                item.textContent = items[Math.floor(Math.random() * items.length)];
+                item.style.left = Math.random() * 100 + 'vw';
+                item.style.animationDuration = (4 + Math.random() * 4) + 's';
+                item.style.fontSize = (12 + Math.random() * 16) + 'px';
+                container.appendChild(item);
+
+                // 画面外に出たら要素を削除してメモリを節約
+                setTimeout(() => {
+                    item.remove();
+                }, 7000);
+            }, 500);
+        }
+
+        // ==========================================
+        // 【初期化処理】画面のロード時にゲームをスタート
         // ==========================================
         window.onload = function() {
+            createSparkles();
+            loadStage(currentStageIndex);
             updateStatusUI();
-            loadNewQuestion();
-            updateEnemyUI();
         };
 
         // ==========================================
-        // 画面のステータス（レベルやポイント）を更新する関数
+        // ステージ読み込み関数
         // ==========================================
-        function updateStatusUI() {
-            document.getElementById("levelText").textContent = currentLevel;
-            document.getElementById("pointsText").textContent = currentPoints;
-            document.getElementById("nextLevelText").textContent = pointsToNextLevel;
-            document.getElementById("defeatText").textContent = defeatCount;
-        }
-
-        // ==========================================
-        // 敵の見た目やHPバーを更新する関数
-        // ==========================================
-        function updateEnemyUI() {
-            document.getElementById("enemyName").textContent = currentEnemy.name;
-            document.getElementById("enemyEmoji").textContent = currentEnemy.emoji;
-            document.getElementById("enemyCurrentHp").textContent = currentEnemy.hp;
-            document.getElementById("enemyMaxHp").textContent = currentEnemy.maxHp;
-            
-            // HPの残り具合を％で計算してバーの長さを変える
-            var hpPercent = (currentEnemy.hp / currentEnemy.maxHp) * 100;
-            if (hpPercent < 0) {
-                hpPercent = 0;
+        function loadStage(index) {
+            if (index >= questionDataList.length) {
+                // すべての問題をクリアした場合
+                elEnemyName.textContent = "全クリおめでとう！🎉";
+                elEnemyIcon.textContent = "👑";
+                elQuestionText.textContent = "すべてのステージをクリアしました！素晴らしい数学マスターぶりです！";
+                elChoicesContainer.innerHTML = "";
+                elBattleMessage.textContent = "ゲームクリア！お疲れ様でした！";
+                elNextBtn.classList.add('hidden');
+                return;
             }
-            document.getElementById("enemyHpBar").style.width = hpPercent + "%";
+
+            const currentData = questionDataList[index];
+            currentEnemyMaxHp = currentData.enemyMaxHp;
+            currentEnemyHp = currentEnemyMaxHp;
+            isAnswered = false;
+
+            // 画面要素の更新
+            elEnemyName.textContent = currentData.enemyName;
+            elEnemyIcon.textContent = currentData.enemyIcon;
+            elQuestionText.textContent = currentData.question;
+            elBattleMessage.textContent = `${currentData.enemyName} があらわれた！解き方を選ぼう！`;
+            elNextBtn.classList.add('hidden');
+
+            // 敵HPバーの更新
+            updateEnemyHpUI();
+
+            // 選択肢ボタンの動的生成 (MUST②：ピンクや薄い水色のパステル調ボタン)
+            elChoicesContainer.innerHTML = "";
+            currentData.choices.forEach((choice, i) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full text-left bg-white hover:bg-pink-50 border-2 border-pink-200 p-3 rounded-xl text-xs sm:text-sm transition-all text-slate-700 font-medium active:scale-[0.98] shadow-sm";
+                btn.textContent = `${i + 1}. ${choice.text}`;
+                btn.onclick = () => handleChoiceSelect(choice);
+                elChoicesContainer.appendChild(btn);
+            });
         }
 
         // ==========================================
-        // 新しい問題をランダムに選んで画面に出す関数（MUST③）
+        // 選択肢を選んだときの処理（正誤判定・バトル進行）(MUST①, ②, ③)
         // ==========================================
-        function loadNewQuestion() {
-            isAnswerLocked = false;
-            document.getElementById("actionArea").classList.add("hidden");
-            document.getElementById("quizArea").classList.remove("hidden");
+        function handleChoiceSelect(choice) {
+            if (isAnswered) return; // すでに答えていれば二重クリック防止
 
-            // 問題リストからランダムに1つ選ぶ
-            var randomIndex = Math.floor(Math.random() * questionsData.length);
-            currentQuestion = questionsData[randomIndex];
-
-            // 問題文を表示する
-            document.getElementById("questionText").textContent = currentQuestion.question;
-            
-            var messageBox = document.getElementById("messageArea");
-            messageBox.textContent = "正しいこたえをタップして攻撃しよう！";
-            messageBox.className = "bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-lg text-sm text-center font-medium";
-
-            // 選択肢のボタンをいったん空にする
-            var choicesContainer = document.getElementById("choicesContainer");
-            choicesContainer.innerHTML = "";
-
-            // 選択肢の数だけボタンを新しく作る
-            for (var i = 0; i < currentQuestion.choices.length; i++) {
-                var choiceText = currentQuestion.choices[i];
+            if (choice.isCorrect) {
+                isAnswered = true;
+                elBattleMessage.textContent = choice.feedback;
+                elBattleMessage.className = "bg-emerald-50 p-3 rounded-xl text-xs text-emerald-800 font-medium border-2 border-emerald-200 flex items-center justify-center text-center shadow-sm";
                 
-                var button = document.createElement("button");
-                button.textContent = choiceText;
-                button.className = "w-full bg-white border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-sm transition text-center";
-                
-                // ボタンが押されたときの処理を登録する
-                button.onclick = (function(selected) {
-                    return function() {
-                        checkAnswer(selected, this);
-                    };
-                })(choiceText);
+                // 敵にダメージを与えてHPを0にする
+                currentEnemyHp = 0;
+                updateEnemyHpUI();
 
-                choicesContainer.appendChild(button);
-            }
-        }
+                // ポイント加算とレベルアップ処理 (MUST③)
+                addPoints(50);
 
-        // ==========================================
-        // 答えが合っているかチェックする関数（MUST①、MUST②、MUST③）
-        // ==========================================
-        function checkAnswer(selectedChoice, buttonElement) {
-            if (isAnswerLocked) {
-                return; // すでに答えていたら何もしない
-            }
-            isAnswerLocked = true;
+                // すべての選択肢ボタンを無効化
+                disableAllChoices();
 
-            // すべてのボタンを一度押せないようにする
-            var choicesContainer = document.getElementById("choicesContainer");
-            var buttons = choicesContainer.getElementsByTagName("button");
-            for (var i = 0; i < buttons.length; i++) {
-                buttons[i].disabled = true;
-            }
-
-            var messageBox = document.getElementById("messageArea");
-
-            if (selectedChoice === currentQuestion.answer) {
-                // 【正解の場合】
-                buttonElement.className = "w-full bg-emerald-500 text-white border-2 border-emerald-600 font-bold py-3 px-4 rounded-xl shadow-sm text-center";
-                messageBox.textContent = "せいかい！ 敵にダメージを与えた！ (" + currentQuestion.explanation + ")";
-                messageBox.className = "bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg text-sm text-center font-medium";
-
-                // 敵のHPを1減らす（MUST①）
-                currentEnemy.hp = currentEnemy.hp - 1;
-                updateEnemyUI();
-
-                // ポイントを増やしてレベルアップをチェック（MUST②）
-                addPoints(35);
-
-                // 敵を倒したかチェック
-                if (currentEnemy.hp <= 0) {
-                    defeatCount = defeatCount + 1;
-                    updateStatusUI();
-                    messageBox.textContent = "やったー！ 敵をたおした！";
-                    document.getElementById("quizArea").classList.add("hidden");
-                    document.getElementById("actionArea").classList.remove("hidden");
+                // 次へボタンを表示
+                if (currentStageIndex < questionDataList.length - 1) {
+                    elNextBtn.textContent = "次のステージへ進む 🚀";
+                    elNextBtn.classList.remove('hidden');
                 } else {
-                    // まだ敵が生きている場合は、少し待ってから次の問題へ
-                    setTimeout(loadNewQuestion, 2000);
+                    elNextBtn.textContent = "クリア画面へ！✨";
+                    elNextBtn.classList.remove('hidden');
                 }
 
             } else {
-                // 【不正解の場合】
-                buttonElement.className = "w-full bg-rose-500 text-white border-2 border-rose-600 font-bold py-3 px-4 rounded-xl shadow-sm text-center";
-                
-                // 正解のボタンを緑色にして教えてあげる
-                for (var j = 0; j < buttons.length; j++) {
-                    if (buttons[j].textContent === currentQuestion.answer) {
-                        buttons[j].className = "w-full bg-emerald-100 border-2 border-emerald-500 text-emerald-800 font-bold py-3 px-4 rounded-xl shadow-sm text-center";
-                    }
-                }
-
-                messageBox.textContent = "ざんねん…！ 正解は「" + currentQuestion.answer + "」だよ。(" + currentQuestion.explanation + ")";
-                messageBox.className = "bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-lg text-sm text-center font-medium";
-
-                // 間違えても少し待ってから次の問題へ
-                setTimeout(loadNewQuestion, 3000);
+                // 不正解の場合
+                elBattleMessage.textContent = choice.feedback;
+                elBattleMessage.className = "bg-rose-50 p-3 rounded-xl text-xs text-rose-800 font-medium border-2 border-rose-200 flex items-center justify-center text-center shadow-sm";
             }
         }
 
         // ==========================================
-        // ポイントを加算し、レベルアップを判定する関数（MUST②）
+        // ポイント加算とレベルアップの判定処理 (MUST③)
         // ==========================================
-        function addPoints(amount) {
-            currentPoints = currentPoints + amount;
+        function addPoints(pts) {
+            playerPoints += pts;
             
-            // レベルアップの条件に届いたか
-            if (currentPoints >= pointsToNextLevel) {
-                currentLevel = currentLevel + 1;
-                currentPoints = currentPoints - pointsToNextLevel;
-                pointsToNextLevel = Math.floor(pointsToNextLevel * 1.5); // 次のレベルを少し難しくする
-                
-                setTimeout(function() {
-                    var messageBox = document.getElementById("messageArea");
-                    messageBox.textContent = "✨ レベルアップ！ レベル " + currentLevel + " になったよ！ ✨";
-                }, 400);
+            // レベルアップのチェック
+            if (playerPoints >= nextLevelPoints) {
+                playerLevel += 1;
+                nextLevelPoints += 100; // 次の目標ポイントを増やす
+                elBattleMessage.textContent += ` 🎉 レベルが ${playerLevel} に上がった！`;
             }
             updateStatusUI();
         }
 
         // ==========================================
-        // 次の敵を登場させる関数
+        // ステータスUI更新関数
         // ==========================================
-        function nextEnemy() {
-            var enemyList = [
-                { name: "スライム算", emoji: "👾", maxHp: 2, hp: 2 },
-                { name: "関数ゴブリン", emoji: "👺", maxHp: 3, hp: 3 },
-                { name: "方程式ドラゴン", emoji: "🐉", maxHp: 4, hp: 4 }
-            ];
-            
-            var randomIndex = Math.floor(Math.random() * enemyList.length);
-            var selected = enemyList[randomIndex];
-            
-            currentEnemy = {
-                name: selected.name,
-                emoji: selected.emoji,
-                maxHp: selected.maxHp,
-                hp: selected.hp
-            };
+        function updateStatusUI() {
+            elPlayerLevel.textContent = playerLevel;
+            elPlayerPoints.textContent = playerPoints;
+            elNextLevelPts.textContent = nextLevelPoints;
+        }
 
-            updateEnemyUI();
-            loadNewQuestion();
+        // ==========================================
+        // 敵HPバー更新関数
+        // ==========================================
+        function updateEnemyHpUI() {
+            elEnemyHp.textContent = currentEnemyHp;
+            elEnemyMaxHp.textContent = currentEnemyMaxHp;
+            const percentage = (currentEnemyHp / currentEnemyMaxHp) * 100;
+            elEnemyHpBar.style.width = `${percentage}%`;
+        }
+
+        // ==========================================
+        // 選択肢ボタンをロックする関数
+        // ==========================================
+        function disableAllChoices() {
+            const buttons = elChoicesContainer.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed', 'bg-slate-100');
+            });
+        }
+
+        // ==========================================
+        // 次のステージへ切り替える関数
+        // ==========================================
+        function nextStage() {
+            currentStageIndex++;
+            // メッセージスタイルのリセット
+            elBattleMessage.className = "bg-white/90 p-3 rounded-xl text-xs text-slate-700 font-medium min-h-[50px] flex items-center justify-center text-center border border-sky-200 shadow-sm";
+            loadStage(currentStageIndex);
         }
     </script>
 </body>
