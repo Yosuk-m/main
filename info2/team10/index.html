@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>髪型お悩みルーレット - ゆめかわVer.0.1</title>
+    <!-- Tailwind CSSの読み込み -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1p:wght@400;700;800&display=swap');
+        
+        body {
+            font-family: 'M PLUS Rounded 1p', sans-serif;
+            /* ゆめかわ原宿系のふんわりしたパステルグラデーション背景 */
+            background: linear-gradient(135deg, #ffe6f2 0%, #e6f0ff 50%, #f0e6ff 100%);
+            background-attachment: fixed;
+        }
+
+        /* ふんわり浮いているようなドロップシャドウ（ゆめかわ感） */
+        .yumekawa-shadow {
+            box-shadow: 0 10px 25px -3px rgba(255, 154, 213, 0.3), 0 4px 6px -2px rgba(186, 230, 253, 0.5);
+        }
+
+        /* キラキラ光るアニメーション */
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.1) rotate(5deg); opacity: 0.85; filter: brightness(1.1); }
+        }
+        .sparkle-anim {
+            animation: sparkle 1.5s infinite ease-in-out;
+        }
+
+        /* ルーレット回転中のポヨポヨアニメーション */
+        @keyframes bouncy {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); background-color: #fff0f8; }
+        }
+        .roulette-spinning {
+            animation: bouncy 0.4s infinite alternate;
+        }
+    </style>
+</head>
+<body class="text-gray-700 min-h-screen flex flex-col justify-between selection:bg-pink-300 selection:text-white pb-6">
+
+    <header class="bg-gradient-to-r from-pink-300 via-purple-300 to-indigo-300 text-white shadow-md p-5 text-center relative overflow-hidden rounded-b-3xl border-b-4 border-white/60">
+        <div class="absolute -top-4 -left-4 text-3xl opacity-60">🎀</div>
+        <div class="absolute -bottom-2 -right-2 text-3xl opacity-60">⭐</div>
+        <h1 class="text-2xl font-extrabold tracking-wider drop-shadow-sm flex items-center justify-center gap-2">
+            <span>💖</span> 髪型お悩みルーレット <span class="text-xs bg-white/80 text-pink-500 px-2.5 py-1 rounded-full font-bold shadow-inner">ゆめかわ Ver.0.1</span> <span>✨</span>
+        </h1>
+        <p class="text-xs text-white/90 mt-1 font-medium">☁️ 天気と長さで、今日の可愛いヘアスタイルをみつけよっ♪ 🦄</p>
+    </header>
+
+    <main class="container mx-auto p-4 max-w-md flex-grow flex flex-col gap-5 mt-2">
+
+        <div class="bg-white/80 backdrop-blur-sm border-2 border-pink-200 text-pink-700 p-3.5 text-xs rounded-2xl yumekawa-shadow flex items-start gap-2.5">
+            <span class="text-base">💡</span>
+            <div>
+                <span class="font-bold block text-pink-800">【開発メモ・制約説明】</span>
+                この試作品は天気アプリ（MUST①の手動切替）、ルーレット（MUST②）、項目別（MUST③の長さ別）を1つのHTMLファイルで動かしています。外部APIなしの仮データで動作中！
+            </div>
+        </div>
+
+        <section class="bg-white/90 backdrop-blur-md p-4.5 rounded-3xl yumekawa-shadow border-2 border-purple-100">
+            <h2 class="text-sm font-bold text-purple-600 mb-2.5 flex items-center justify-between">
+                <span class="flex items-center gap-1.5">🌈 MUST①：今日の天気（シミュレーション）</span>
+                <span id="weatherSourceBadge" class="text-[10px] bg-purple-100 text-purple-700 px-2.5 py-0.5 rounded-full font-bold">自動設定中</span>
+            </h2>
+            <div class="flex items-center justify-between bg-gradient-to-r from-pink-50 to-purple-50 p-3.5 rounded-2xl border border-pink-100">
+                <div class="flex items-center space-x-3.5">
+                    <span id="weatherIcon" class="text-3xl filter drop-shadow">☀️</span>
+                    <div>
+                        <div id="weatherName" class="font-extrabold text-base text-pink-600">晴れ</div>
+                        <div id="weatherDesc" class="text-xs text-gray-500 font-medium">紫外線対策OK！巻き髪やダウンスタイルがおすすめ</div>
+                    </div>
+                </div>
+            </div>
+            <!-- テスト用の手動切り替えボタン -->
+            <div class="mt-3">
+                <p class="text-[11px] text-purple-400 font-bold mb-1.5 text-center">👇【テスト用】天気を変えてみる？</p>
+                <div class="grid grid-cols-4 gap-1.5">
+                    <button onclick="setWeather('sunny')" class="bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 text-xs py-2 rounded-xl font-bold transition shadow-sm active:scale-95">☀️ 晴れ</button>
+                    <button onclick="setWeather('rainy')" class="bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200 text-xs py-2 rounded-xl font-bold transition shadow-sm active:scale-95">🌧️ 雨</button>
+                    <button onclick="setWeather('cloudy')" class="bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 text-xs py-2 rounded-xl font-bold transition shadow-sm active:scale-95">☁️ 曇り</button>
+                    <button onclick="setWeather('windy')" class="bg-teal-50 hover:bg-teal-100 text-teal-700 border border-teal-200 text-xs py-2 rounded-xl font-bold transition shadow-sm active:scale-95">💨 風強め</button>
+                </div>
+            </div>
+        </section>
+
+        <section class="bg-white/90 backdrop-blur-md p-4.5 rounded-3xl yumekawa-shadow border-2 border-pink-100">
+            <h2 class="text-sm font-bold text-pink-600 mb-2.5 flex items-center gap-1.5">
+                <span>✂️</span> MUST③：髪の長さをえらんでね
+            </h2>
+            <div class="grid grid-cols-4 gap-2">
+                <button onclick="setLength('long')" id="btn-long" class="length-btn bg-gradient-to-b from-pink-400 to-pink-500 text-white text-xs py-2.5 rounded-2xl font-bold shadow-md transition transform active:scale-95 border-b-2 border-pink-600">ロング</button>
+                <button onclick="setLength('medium')" id="btn-medium" class="length-btn bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200 text-xs py-2.5 rounded-2xl font-bold transition transform active:scale-95">ミディアム</button>
+                <button onclick="setLength('bob')" id="btn-bob" class="length-btn bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200 text-xs py-2.5 rounded-2xl font-bold transition transform active:scale-95">ボブ</button>
+                <button onclick="setLength('short')" id="btn-short" class="length-btn bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200 text-xs py-2.5 rounded-2xl font-bold transition transform active:scale-95">ショート</button>
+            </div>
+        </section>
+
+        <section class="bg-white/90 backdrop-blur-md p-5 rounded-3xl yumekawa-shadow text-center flex flex-col items-center border-2 border-purple-100 relative overflow-hidden">
+            <div class="absolute top-2 right-2 text-pink-300 text-lg opacity-40">✨</div>
+            <h2 class="text-sm font-bold text-purple-600 mb-2.5 w-full text-left flex items-center gap-1.5">
+                <span>🎡</span> MUST②：髪型ルーレット
+            </h2>
+            
+            <!-- ルーレット結果表示ディスプレイ -->
+            <div id="rouletteDisplay" class="w-full bg-gradient-to-b from-pink-50/80 to-purple-50/80 border-2 border-dashed border-pink-300 rounded-2xl p-6 my-2 flex flex-col items-center justify-center min-h-[130px] transition-all">
+                <span id="rouletteSubText" class="text-xs text-purple-400 font-bold mb-1.5">✨ 下のボタンを押して決めてね ✨</span>
+                <div id="rouletteResult" class="text-xl font-extrabold text-pink-600 drop-shadow-sm">ルーレットスタンバイ中...</div>
+            </div>
+
+            <!-- ゆめかわグラデーションの可愛いスタートボタン -->
+            <button onclick="startRoulette()" id="spinButton" class="w-full mt-2 bg-gradient-to-r from-pink-400 via-purple-400 to-indigo-400 text-white font-extrabold py-3.5 px-6 rounded-2xl shadow-lg hover:opacity-95 active:scale-95 transition transform border-b-4 border-purple-600/40 text-sm tracking-wider sparkle-anim">
+                🎀 髪型をきめる！ 🎀
+            </button>
+        </section>
+
+    </main>
+
+    <footer class="text-center text-xs text-purple-400 font-bold p-4">
+        💕 情報Ⅱ 開発試作品 Ver.0.1 (Yumekawa Harajuku Style) 💕
+    </footer>
+
+    <script>
+        // --- 1. 状態管理用の変数（ここを変更するとデータを追加・修正できます） ---
+        
+        // 現在選択されている髪の長さ（初期値: long）
+        let currentLength = 'long';
+        
+        // 現在の天気（初期値: sunny）
+        let currentWeather = 'sunny';
+
+        // 天気の仮データ（モック）定義
+        const weatherData = {
+            sunny: { name: '晴れ', icon: '☀️', desc: '紫外線対策OK！巻き髪やダウンスタイルがおすすめ' },
+            rainy: { name: '雨', icon: '🌧️', desc: '湿気で広がりやすい日。すっきりまとめるのが吉' },
+            cloudy: { name: '曇り', icon: '☁️', desc: '過ごしやすい日。どんなアレンジも楽しめます' },
+            windy: { name: '風強め', icon: '💨', desc: '髪が乱れやすい日。しっかり結ぶスタイルが安全' }
+        };
+
+        // 髪型アイデアの仮データ（天候別・長さ別）
+        // 拡張ポイント：ここを書き換えることで、髪型のバリエーションを増やせます
+        const hairIdeas = {
+            long: {
+                sunny: ['ハイポニーテール 🦄', '巻き髪ダウンスタイル 🌟', 'リボンハーフアップ 🎀'],
+                rainy: ['きっちりシニヨン 🍡', '三つ編みまとめ髪 🪄', 'ローポニーテール 💧'],
+                cloudy: ['ゆるふわ巻き ✨', 'サイド寄せアレンジ 💖', '編み込みダウンスタイル ☁️'],
+                windy: ['タイトな編みおろし 🎀', 'フィッシュボーン 🌟', 'しっかりお団子ヘア 🍡']
+            },
+            medium: {
+                sunny: ['外ハネミディアム 🌟', '軽やかハーフアップ 🎀', 'ポンパドール 🦄'],
+                rainy: ['コンパクトな外ハネ 💧', 'クリップ留めまとめ髪 📎', '低めお団子 🍡'],
+                cloudy: ['ふんわり外ハネボブ風 ✨', '耳かけすっきりスタイル 💖', 'ゆる巻きミディアム ☁️'],
+                windy: ['しっかり結べるハーフアップ 🎀', 'ピンで固定すっきりヘア 📌', 'タイトポニーテール ✨']
+            },
+            bob: {
+                sunny: ['タンバルモリ（ふんわりボブ） 🌟', '耳かけワンカール 🎀', 'ヘアピンアクセント 💖'],
+                rainy: ['ウェット感オイル仕上げボブ 💧', 'タイトなストレートボブ ☁️', 'ハーフアップお団子 🍡'],
+                cloudy: ['内巻きワンカール ✨', 'シースルーバング 🦄', 'カジュアル外ハネ 🌟'],
+                windy: ['ピン留め耳かけボブ 📌', 'タイトボブ 🎀', 'ねじり留めアレンジ ✨']
+            },
+            short: {
+                sunny: ['ふんわりエアリーショート 🌟', 'アップバング風 🦄', '外ハネショート 💖'],
+                rainy: ['タイトストレート 💧', 'ジェルでウエット風 ✨', 'ピンアレンジ 📌'],
+                cloudy: ['ナチュラルショート ☁️', '耳かけショート 🎀', 'トップボリューム出し 🌟'],
+                windy: ['崩れにくいタイトショート 💨', 'ワックスでしっかり固定 ✨', '前髪重め固定 📌']
+            }
+        };
+
+        // --- 2. 天気変更の関数（MUST①用） ---
+        function setWeather(type) {
+            currentWeather = type;
+            const data = weatherData[type];
+            
+            // 画面の天気を更新
+            document.getElementById('weatherIcon').innerText = data.icon;
+            document.getElementById('weatherName').innerText = data.name;
+            document.getElementById('weatherDesc').innerText = data.desc;
+            
+            // 手動変更されたことをユーザーに分かりやすく表示
+            const badge = document.getElementById('weatherSourceBadge');
+            badge.innerText = "手動選択中 ✨";
+            badge.className = "text-[10px] bg-pink-100 text-pink-700 px-2.5 py-0.5 rounded-full font-bold";
+        }
+
+        // --- 3. 髪の長さ変更の関数（MUST③用） ---
+        function setLength(length) {
+            currentLength = length;
+            
+            // すべてのボタンの見た目をリセット（ゆめかわな非選択スタイル）
+            const buttons = document.querySelectorAll('.length-btn');
+            buttons.forEach(btn => {
+                btn.className = "length-btn bg-pink-50 hover:bg-pink-100 text-pink-600 border border-pink-200 text-xs py-2.5 rounded-2xl font-bold transition transform active:scale-95";
+            });
+            
+            // 選択されたボタンだけ可愛いピンクのグラデーションにする
+            const selectedBtn = document.getElementById(`btn-${length}`);
+            selectedBtn.className = "length-btn bg-gradient-to-b from-pink-400 to-pink-500 text-white text-xs py-2.5 rounded-2xl font-bold shadow-md transition transform active:scale-95 border-b-2 border-pink-600";
+        }
+
+        // --- 4. ルーレット開始の関数（MUST②用） ---
+        function startRoulette() {
+            const spinBtn = document.getElementById('spinButton');
+            const resultDiv = document.getElementById('rouletteResult');
+            const subText = document.getElementById('rouletteSubText');
+            const displayBox = document.getElementById('rouletteDisplay');
+
+            // ボタンを無効化してアニメーション演出
+            spinBtn.disabled = true;
+            spinBtn.classList.add('opacity-70', 'cursor-not-allowed');
+            displayBox.classList.add('roulette-spinning');
+            subText.innerText = "✨ ルーレット回転中…ワクワク♪ ✨";
+
+            // 選択されている長さと天気に対応するアイデアのリストを取得
+            const availableIdeas = hairIdeas[currentLength][currentWeather];
+
+            let count = 0;
+            // パラパラと文字が変わるアニメーション演出（約1.2秒間）
+            const interval = setInterval(() => {
+                const randomIdea = availableIdeas[Math.floor(Math.random() * availableIdeas.length)];
+                resultDiv.innerText = randomIdea;
+                count++;
+                
+                if (count > 12) {
+                    clearInterval(interval);
+                    // 最終決定
+                    const finalIdea = availableIdeas[Math.floor(Math.random() * availableIdeas.length)];
+                    resultDiv.innerText = "💖 " + finalIdea + " 💖";
+                    subText.innerText = `【${weatherData[currentWeather].name} × ${getLengthName(currentLength)}】のきゅーとコーデ！`;
+                    
+                    // アニメーション終了
+                    displayBox.classList.remove('roulette-spinning');
+                    spinBtn.disabled = false;
+                    spinBtn.classList.remove('opacity-70', 'cursor-not-allowed');
+                }
+            }, 100);
+        }
+
+        // 長さのコード名を日本語に変換するヘルパー関数
+        function getLengthName(code) {
+            const names = { long: 'ロング', medium: 'ミディアム', bob: 'ボブ', short: 'ショート' };
+            return names[code] || code;
+        }
+
+        // ページ読み込み時の初期化
+        window.onload = function() {
+            console.log("髪型お悩みルーレット ゆめかわ原宿系 Ver.0.1 が正常に起動しました！🎀");
+        };
+    </script>
+</body>
+</html>
