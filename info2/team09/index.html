@@ -3,20 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>傘シェアアプリ（試作品 Ver.0.1）</title>
-    <!-- スタイルシート（見た目・デザイン性：MUST③） -->
+    <title>お天気アンブレラ（富士宮市版 Ver.0.1）</title>
+    <!-- Googleフォント（丸っこいフォント） -->
+    <link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary-color: #3b82f6;
-            --primary-hover: #2563eb;
-            --bg-color: #f8fafc;
+            --primary-color: #ff85a1;
+            --primary-hover: #ff6b8b;
+            --secondary-color: #8ac9de;
+            --bg-color: #fff0f3;
             --card-bg: #ffffff;
-            --text-color: #1e293b;
-            --gray-text: #64748b;
+            --text-color: #4a4e69;
+            --gray-text: #9a8c98;
         }
 
         body {
-            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
@@ -31,39 +33,42 @@
             width: 100%;
             max-width: 420px;
             background-color: var(--card-bg);
-            border-radius: 16px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 28px;
+            box-shadow: 0 10px 25px rgba(255, 133, 161, 0.15);
             overflow: hidden;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            max-height: 800px;
+            max-height: 850px;
+            border: 4px solid #ffffff;
         }
 
         @media (min-width: 480px) {
             .container {
-                height: 85vh;
+                height: 90vh;
             }
         }
 
         /* ヘッダー */
         header {
-            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            background: linear-gradient(135deg, #ffb5a7, #ff85a1);
             color: white;
             padding: 20px;
             text-align: center;
+            border-bottom-left-radius: 24px;
+            border-bottom-right-radius: 24px;
         }
 
         header h1 {
             margin: 0;
-            font-size: 1.25rem;
+            font-size: 1.3rem;
             font-weight: 700;
         }
 
         header p {
-            margin: 5px 0 0;
-            font-size: 0.85rem;
-            opacity: 0.9;
+            margin: 4px 0 0;
+            font-size: 0.8rem;
+            opacity: 0.95;
         }
 
         /* メインコンテンツエリア */
@@ -74,43 +79,92 @@
         }
 
         .section-title {
-            font-size: 1rem;
-            font-weight: 600;
+            font-size: 0.95rem;
+            font-weight: 700;
             margin-bottom: 12px;
+            color: #6c584c;
             display: flex;
             align-items: center;
             gap: 6px;
         }
 
-        /* 天気情報カード（仮データ） */
+        /* 天気情報カード（タップ可能） */
         .weather-card {
-            background-color: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 10px;
-            padding: 12px 16px;
+            background: linear-gradient(135deg, #e0fbfc, #c2f9f9);
+            border: 2px dashed var(--secondary-color);
+            border-radius: 20px;
+            padding: 16px;
             margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .weather-card:hover {
+            transform: scale(1.01);
+            box-shadow: 0 4px 12px rgba(138, 201, 222, 0.3);
+        }
+
+        .weather-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .weather-info .status {
+        .weather-info .city {
+            font-size: 0.75rem;
             font-weight: bold;
-            color: #1d4ed8;
-            font-size: 0.95rem;
+            color: #293241;
+            background: rgba(255,255,255,0.7);
+            padding: 2px 8px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+
+        .weather-info .status {
+            font-weight: 700;
+            color: #1d6f42;
+            font-size: 0.9rem;
         }
 
         .weather-info .note {
-            font-size: 0.75rem;
-            color: var(--gray-text);
+            font-size: 0.7rem;
+            color: #555555;
             margin-top: 2px;
         }
 
         .weather-icon {
-            font-size: 2rem;
+            font-size: 2.2rem;
+            animation: bounce 2s infinite;
         }
 
-        /* スポット（貸出場所）リスト */
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+
+        /* 1時間ごとの天気詳細（初期は非表示） */
+        .hourly-forecast {
+            margin-top: 12px;
+            padding-top: 10px;
+            border-top: 1px dashed rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .hourly-item {
+            font-size: 0.7rem;
+            color: #3d3a45;
+        }
+
+        .hourly-item .time {
+            font-weight: bold;
+            color: #1d6f42;
+        }
+
+        /* スポットリスト */
         .spot-list {
             display: flex;
             flex-direction: column;
@@ -119,102 +173,134 @@
         }
 
         .spot-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 14px;
+            background-color: #faf0ca;
+            border: 2px solid transparent;
+            border-radius: 16px;
+            padding: 12px 16px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
         .spot-card:hover {
+            transform: scale(1.02);
             border-color: var(--primary-color);
-            background-color: #f8fafc;
         }
 
         .spot-card.selected {
+            background-color: #ffd1dc;
             border-color: var(--primary-color);
-            background-color: #eff6ff;
+            box-shadow: 0 4px 12px rgba(255, 133, 161, 0.2);
         }
 
         .spot-name {
-            font-weight: 600;
-            font-size: 0.95rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: #3d3a45;
         }
 
         .spot-stock {
-            font-size: 0.8rem;
-            color: var(--gray-text);
-            margin-top: 4px;
+            font-size: 0.7rem;
+            color: #8d7b68;
+            margin-top: 2px;
         }
 
         .stock-badge {
-            background-color: #dbeafe;
-            color: #1e40af;
-            padding: 4px 10px;
+            background-color: white;
+            color: #ff6b8b;
+            padding: 6px 10px;
             border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
 
-        /* アクションボタン（MUST①：借りる機能） */
+        /* ボタンデザイン */
         .btn {
             width: 100%;
-            background-color: var(--primary-color);
+            background: linear-gradient(135deg, #ff85a1, #ff6b8b);
             color: white;
             border: none;
             padding: 14px;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            font-family: 'M PLUS Rounded 1c', sans-serif;
+            font-weight: 700;
             cursor: pointer;
-            transition: background-color 0.2s;
+            box-shadow: 0 6px 15px rgba(255, 107, 139, 0.3);
+            transition: all 0.2s;
         }
 
         .btn:hover {
-            background-color: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 139, 0.4);
         }
 
-        .btn:disabled {
-            background-color: #cbd5e1;
-            cursor: not-allowed;
-        }
-
-        /* 借りた後の画面（完了画面） */
+        /* 完了画面 */
         .complete-screen {
             text-align: center;
-            padding: 30px 10px;
+            padding: 10px 0;
         }
 
         .complete-icon {
             font-size: 3.5rem;
-            margin-bottom: 15px;
+            margin-bottom: 5px;
+            animation: popUp 0.5s ease;
+        }
+
+        @keyframes popUp {
+            0% { transform: scale(0); }
+            80% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
 
         .complete-screen h2 {
-            font-size: 1.25rem;
-            margin-bottom: 10px;
+            font-size: 1.2rem;
+            color: #ff6b8b;
+            margin-bottom: 6px;
         }
 
         .complete-screen p {
-            color: var(--gray-text);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
+            color: var(--text-color);
+            font-size: 0.8rem;
+            margin-bottom: 15px;
             line-height: 1.5;
         }
 
-        .qr-box {
-            background-color: #f1f5f9;
-            border: 2px dashed #cbd5e1;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
+        /* QRコード風デザイン（CSSで網模様を表現） */
+        .qr-container {
+            background-color: white;
+            border: 3px solid var(--primary-color);
+            border-radius: 16px;
+            padding: 15px;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        .qr-mock {
+            width: 130px;
+            height: 130px;
+            background: 
+                radial-gradient(circle at 20px 20px, #000 12px, transparent 13px),
+                radial-gradient(circle at 110px 20px, #000 12px, transparent 13px),
+                radial-gradient(circle at 20px 110px, #000 12px, transparent 13px),
+                linear-gradient(45deg, #333 25%, transparent 25%, transparent 75%, #333 75%),
+                linear-gradient(45deg, #333 25%, #fff 25%, #fff 75%, #333 75%);
+            background-size: 100% 100%, 100% 100%, 100% 100%, 20px 20px, 20px 20px;
+            background-position: 0 0, 0 0, 0 0, 0 0, 10px 10px;
+            margin: 0 auto;
+            border-radius: 4px;
+        }
+
+        .qr-code-text {
             font-family: monospace;
-            font-size: 1.1rem;
-            color: #334155;
-            letter-spacing: 2px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #ff6b8b;
+            margin-top: 8px;
         }
 
         .hidden {
@@ -227,75 +313,104 @@
     <div class="container">
         <!-- ヘッダー -->
         <header>
-            <h1>☔ 傘シェアアプリ</h1>
-            <p>急な雨でも安心、すぐレンタル</p>
+            <h1>☔ ぽかぽかお天気傘</h1>
+            <p>静岡県富士宮市のレンタルアプリ♪</p>
         </header>
 
         <!-- メインコンテンツ -->
         <div class="content">
             <!-- 借りる前：選択・天気表示画面 -->
             <div id="rent-view">
-                <!-- 天気予報（仮データ） -->
-                <div class="weather-card">
-                    <div class="weather-info">
-                        <div class="status">予報：まもなく雨が降ります</div>
-                        <div class="note">※外部API連携前の仮データです</div>
+                <!-- 天気予報カード（タップすると1時間ごとの天気に切り替わる） -->
+                <div class="weather-card" onclick="toggleHourlyForecast()">
+                    <div class="weather-header">
+                        <div class="weather-info">
+                            <div class="city">📍 富士宮市の天気</div>
+                            <div class="status" id="weather-status-text">☁️ まもなく雨が降りそう！</div>
+                            <div class="note">👉 タップして1時間ごとの予報を見る</div>
+                        </div>
+                        <div class="weather-icon" id="weather-main-icon">🌧️</div>
                     </div>
-                    <div class="weather-icon">🌧️</div>
+
+                    <!-- 1時間ごとの天気（初期は非表示） -->
+                    <div id="hourly-section" class="hourly-forecast hidden">
+                        <div class="hourly-item">
+                            <div class="time">13時</div>
+                            <div style="font-size:1.2rem;">☁️</div>
+                            <div>曇り</div>
+                        </div>
+                        <div class="hourly-item">
+                            <div class="time">14時</div>
+                            <div style="font-size:1.2rem;">☔</div>
+                            <div>小雨</div>
+                        </div>
+                        <div class="hourly-item">
+                            <div class="time">15時</div>
+                            <div style="font-size:1.2rem;">🌧️</div>
+                            <div>本降雨</div>
+                        </div>
+                        <div class="hourly-item">
+                            <div class="time">16時</div>
+                            <div style="font-size:1.2rem;">☔</div>
+                            <div>雨</div>
+                        </div>
+                    </div>
                 </div>
 
-                <div class="section-title">📍 近くの傘スポットを選ぶ</div>
+                <div class="section-title">📍 傘を借りる場所をえらんでね</div>
                 
-                <!-- スポットリスト（MUST②：学生でも使える仕様） -->
+                <!-- スポットリスト -->
                 <div class="spot-list" id="spot-list">
                     <div class="spot-card selected" onclick="selectSpot(0)">
                         <div>
-                            <div class="spot-name">校門前エントランス</div>
-                            <div class="spot-stock">生徒・教職員利用可</div>
+                            <div class="spot-name">🌸 校門前エントランス</div>
+                            <div class="spot-stock">すぐ取り出せて便利！</div>
                         </div>
                         <div class="stock-badge">残り 3本</div>
                     </div>
                     <div class="spot-card" onclick="selectSpot(1)">
                         <div>
-                            <div class="spot-name">生徒玄関ロビー</div>
-                            <div class="spot-stock">生徒・教職員利用可</div>
+                            <div class="spot-name">🏫 生徒玄関ロビー</div>
+                            <div class="spot-stock">雨宿りにぴったり</div>
                         </div>
                         <div class="stock-badge">残り 5本</div>
                     </div>
                     <div class="spot-card" onclick="selectSpot(2)">
                         <div>
-                            <div class="spot-name">体育館前通路</div>
-                            <div class="spot-stock">生徒・教職員利用可</div>
+                            <div class="spot-name">🏀 体育館前通路</div>
+                            <div class="spot-stock">部活の帰りにも！</div>
                         </div>
                         <div class="stock-badge">残り 1本</div>
                     </div>
                 </div>
 
-                <!-- 借用ボタン（MUST①） -->
-                <button class="btn" id="rent-btn" onclick="rentUmbrella()">この場所で傘を借りる</button>
+                <!-- 借用ボタン -->
+                <button class="btn" id="rent-btn" onclick="rentUmbrella()">✨ この場所で傘を借りる</button>
             </div>
 
-            <!-- 借りた後：完了画面（MUST③：デザイン性と楽しさ） -->
+            <!-- 借りた後：完了画面（QRコード表示） -->
             <div id="complete-view" class="complete-screen hidden">
-                <div class="complete-icon">🎉</div>
-                <h2>レンタル手続き完了！</h2>
-                <p>以下の解錠コード、またはQRをスポットの端末にかざして傘を取り出してください。</p>
+                <div class="complete-icon">💖</div>
+                <h2>レンタル完了だよ！</h2>
+                <p>スポットの端末にこのQRコードをかざして、かわいい傘を取り出してね♪</p>
                 
-                <div class="qr-box" id="auth-code">
-                    CODE: UMB-8421
+                <!-- QRコード（CSS模倣） -->
+                <div class="qr-container">
+                    <div class="qr-mock"></div>
+                    <div class="qr-code-text" id="auth-code">UMB-8421</div>
                 </div>
 
-                <p style="font-size: 0.8rem; color: #64748b;">返却期限：利用開始から24時間以内</p>
+                <p style="font-size: 0.75rem; color: #9a8c98; margin-bottom: 15px;">返却期限：利用開始から24時間以内</p>
 
-                <button class="btn" onclick="resetApp()" style="background-color: #64748b;">ホームに戻る</button>
+                <button class="btn" onclick="resetApp()" style="background: linear-gradient(135deg, #b5838d, #6d6875); box-shadow: 0 6px 15px rgba(109,104,117,0.3);">ホームに戻る</button>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript（動きを制御する部分） -->
+    <!-- JavaScript -->
     <script>
-        // 選択されているスポットのインデックス
         let selectedIndex = 0;
+        let isHourlyShow = false;
 
         const spots = [
             { name: "校門前エントランス", stock: 3 },
@@ -303,7 +418,17 @@
             { name: "体育館前通路", stock: 1 }
         ];
 
-        // スポット選択時の処理
+        // 天気カードをタップしたときの切り替え（1時間ごとの天気表示）
+        function toggleHourlyForecast() {
+            const hourlySec = document.getElementById('hourly-section');
+            isHourlyShow = !isHourlyShow;
+            if (isHourlyShow) {
+                hourlySec.classList.remove('hidden');
+            } else {
+                hourlySec.classList.add('hidden');
+            }
+        }
+
         function selectSpot(index) {
             selectedIndex = index;
             const cards = document.querySelectorAll('.spot-card');
@@ -316,20 +441,14 @@
             });
         }
 
-        // 傘を借りるボタンを押したときの処理（MUST①）
         function rentUmbrella() {
-            const chosenSpot = spots[selectedIndex];
-            
-            // ランダムな解錠コードを生成して楽しさを演出（MUST③）
             const randomCode = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('auth-code').innerText = `CODE: UMB-${randomCode}`;
+            document.getElementById('auth-code').innerText = `UMB-${randomCode}`;
 
-            // 画面の切り替え
             document.getElementById('rent-view').classList.add('hidden');
             document.getElementById('complete-view').classList.remove('hidden');
         }
 
-        // ホームに戻る処理
         function resetApp() {
             document.getElementById('complete-view').classList.add('hidden');
             document.getElementById('rent-view').classList.remove('hidden');
