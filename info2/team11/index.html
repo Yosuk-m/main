@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>忘れ物防止アプリ (Ver.0.1)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+    <header class="bg-indigo-600 text-white shadow-md">
+        <div class="max-w-md mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <span>🎒</span> うっかりゼロアプリ
+            </h1>
+            <span class="text-xs bg-indigo-500 px-2.5 py-1 rounded-full">Ver.0.1 試作品</span>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-md w-full mx-auto p-4 space-y-6 mb-16">
+
+        <!-- 仮データ使用中の通知バナー -->
+        <div id="sample-banner" class="bg-amber-50 border border-amber-200 text-amber-800 p-3 rounded-xl text-sm flex items-start gap-2 shadow-sm">
+            <span class="text-lg">💡</span>
+            <div>
+                <span class="font-bold">サンプルデータ表示中:</span> 初めて開いたため、仮データを表示しています。自分で追加・完了するとブラウザに保存されます。
+            </div>
+        </div>
+
+        <!-- MUST①：提出物・持ち物の登録フォーム -->
+        <section class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
+            <h2 class="text-lg font-bold mb-3 text-indigo-900 flex items-center gap-2">
+                <span>✍️</span> 新規登録
+            </h2>
+            <form id="item-form" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-600 mb-1">名前（タイトル）</label>
+                    <input type="text" id="item-title" required placeholder="例: 数学のワークP.30〜32" 
+                        class="w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-slate-50">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">期限・日付</label>
+                        <input type="date" id="item-date" required 
+                            class="w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-slate-50">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">種別</label>
+                        <select id="item-type" 
+                            class="w-full px-3 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-slate-50">
+                            <option value="submission">提出物</option>
+                            <option value="belonging">持ち物</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="submit" 
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-xl shadow-md transition active:scale-[0.99] text-sm">
+                    登録する
+                </button>
+            </form>
+        </section>
+
+        <!-- MUST②：締め切り・予定の確認（フィルター機能付き） -->
+        <section class="space-y-3">
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-indigo-900 flex items-center gap-2">
+                    <span>📋</span> 一覧・確認
+                </h2>
+                <!-- フィルターボタン -->
+                <div class="flex bg-slate-200 p-1 rounded-xl text-xs font-medium">
+                    <button type="button" onclick="setFilter('all')" id="filter-all" class="px-3 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm transition">すべて</button>
+                    <button type="button" onclick="setFilter('submission')" id="filter-submission" class="px-3 py-1.5 rounded-lg text-slate-600 transition">提出物</button>
+                    <button type="button" onclick="setFilter('belonging')" id="filter-belonging" class="px-3 py-1.5 rounded-lg text-slate-600 transition">持ち物</button>
+                </div>
+            </div>
+
+            <!-- リスト表示エリア -->
+            <div id="item-list" class="space-y-3">
+                <!-- JavaScript動的描画 -->
+            </div>
+
+            <!-- 完了済みセクションのトグルまたは表示 -->
+            <div class="pt-2">
+                <button onclick="toggleShowCompleted()" id="toggle-completed-btn" class="text-xs text-indigo-600 hover:underline font-medium">
+                    完了済み項目を表示する (0件)
+                </button>
+                <div id="completed-list" class="space-y-2 mt-2 hidden">
+                    <!-- 完了済みがここに表示される -->
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // --- アプリケーションの状態管理 ---
+        let items = [];
+        let currentFilter = 'all'; // 'all', 'submission', 'belonging'
+        let showCompletedFlag = false;
+
+        // 初期サンプルデータ（仮データ）
+        const sampleData = [
+            { id: 1, title: '現代文の漢字ドリル', date: '2026-10-12', type: 'submission', completed: false, isSample: true },
+            { id: 2, title: '体育館シューズ', date: '2026-10-10', type: 'belonging', completed: false, isSample: true },
+            { id: 3, title: '数学I・Aプリント', date: '2026-10-09', type: 'submission', completed: true, isSample: true }
+        ];
+
+        // --- 起動時の処理 (LocalStorageの読み込み) ---
+        window.onload = function() {
+            const savedItems = localStorage.getItem('reminder_items');
+            if (savedItems) {
+                items = JSON.parse(savedItems);
+                // 保存データがある場合はサンプルバナーを非表示
+                document.getElementById('sample-banner').style.display = 'none';
+            } else {
+                // 初回はサンプルデータをセット
+                items = sampleData;
+                saveItems();
+            }
+
+            // 今日の日付をデフォルト値にセット
+            const todayStr = new Date().toISOString().split('T')[0];
+            document.getElementById('item-date').value = todayStr;
+
+            render();
+        };
+
+        // --- データの保存 (LocalStorage) ---
+        function saveItems() {
+            localStorage.setItem('reminder_items', JSON.stringify(items));
+        }
+
+        // --- MUST①：新規登録フォームの送信処理 ---
+        document.getElementById('item-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const titleInput = document.getElementById('item-title');
+            const dateInput = document.getElementById('item-date');
+            const typeInput = document.getElementById('item-type');
+
+            const newItem = {
+                id: Date.now(), // ユニークなIDとしてタイムスタンプを使用
+                title: titleInput.value.trim(),
+                date: dateInput.value,
+                type: typeInput.value,
+                completed: false,
+                isSample: false // ユーザーが追加したものは実データ
+            };
+
+            items.push(newItem);
+            saveItems();
+
+            // フォームをリセット
+            titleInput.value = '';
+            
+            // サンプルバナーを隠す
+            document.getElementById('sample-banner').style.display = 'none';
+
+            render();
+        });
+
+        // --- MUST③：完了チェックの切り替え処理 ---
+        function toggleComplete(id) {
+            const target = items.find(item => item.id === id);
+            if (target) {
+                target.completed = !target.completed;
+                saveItems();
+                render();
+            }
+        }
+
+        // --- 項目の削除処理 ---
+        function deleteItem(id) {
+            items = items.filter(item => item.id !== id);
+            saveItems();
+            render();
+        }
+
+        // --- フィルター変更処理 ---
+        function setFilter(filterType) {
+            currentFilter = filterType;
+            
+            // フィルターボタンの見た目切り替え
+            ['all', 'submission', 'belonging'].forEach(type => {
+                const btn = document.getElementById(`filter-${type}`);
+                if (type === filterType) {
+                    btn.className = "px-3 py-1.5 rounded-lg bg-white text-indigo-600 shadow-sm transition";
+                } else {
+                    btn.className = "px-3 py-1.5 rounded-lg text-slate-600 transition";
+                }
+            });
+
+            render();
+        }
+
+        // --- 完了済み項目の表示トグル ---
+        function toggleShowCompleted() {
+            showCompletedFlag = !showCompletedFlag;
+            render();
+        }
+
+        // --- MUST②：画面の再描画（レンダリング）処理 ---
+        function render() {
+            const listContainer = document.getElementById('item-list');
+            const completedContainer = document.getElementById('completed-list');
+            const toggleBtn = document.getElementById('toggle-completed-btn');
+
+            listContainer.innerHTML = '';
+            completedContainer.innerHTML = '';
+
+            // 期限順（日付昇順）に並び替え
+            const sortedItems = [...items].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            // 未完了と完了済みに分ける
+            const activeItems = sortedItems.filter(item => !item.completed);
+            const completedItems = sortedItems.filter(item => item.completed);
+
+            // フィルター適用の絞り込み（未完了リスト側）
+            const filteredActive = activeItems.filter(item => {
+                if (currentFilter === 'all') return true;
+                return item.type === currentFilter;
+            });
+
+            // 未完了リストの描画
+            if (filteredActive.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="bg-white p-6 rounded-2xl text-center border border-slate-100 text-slate-400 text-sm">
+                        予定されている提出物・持ち物はありません 🎉
+                    </div>
+                `;
+            } else {
+                filteredActive.forEach(item => {
+                    listContainer.appendChild(createItemCard(item));
+                });
+            }
+
+            // 完了済みリストの描画
+            completedItems.forEach(item => {
+                completedContainer.appendChild(createItemCard(item));
+            });
+
+            // 完了済みトグルボタンのテキスト更新
+            toggleBtn.innerText = showCompletedFlag ? `完了済みを隠す (${completedItems.length}件)` : `完了済み項目を表示する (${completedItems.length}件)`;
+            
+            if (showCompletedFlag && completedItems.length > 0) {
+                completedContainer.classList.remove('hidden');
+            } else {
+                completedContainer.classList.add('hidden');
+            }
+        }
+
+        // --- 1件分のカード要素を作成するヘルパー関数 ---
+        function createItemCard(item) {
+            const card = document.createElement('div');
+            card.className = `p-4 rounded-2xl border transition flex items-center justify-between gap-3 ${
+                item.completed ? 'bg-slate-100 border-slate-200 opacity-60' : 'bg-white border-slate-100 shadow-sm'
+            }`;
+
+            const typeBadge = item.type === 'submission' 
+                ? '<span class="text-[10px] bg-rose-100 text-rose-700 px-2 py-0.5 rounded-md font-medium">提出物</span>'
+                : '<span class="text-[10px] bg-sky-100 text-sky-700 px-2 py-0.5 rounded-md font-medium">持ち物</span>';
+
+            // 仮データ区別のためのマーク
+            const sampleBadge = item.isSample 
+                ? '<span class="text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-mono ml-1">仮</span>' 
+                : '';
+
+            // 期限までの残り日数を計算・表示
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const itemDate = new Date(item.date);
+            itemDate.setHours(0, 0, 0, 0);
+            const diffTime = itemDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            let dateColor = 'text-slate-500';
+            let dateText = item.date;
+
+            if (!item.completed) {
+                if (diffDays < 0) {
+                    dateColor = 'text-rose-600 font-bold';
+                    dateText = `${item.date} (期限切れ)`;
+                } else if (diffDays === 0) {
+                    dateColor = 'text-amber-600 font-bold';
+                    dateText = `${item.date} (今日)`;
+                } else if (diffDays === 1) {
+                    dateColor = 'text-indigo-600 font-medium';
+                    dateText = `${item.date} (明日)`;
+                }
+            }
+
+            card.innerHTML = `
+                <div class="flex items-start gap-3 flex-1 min-w-0">
+                    <input type="checkbox" ${item.completed ? 'checked' : ''} 
+                        onclick="toggleComplete(${item.id})"
+                        class="w-5 h-5 mt-0.5 accent-indigo-600 rounded cursor-pointer">
+                    <div class="min-w-0 flex-1">
+                        <div class="flex items-center gap-1.5 flex-wrap">
+                            ${typeBadge}
+                            <span class="text-sm font-semibold truncate ${item.completed ? 'line-through text-slate-500' : 'text-slate-800'}">${escapeHtml(item.title)}</span>
+                            ${sampleBadge}
+                        </div>
+                        <div class="text-xs ${dateColor} mt-1">期限: ${dateText}</div>
+                    </div>
+                </div>
+                <button onclick="deleteItem(${item.id})" class="text-slate-400 hover:text-rose-600 p-1 text-sm transition" title="削除">
+                    🗑️
+                </button>
+            `;
+
+            return card;
+        }
+
+        // --- XSS対策の簡単なエスケープ関数 ---
+        function escapeHtml(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
+    </script>
+</body>
+</html>
