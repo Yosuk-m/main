@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数学バトルゲーム（試作品Ver.0.1）</title>
+    <!-- Tailwind CSS (見た目を整えるための外部スタイルシート) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 font-sans text-slate-800 min-h-screen flex flex-col items-center justify-center p-4">
+
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-6 space-y-6">
+        
+        <!-- ヘッダー情報（ステータス表示） -->
+        <div class="flex justify-between items-center border-b pb-4">
+            <div>
+                <span class="text-sm text-slate-500 block">レベル</span>
+                <span id="levelText" class="text-2xl font-bold text-indigo-600">1</span>
+            </div>
+            <div>
+                <span class="text-sm text-slate-500 block">ポイント</span>
+                <span id="pointsText" class="text-2xl font-bold text-emerald-600">0</span> <span class="text-xs text-slate-400">/ <span id="nextLevelText">100</span>pt</span>
+            </div>
+            <div>
+                <span class="text-sm text-slate-500 block">撃破数</span>
+                <span id="defeatText" class="text-2xl font-bold text-amber-600">0</span>
+            </div>
+        </div>
+
+        <!-- 敵キャラクター・戦闘画面エリア (MUST①：敵を倒す機能) -->
+        <div class="bg-slate-900 text-white rounded-xl p-5 text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[180px]">
+            <div id="enemyEmoji" class="text-6xl mb-2">👾</div>
+            <h2 id="enemyName" class="text-lg font-bold mb-1">スライム算</h2>
+            
+            <!-- 敵のHPバー -->
+            <div class="w-full bg-slate-700 rounded-full h-4 mt-2 overflow-hidden">
+                <div id="enemyHpBar" class="bg-red-500 h-full transition-all duration-300" style="width: 100%;"></div>
+            </div>
+            <p class="text-xs text-slate-400 mt-1">HP: <span id="enemyCurrentHp">2</span> / <span id="enemyMaxHp">2</span></p>
+        </div>
+
+        <!-- メッセージ・フィードバック表示 -->
+        <div id="messageArea" class="bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-lg text-sm text-center font-medium">
+            正しいこたえを選んで、モンスターをたおそう！
+        </div>
+
+        <!-- 問題・選択肢エリア (MUST③：いくつか選択肢を出す) -->
+        <div id="quizArea" class="space-y-4">
+            <div class="bg-slate-50 border p-4 rounded-xl text-center">
+                <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">もんだい</span>
+                <p id="questionText" class="text-lg font-bold mt-1 text-slate-800">ここに問題が表示されます</p>
+            </div>
+
+            <!-- 選択肢ボタンエリア -->
+            <div id="choicesContainer" class="space-y-2">
+                <!-- JavaScriptでボタンを自動で作ります -->
+            </div>
+        </div>
+
+        <!-- 次の敵へ進むボタン（敵を倒した時に表示） -->
+        <div id="actionArea" class="hidden">
+            <button onclick="nextEnemy()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-xl shadow transition">
+                つぎの敵へすすむ
+            </button>
+        </div>
+
+    </div>
+
+    <script>
+        // ==========================================
+        // 【仮データ】数学の問題リスト
+        // 特殊な記号（^など）を使わず、日本語や数字で分かりやすく表現しています。
+        // ここを書き換えるだけで、自由に行う問題を追加・変更できます。
+        // ==========================================
+        var questionsData = [
+            {
+                question: "方程式「x + 3 = 7」の x の値はいくつ？",
+                choices: ["2", "4", "5", "10"],
+                answer: "4",
+                explanation: "両辺から3をひくと、x = 7 - 3 = 4 になります。"
+            },
+            {
+                question: "「2の2乗（2×2）」の値はいくつ？",
+                choices: ["2", "4", "6", "8"],
+                answer: "4",
+                explanation: "2の2乗は 2 × 2 なので、答えは 4 です。"
+            },
+            {
+                question: "三角形の内角の和（ぜんぶ足した角度）は何度？",
+                choices: ["90度", "180度", "270度", "360度"],
+                answer: "180度",
+                explanation: "どんな三角形でも内角の和はいつでも180度です。"
+            },
+            {
+                question: "関数「y = 2x + 1」の傾き（変化の割合）はいくつ？",
+                choices: ["1", "2", "3", "x"],
+                answer: "2",
+                explanation: "y = ax + b の形では、x の係数である a の部分が傾きになります。"
+            }
+        ];
+
+        // ==========================================
+        // ゲームの状態を保存する変数
+        // ==========================================
+        var currentLevel = 1;         // プレイヤーのレベル (MUST②)
+        var currentPoints = 0;        // 現在のポイント (MUST②)
+        var pointsToNextLevel = 100;  // 次のレベルに必要なポイント
+        var defeatCount = 0;          // 敵を倒した数 (MUST①)
+
+        // 現在の敵の情報
+        var currentEnemy = {
+            name: "スライム算",
+            emoji: "👾",
+            maxHp: 2,
+            hp: 2
+        };
+
+        var currentQuestion = null;   // 今出ている問題
+        var isAnswerLocked = false;   // 連続クリック防止用ロック
+
+        // ==========================================
+        // ページを読み込んだときに最初に動くプログラム
+        // ==========================================
+        window.onload = function() {
+            updateStatusUI();
+            loadNewQuestion();
+            updateEnemyUI();
+        };
+
+        // ==========================================
+        // 画面のステータス（レベルやポイント）を更新する関数
+        // ==========================================
+        function updateStatusUI() {
+            document.getElementById("levelText").textContent = currentLevel;
+            document.getElementById("pointsText").textContent = currentPoints;
+            document.getElementById("nextLevelText").textContent = pointsToNextLevel;
+            document.getElementById("defeatText").textContent = defeatCount;
+        }
+
+        // ==========================================
+        // 敵の見た目やHPバーを更新する関数
+        // ==========================================
+        function updateEnemyUI() {
+            document.getElementById("enemyName").textContent = currentEnemy.name;
+            document.getElementById("enemyEmoji").textContent = currentEnemy.emoji;
+            document.getElementById("enemyCurrentHp").textContent = currentEnemy.hp;
+            document.getElementById("enemyMaxHp").textContent = currentEnemy.maxHp;
+            
+            // HPの残り具合を％で計算してバーの長さを変える
+            var hpPercent = (currentEnemy.hp / currentEnemy.maxHp) * 100;
+            if (hpPercent < 0) {
+                hpPercent = 0;
+            }
+            document.getElementById("enemyHpBar").style.width = hpPercent + "%";
+        }
+
+        // ==========================================
+        // 新しい問題をランダムに選んで画面に出す関数（MUST③）
+        // ==========================================
+        function loadNewQuestion() {
+            isAnswerLocked = false;
+            document.getElementById("actionArea").classList.add("hidden");
+            document.getElementById("quizArea").classList.remove("hidden");
+
+            // 問題リストからランダムに1つ選ぶ
+            var randomIndex = Math.floor(Math.random() * questionsData.length);
+            currentQuestion = questionsData[randomIndex];
+
+            // 問題文を表示する
+            document.getElementById("questionText").textContent = currentQuestion.question;
+            
+            var messageBox = document.getElementById("messageArea");
+            messageBox.textContent = "正しいこたえをタップして攻撃しよう！";
+            messageBox.className = "bg-indigo-50 border border-indigo-200 text-indigo-800 px-4 py-3 rounded-lg text-sm text-center font-medium";
+
+            // 選択肢のボタンをいったん空にする
+            var choicesContainer = document.getElementById("choicesContainer");
+            choicesContainer.innerHTML = "";
+
+            // 選択肢の数だけボタンを新しく作る
+            for (var i = 0; i < currentQuestion.choices.length; i++) {
+                var choiceText = currentQuestion.choices[i];
+                
+                var button = document.createElement("button");
+                button.textContent = choiceText;
+                button.className = "w-full bg-white border-2 border-slate-200 hover:border-indigo-500 hover:bg-indigo-50 text-slate-700 font-bold py-3 px-4 rounded-xl shadow-sm transition text-center";
+                
+                // ボタンが押されたときの処理を登録する
+                button.onclick = (function(selected) {
+                    return function() {
+                        checkAnswer(selected, this);
+                    };
+                })(choiceText);
+
+                choicesContainer.appendChild(button);
+            }
+        }
+
+        // ==========================================
+        // 答えが合っているかチェックする関数（MUST①、MUST②、MUST③）
+        // ==========================================
+        function checkAnswer(selectedChoice, buttonElement) {
+            if (isAnswerLocked) {
+                return; // すでに答えていたら何もしない
+            }
+            isAnswerLocked = true;
+
+            // すべてのボタンを一度押せないようにする
+            var choicesContainer = document.getElementById("choicesContainer");
+            var buttons = choicesContainer.getElementsByTagName("button");
+            for (var i = 0; i < buttons.length; i++) {
+                buttons[i].disabled = true;
+            }
+
+            var messageBox = document.getElementById("messageArea");
+
+            if (selectedChoice === currentQuestion.answer) {
+                // 【正解の場合】
+                buttonElement.className = "w-full bg-emerald-500 text-white border-2 border-emerald-600 font-bold py-3 px-4 rounded-xl shadow-sm text-center";
+                messageBox.textContent = "せいかい！ 敵にダメージを与えた！ (" + currentQuestion.explanation + ")";
+                messageBox.className = "bg-emerald-50 border border-emerald-200 text-emerald-800 px-4 py-3 rounded-lg text-sm text-center font-medium";
+
+                // 敵のHPを1減らす（MUST①）
+                currentEnemy.hp = currentEnemy.hp - 1;
+                updateEnemyUI();
+
+                // ポイントを増やしてレベルアップをチェック（MUST②）
+                addPoints(35);
+
+                // 敵を倒したかチェック
+                if (currentEnemy.hp <= 0) {
+                    defeatCount = defeatCount + 1;
+                    updateStatusUI();
+                    messageBox.textContent = "やったー！ 敵をたおした！";
+                    document.getElementById("quizArea").classList.add("hidden");
+                    document.getElementById("actionArea").classList.remove("hidden");
+                } else {
+                    // まだ敵が生きている場合は、少し待ってから次の問題へ
+                    setTimeout(loadNewQuestion, 2000);
+                }
+
+            } else {
+                // 【不正解の場合】
+                buttonElement.className = "w-full bg-rose-500 text-white border-2 border-rose-600 font-bold py-3 px-4 rounded-xl shadow-sm text-center";
+                
+                // 正解のボタンを緑色にして教えてあげる
+                for (var j = 0; j < buttons.length; j++) {
+                    if (buttons[j].textContent === currentQuestion.answer) {
+                        buttons[j].className = "w-full bg-emerald-100 border-2 border-emerald-500 text-emerald-800 font-bold py-3 px-4 rounded-xl shadow-sm text-center";
+                    }
+                }
+
+                messageBox.textContent = "ざんねん…！ 正解は「" + currentQuestion.answer + "」だよ。(" + currentQuestion.explanation + ")";
+                messageBox.className = "bg-rose-50 border border-rose-200 text-rose-800 px-4 py-3 rounded-lg text-sm text-center font-medium";
+
+                // 間違えても少し待ってから次の問題へ
+                setTimeout(loadNewQuestion, 3000);
+            }
+        }
+
+        // ==========================================
+        // ポイントを加算し、レベルアップを判定する関数（MUST②）
+        // ==========================================
+        function addPoints(amount) {
+            currentPoints = currentPoints + amount;
+            
+            // レベルアップの条件に届いたか
+            if (currentPoints >= pointsToNextLevel) {
+                currentLevel = currentLevel + 1;
+                currentPoints = currentPoints - pointsToNextLevel;
+                pointsToNextLevel = Math.floor(pointsToNextLevel * 1.5); // 次のレベルを少し難しくする
+                
+                setTimeout(function() {
+                    var messageBox = document.getElementById("messageArea");
+                    messageBox.textContent = "✨ レベルアップ！ レベル " + currentLevel + " になったよ！ ✨";
+                }, 400);
+            }
+            updateStatusUI();
+        }
+
+        // ==========================================
+        // 次の敵を登場させる関数
+        // ==========================================
+        function nextEnemy() {
+            var enemyList = [
+                { name: "スライム算", emoji: "👾", maxHp: 2, hp: 2 },
+                { name: "関数ゴブリン", emoji: "👺", maxHp: 3, hp: 3 },
+                { name: "方程式ドラゴン", emoji: "🐉", maxHp: 4, hp: 4 }
+            ];
+            
+            var randomIndex = Math.floor(Math.random() * enemyList.length);
+            var selected = enemyList[randomIndex];
+            
+            currentEnemy = {
+                name: selected.name,
+                emoji: selected.emoji,
+                maxHp: selected.maxHp,
+                hp: selected.hp
+            };
+
+            updateEnemyUI();
+            loadNewQuestion();
+        }
+    </script>
+</body>
+</html>

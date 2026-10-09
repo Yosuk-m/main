@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>推し活サポートアプリ - 東京ドームLiveお試し版</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Leaflet.js CSS (インタラクティブマップ用) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <!-- Leaflet.js JavaScript -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <style>
+        /* マップコンテナの高さ設定 */
+        #map {
+            height: 380px;
+            width: 100%;
+            z-index: 10;
+        }
+        /* スクロールバー非表示（ディズニー風フィルター用） */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-pink-50/50 text-slate-800 font-sans pb-24">
+
+    <!-- 推し活テーマカラー切り替え可能なヘッダー -->
+    <header id="appHeader" class="bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white p-4 shadow-lg sticky top-0 z-50 transition-all duration-300">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <div>
+                <h1 class="text-sm font-black tracking-wider flex items-center gap-1.5">
+                    ✨ TOKYO DOME LIVE NAVI <span class="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-normal">Ver.0.3</span>
+                </h1>
+                <p class="text-[10px] text-pink-100">地方民の東京ドーム遠征を安心サポート！</p>
+            </div>
+            <!-- 推しカラー変更ボタン -->
+            <div class="relative">
+                <button onclick="toggleColorMenu()" class="bg-white/20 backdrop-blur-md px-2.5 py-1 rounded-full text-[11px] font-bold border border-white/30 flex items-center gap-1 hover:bg-white/30 transition">
+                    🎨 推しカラー変更
+                </button>
+                <div id="colorMenu" class="hidden absolute right-0 mt-2 bg-white text-slate-800 p-2 rounded-xl shadow-xl border border-pink-100 flex gap-2 z-50">
+                    <button onclick="changeTheme('pink')" class="w-6 h-6 rounded-full bg-pink-500 border-2 border-white shadow-xs"></button>
+                    <button onclick="changeTheme('purple')" class="w-6 h-6 rounded-full bg-purple-600 border-2 border-white shadow-xs"></button>
+                    <button onclick="changeTheme('blue')" class="w-6 h-6 rounded-full bg-blue-500 border-2 border-white shadow-xs"></button>
+                    <button onclick="changeTheme('emerald')" class="w-6 h-6 rounded-full bg-emerald-500 border-2 border-white shadow-xs"></button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- メインコンテンツ領域 -->
+    <main class="max-w-md mx-auto p-3 space-y-4">
+
+        <!-- ========================================== -->
+        <!-- ワンタップおすすめ診断（AIチャットなしのシンプル絞り込み） -->
+        <!-- ========================================== -->
+        <section class="bg-white p-4 rounded-2xl shadow-sm border border-pink-100">
+            <div class="flex items-center gap-2 mb-2">
+                <span class="bg-pink-100 text-pink-600 text-xs px-2 py-0.5 rounded-full font-bold">💡 ワンタップ診断</span>
+                <h2 class="text-xs font-bold text-slate-700">今の目的に合わせてスポットを瞬時に絞り込み</h2>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+                <button onclick="quickFilter('food')" class="bg-pink-50 hover:bg-pink-100 text-pink-700 text-xs font-bold py-2 px-2 rounded-xl transition border border-pink-200 text-center">
+                    🍔 腹ごしらえ
+                </button>
+                <button onclick="quickFilter('cafe')" class="bg-purple-50 hover:bg-purple-100 text-purple-700 text-xs font-bold py-2 px-2 rounded-xl transition border border-purple-200 text-center">
+                    💖 推しカフェ
+                </button>
+                <button onclick="quickFilter('rest')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-bold py-2 px-2 rounded-xl transition border border-indigo-200 text-center">
+                    ☕ 休憩・充電
+                </button>
+            </div>
+        </section>
+
+        <!-- アプリ内タブ切り替え（ディズニー風ナビゲーション） -->
+        <nav class="flex bg-white rounded-2xl shadow-sm p-1.5 border border-pink-100 gap-1">
+            <button onclick="switchTab('mapTab')" id="btnMapTab" class="flex-1 py-2 text-xs font-bold rounded-xl bg-pink-500 text-white transition shadow-sm flex items-center justify-center gap-1">
+                <span>🗺️</span> マップ
+            </button>
+            <button onclick="switchTab('scheduleTab')" id="btnScheduleTab" class="flex-1 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1">
+                <span>📅</span> スケジュール
+            </button>
+            <button onclick="switchTab('shopsTab')" id="btnShopsTab" class="flex-1 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1">
+                <span>🍽️</span> スポット一覧
+            </button>
+        </nav>
+
+        <!-- ========================================== -->
+        <!-- MUST①：Googleマップ風インタラクティブマップ -->
+        <!-- ========================================== -->
+        <section id="mapTab" class="space-y-3">
+            <div class="bg-white p-3 rounded-2xl shadow-sm border border-pink-100">
+                <div class="flex justify-between items-center mb-2 px-1">
+                    <h2 class="font-bold text-xs text-slate-800 flex items-center gap-1">
+                        <span>🎡</span> 東京ドーム周辺ディズニー風マップ
+                    </h2>
+                    <span class="text-[10px] text-slate-400">ピンタップで詳細表示</span>
+                </div>
+
+                <!-- ジャンルフィルターボタン（ピル型） -->
+                <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-2">
+                    <button onclick="filterMapMarkers('all')" class="bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-xs filter-btn" data-category="all">すべて</button>
+                    <button onclick="filterMapMarkers('live')" class="bg-slate-100 text-slate-600 text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap filter-btn" data-category="live">🎤 会場・グッズ</button>
+                    <button onclick="filterMapMarkers('food')" class="bg-slate-100 text-slate-600 text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap filter-btn" data-category="food">🍔 レストラン</button>
+                    <button onclick="filterMapMarkers('cafe')" class="bg-slate-100 text-slate-600 text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap filter-btn" data-category="cafe">💖 カフェ</button>
+                    <button onclick="filterMapMarkers('rest')" class="bg-slate-100 text-slate-600 text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap filter-btn" data-category="rest">☕ 休憩スポット</button>
+                </div>
+
+                <!-- マップ描画エリア -->
+                <div id="map" class="rounded-xl border border-pink-100 shadow-inner"></div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- MUST②：スケジュール管理（タイムライン） -->
+        <!-- ========================================== -->
+        <section id="scheduleTab" class="space-y-3 hidden">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-100">
+                <h2 class="font-bold text-sm mb-1 text-slate-800">🕒 東京ドーム遠征タイムライン</h2>
+                <p class="text-xs text-slate-400 mb-3">地方出発からライブ終了までの行動計画</p>
+                
+                <!-- 予定追加フォーム -->
+                <form id="scheduleForm" class="space-y-2 mb-4 bg-pink-50/40 p-3 rounded-xl border border-pink-100">
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">時間</label>
+                        <input type="text" id="schTime" placeholder="例: 13:00" required class="w-full text-xs p-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] font-bold text-slate-700 mb-1">行動内容</label>
+                        <input type="text" id="schTitle" placeholder="例: 水道橋駅到着・ホテル荷物預け" required class="w-full text-xs p-2 rounded-xl border border-pink-200 bg-white focus:outline-none focus:ring-2 focus:ring-pink-500">
+                    </div>
+                    <button type="submit" class="w-full bg-pink-500 text-white text-xs font-bold py-2 rounded-xl hover:bg-pink-600 transition shadow-sm">予定を追加する</button>
+                </form>
+
+                <div id="scheduleList" class="space-y-2">
+                    <!-- 動的生成 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- MUST③：ショップやレストランの提案 -->
+        <!-- ========================================== -->
+        <section id="shopsTab" class="space-y-3 hidden">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-pink-100">
+                <h2 class="font-bold text-sm mb-1 text-slate-800">🍽️ 東京ドーム周辺 おすすめスポット一覧</h2>
+                <p class="text-xs text-slate-400 mb-3">マップと完全連動した厳選店舗リスト</p>
+                
+                <div class="space-y-3" id="shopListContainer">
+                    <!-- 動的生成 -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- アプリ制御スクリプト -->
+    <script>
+        // --- テーマカラー変更機能 ---
+        function toggleColorMenu() {
+            const menu = document.getElementById('colorMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        function changeTheme(color) {
+            const header = document.getElementById('appHeader');
+            if(color === 'pink') {
+                header.className = 'bg-gradient-to-r from-pink-500 via-purple-600 to-indigo-600 text-white p-4 shadow-lg sticky top-0 z-50 transition-all duration-300';
+            } else if(color === 'purple') {
+                header.className = 'bg-gradient-to-r from-purple-600 via-indigo-600 to-slate-800 text-white p-4 shadow-lg sticky top-0 z-50 transition-all duration-300';
+            } else if(color === 'blue') {
+                header.className = 'bg-gradient-to-r from-blue-500 via-indigo-500 to-cyan-500 text-white p-4 shadow-lg sticky top-0 z-50 transition-all duration-300';
+            } else if(color === 'emerald') {
+                header.className = 'bg-gradient-to-r from-emerald-500 via-teal-600 to-cyan-600 text-white p-4 shadow-lg sticky top-0 z-50 transition-all duration-300';
+            }
+            document.getElementById('colorMenu').classList.add('hidden');
+        }
+
+        // --- タブ切り替えロジック ---
+        function switchTab(tabId) {
+            document.getElementById('mapTab').classList.add('hidden');
+            document.getElementById('scheduleTab').classList.add('hidden');
+            document.getElementById('shopsTab').classList.add('hidden');
+
+            document.getElementById('btnMapTab').className = 'flex-1 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1';
+            document.getElementById('btnScheduleTab').className = 'flex-1 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1';
+            document.getElementById('btnShopsTab').className = 'flex-1 py-2 text-xs font-bold rounded-xl text-slate-600 hover:bg-slate-50 transition flex items-center justify-center gap-1';
+
+            document.getElementById(tabId).classList.remove('hidden');
+            if (tabId === 'mapTab') {
+                document.getElementById('btnMapTab').className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-pink-500 text-white transition shadow-sm flex items-center justify-center gap-1';
+                setTimeout(() => { map.invalidateSize(); }, 100);
+            } else if (tabId === 'scheduleTab') {
+                document.getElementById('btnScheduleTab').className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-pink-500 text-white transition shadow-sm flex items-center justify-center gap-1';
+            } else if (tabId === 'shopsTab') {
+                document.getElementById('btnShopsTab').className = 'flex-1 py-2 text-xs font-bold rounded-xl bg-pink-500 text-white transition shadow-sm flex items-center justify-center gap-1';
+            }
+        }
+
+        // --- 東京ドーム周辺のスポットお試しデータ ---
+        const spotsData = [
+            { id: 1, name: "東京ドーム（ライブ会場）", category: "live", lat: 35.7056, lng: 139.7514, desc: "本日のメイン会場！入場ゲートや周辺混雑に注意。", icon: "🎤" },
+            { id: 2, name: "特設グッズ販売テント", category: "live", lat: 35.7030, lng: 139.7500, desc: "事前予約済みのグッズ受取所。", icon: "🛍️" },
+            { id: 3, name: "水道橋スタミナ食堂", category: "food", lat: 35.7015, lng: 139.7530, desc: "ライブ前のエネルギーチャージにぴったりの定食屋。", icon: "🍔" },
+            { id: 4, name: "東京ドームシティフードコート", category: "food", lat: 35.7040, lng: 139.7535, desc: "座席数が多くてメニューも豊富な休憩スポット。", icon: "🍛" },
+            { id: 5, name: "推し活コラボカフェ水道橋店", category: "cafe", lat: 35.6980, lng: 139.7520, desc: "推しカラーのドリンクやパネル展示が楽しめる。", icon: "💖" },
+            { id: 6, name: "リラックス快活スペース水道橋", category: "rest", lat: 35.7000, lng: 139.7560, desc: "遠征の荷物整理、スマホ充電、メイク直しに最適。", icon: "☕" }
+        ];
+
+        // --- Leaflet.js マップ初期化 ---
+        let map = L.map('map').setView([35.7035, 139.7520], 14);
+
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        let activeMarkers = [];
+
+        function renderMapMarkers(categoryFilter) {
+            activeMarkers.forEach(marker => map.removeLayer(marker));
+            activeMarkers = [];
+
+            spotsData.forEach(spot => {
+                if (categoryFilter === 'all' || spot.category === categoryFilter) {
+                    let marker = L.marker([spot.lat, spot.lng]).addTo(map);
+                    marker.bindPopup(`
+                        <div style="font-size: 12px; font-family: sans-serif; line-height: 1.4;">
+                            <b>${spot.icon} ${spot.name}</b><br>
+                            <span style="color: #555;">${spot.desc}</span>
+                        </div>
+                    `);
+                    activeMarkers.push(marker);
+                }
+            });
+        }
+
+        function filterMapMarkers(category) {
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => {
+                if(btn.dataset.category === category) {
+                    btn.className = 'bg-pink-500 text-white text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap shadow-xs filter-btn';
+                } else {
+                    btn.className = 'bg-slate-100 text-slate-600 text-[10px] font-bold px-3 py-1 rounded-full whitespace-nowrap filter-btn';
+                }
+            });
+            renderMapMarkers(category);
+        }
+
+        // ワンタップ診断ボタンからマップタブへ切り替えて絞り込む機能
+        function quickFilter(category) {
+            switchTab('mapTab');
+            filterMapMarkers(category);
+        }
+
+        renderMapMarkers('all');
+
+
+        // --- MUST②：スケジュール管理ロジック ---
+        let schedules = [
+            { time: "11:00", title: "地方発の新幹線に乗車" },
+            { time: "14:00", title: "東京駅到着・中央線で水道橋へ移動" },
+            { time: "14:30", title: "ホテルにチェックイン・荷物預け" },
+            { time: "16:00", title: "東京ドーム到着・グッズ引換" },
+            { time: "18:00", title: "ライブ開演 🎉" }
+        ];
+
+        function renderSchedules() {
+            const container = document.getElementById('scheduleList');
+            container.innerHTML = '';
+            
+            schedules.forEach((item, index) => {
+                const div = document.createElement('div');
+                div.className = 'flex items-center justify-between bg-pink-50/40 p-2.5 rounded-xl border border-pink-100 text-xs';
+                div.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="bg-pink-500 text-white font-bold px-2 py-0.5 rounded-lg text-[10px]">${item.time}</span>
+                        <span class="font-medium text-slate-700">${item.title}</span>
+                    </div>
+                    <button onclick="deleteSchedule(${index})" class="text-rose-400 hover:text-rose-600 font-bold px-2">×</button>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        document.getElementById('scheduleForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const time = document.getElementById('schTime').value;
+            const title = document.getElementById('schTitle').value;
+
+            if(time && title) {
+                schedules.push({ time, title });
+                schedules.sort((a, b) => a.time.localeCompare(b.time));
+                renderSchedules();
+                document.getElementById('schTime').value = '';
+                document.getElementById('schTitle').value = '';
+            }
+        });
+
+        function deleteSchedule(index) {
+            schedules.splice(index, 1);
+            renderSchedules();
+        }
+
+
+        // --- MUST③：ショップ・レストラン一覧描画 ---
+        function renderShops() {
+            const container = document.getElementById('shopListContainer');
+            container.innerHTML = '';
+
+            spotsData.forEach(spot => {
+                let badgeColor = "bg-pink-100 text-pink-700";
+                if(spot.category === 'food') badgeColor = "bg-amber-100 text-amber-700";
+                if(spot.category === 'cafe') badgeColor = "bg-purple-100 text-purple-700";
+                if(spot.category === 'rest') badgeColor = "bg-emerald-100 text-emerald-700";
+
+                const card = document.createElement('div');
+                card.className = 'bg-pink-50/30 p-3 rounded-2xl border border-pink-100 flex items-start gap-3';
+                card.innerHTML = `
+                    <div class="text-2xl bg-white p-2 rounded-xl shadow-xs border border-pink-100 flex items-center justify-center">${spot.icon}</div>
+                    <div class="flex-1">
+                        <div class="flex justify-between items-start mb-0.5">
+                            <h4 class="font-bold text-xs text-slate-800">${spot.name}</h4>
+                            <span class="text-[9px] ${badgeColor} px-2 py-0.5 rounded-full font-bold uppercase">${spot.category}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 mb-1">${spot.desc}</p>
+                        <span class="text-[9px] text-pink-600 font-medium">📍 東京ドーム周辺マップ連動</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        renderSchedules();
+        renderShops();
+    </script>
+</body>
+</html>
