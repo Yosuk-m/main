@@ -23,10 +23,6 @@
       line-height: 1.7;
     }
 
-    /* =========================
-       HEADER
-    ========================= */
-
     header {
       background: #1f3a5f;
       color: white;
@@ -54,10 +50,6 @@
       opacity: 0.92;
     }
 
-    /* =========================
-       MAIN
-    ========================= */
-
     main {
       width: min(1180px, 92%);
       margin: 0 auto;
@@ -69,7 +61,7 @@
       border-radius: 16px;
       padding: 24px 28px;
       margin-bottom: 35px;
-      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.06);
     }
 
     .intro h2 {
@@ -81,10 +73,6 @@
     .intro p {
       margin-bottom: 0;
     }
-
-    /* =========================
-       GALLERY TITLE
-    ========================= */
 
     .gallery-title {
       display: flex;
@@ -105,25 +93,17 @@
       color: #666;
     }
 
-    /* =========================
-       GALLERY
-    ========================= */
-
     .gallery {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 22px;
     }
 
-    /* =========================
-       APP CARD
-    ========================= */
-
     .app-card {
       background: white;
       border-radius: 18px;
       overflow: hidden;
-      box-shadow: 0 5px 18px rgba(0, 0, 0, 0.08);
+      box-shadow: 0 5px 18px rgba(0,0,0,0.08);
       display: flex;
       flex-direction: column;
       transition:
@@ -133,7 +113,7 @@
 
     .app-card:hover {
       transform: translateY(-4px);
-      box-shadow: 0 9px 25px rgba(0, 0, 0, 0.12);
+      box-shadow: 0 9px 25px rgba(0,0,0,0.12);
     }
 
     .card-top {
@@ -188,10 +168,6 @@
       flex: 1;
     }
 
-    /* =========================
-       APP INFO
-    ========================= */
-
     .app-info {
       border-top: 1px solid #e5e5e5;
       padding-top: 14px;
@@ -233,10 +209,6 @@
       min-height: 20px;
     }
 
-    /* =========================
-       BUTTON
-    ========================= */
-
     .btn-app {
       display: block;
       width: 100%;
@@ -248,19 +220,13 @@
       font-weight: bold;
       background: #1f5f99;
       color: white;
-      transition:
-        opacity 0.2s ease,
-        transform 0.2s ease;
+      transition: 0.2s;
     }
 
     .btn-app:hover {
       opacity: 0.85;
       transform: translateY(-1px);
     }
-
-    /* =========================
-       COMING SOON
-    ========================= */
 
     .coming-soon {
       opacity: 0.72;
@@ -297,10 +263,6 @@
       background: #aaa;
     }
 
-    /* =========================
-       FOOTER
-    ========================= */
-
     footer {
       background: #23303d;
       color: #ddd;
@@ -313,22 +275,13 @@
       margin: 4px;
     }
 
-    /* =========================
-       TABLET
-    ========================= */
-
     @media (max-width: 900px) {
       .gallery {
         grid-template-columns: repeat(2, 1fr);
       }
     }
 
-    /* =========================
-       SMARTPHONE
-    ========================= */
-
     @media (max-width: 600px) {
-
       header {
         padding: 38px 18px 34px;
       }
@@ -356,51 +309,34 @@
 <body>
 
 <header>
+  <div class="small-title">INFORMATION STUDY Ⅱ</div>
 
-  <div class="small-title">
-    INFORMATION STUDY Ⅱ
-  </div>
-
-  <h1>
-    情報Ⅱ アプリギャラリー
-  </h1>
+  <h1>情報Ⅱ アプリギャラリー</h1>
 
   <p>
     高校生が身近な困りごとや課題を発見し、
     生成AIを活用しながら企画・開発したWebアプリです。
     公開された作品を実際に体験できます。
   </p>
-
 </header>
 
 
 <main>
 
   <section class="intro">
-
-    <h2>
-      アプリを使ってみよう
-    </h2>
+    <h2>アプリを使ってみよう</h2>
 
     <p>
       各班が「誰の、どんな困りごとを解決するのか」を考え、
       コンセプト設計・試作・ユーザーテスト・改善を行っています。
       各アプリは開発状況に応じて随時更新されます。
     </p>
-
   </section>
 
 
   <div class="gallery-title">
-
-    <h2>
-      Apps
-    </h2>
-
-    <span>
-      公開されたアプリから順次追加します
-    </span>
-
+    <h2>Apps</h2>
+    <span>現在公開中のアプリ</span>
   </div>
 
 
@@ -429,15 +365,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team01/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team01/" target="_blank">
           アプリを使う
         </a>
 
@@ -451,9 +384,7 @@
 
       <div class="card-top">
         <span class="team">TEAM 02</span>
-        <h3 class="app-name">
-          垢抜けコーディネートサポート
-        </h3>
+        <h3 class="app-name">垢抜けコーディネートサポート</h3>
       </div>
 
       <div class="card-body">
@@ -469,15 +400,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team02/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team02/" target="_blank">
           アプリを使う
         </a>
 
@@ -508,15 +436,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team03/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team03/" target="_blank">
           アプリを使う
         </a>
 
@@ -547,15 +472,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team04/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team04/" target="_blank">
           アプリを使う
         </a>
 
@@ -585,15 +507,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team05/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team05/" target="_blank">
           アプリを使う
         </a>
 
@@ -612,9 +531,7 @@
 
       <div class="card-body">
 
-        <span class="target">
-          内容未定
-        </span>
+        <span class="target">内容未定</span>
 
         <p class="description">
           現在アプリを開発しています。
@@ -652,15 +569,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team07/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team07/" target="_blank">
           アプリを使う
         </a>
 
@@ -691,15 +605,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team08/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team08/" target="_blank">
           アプリを使う
         </a>
 
@@ -730,15 +641,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team09/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team09/" target="_blank">
           アプリを使う
         </a>
 
@@ -769,15 +677,12 @@
 
         <div class="app-info">
           <span class="status">公開中</span>
-          <span class="version">Ver. 読み込み中…</span>
+          <span class="version">Ver. 確認中…</span>
         </div>
 
         <div class="updated"></div>
 
-        <a class="btn-app"
-           href="./team10/"
-           target="_blank"
-           rel="noopener noreferrer">
+        <a class="btn-app" href="./team10/" target="_blank">
           アプリを使う
         </a>
 
@@ -797,8 +702,7 @@
   </p>
 
   <p>
-    生徒作品のため、開発・改善に伴って
-    内容が変更される場合があります。
+    生徒作品のため、開発・改善に伴って内容が変更される場合があります。
   </p>
 
 </footer>
@@ -808,26 +712,19 @@
 
 /*
 =========================================================
-各班の index.html から
+公開中の各アプリの index.html を読み込み
 
-・app-version
-・app-updated
+1. meta[name="app-version"]
+2. titleタグ
+3. 本文
 
-を取得する。
-
-metaタグがない場合は
-
-・title
-・本文
-
-から Ver.0.1 等を検索する。
+の順にバージョンを探します。
 =========================================================
 */
 
 async function loadAppInformation(card) {
 
-  const appPath =
-    card.dataset.app;
+  const appPath = card.dataset.app;
 
   const versionElement =
     card.querySelector(".version");
@@ -836,31 +733,34 @@ async function loadAppInformation(card) {
     card.querySelector(".updated");
 
 
-  if (!appPath || !versionElement) {
-    return;
-  }
-
-
   try {
 
+    /*
+    キャッシュ対策
+    */
+
+    const url =
+      appPath +
+      "index.html?v=" +
+      Date.now();
+
+
     const response =
-      await fetch(
-        appPath +
-        "index.html?t=" +
-        Date.now()
-      );
+      await fetch(url, {
+        cache: "no-store"
+      });
 
 
     if (!response.ok) {
 
       throw new Error(
-        "HTMLを取得できません"
+        "HTTP " + response.status
       );
 
     }
 
 
-    const htmlText =
+    const html =
       await response.text();
 
 
@@ -870,90 +770,117 @@ async function loadAppInformation(card) {
 
     const doc =
       parser.parseFromString(
-        htmlText,
+        html,
         "text/html"
       );
 
 
-    /* =========================
-       VERSION
-    ========================= */
+    /*
+    =====================================
+    VERSION
+    =====================================
+    */
 
-    const versionMeta =
+    let version = "";
+
+
+    /*
+    ① metaタグ
+    */
+
+    const metaVersion =
       doc.querySelector(
         'meta[name="app-version"]'
       );
 
 
-    if (versionMeta) {
+    if (metaVersion) {
 
-      const version =
-        versionMeta.getAttribute(
-          "content"
-        );
-
-
-      if (version) {
-
-        versionElement.textContent =
-          "Ver. " + version;
-
-      }
-
-      else {
-
-        versionElement.textContent =
-          "Ver. 未設定";
-
-      }
+      version =
+        metaVersion.getAttribute("content")
+        || "";
 
     }
 
-    else {
+
+    /*
+    ② titleタグ
+    */
+
+    if (!version) {
 
       const titleText =
         doc.title || "";
 
 
-      const bodyText =
-        doc.body
-          ? doc.body.innerText
-          : "";
-
-
-      const searchText =
-        titleText +
-        " " +
-        bodyText;
-
-
-      const versionMatch =
-        searchText.match(
+      const match =
+        titleText.match(
           /(?:Ver\.?|Version)\s*([0-9]+(?:\.[0-9]+)*)/i
         );
 
 
-      if (versionMatch) {
+      if (match) {
 
-        versionElement.textContent =
-          "Ver. " +
-          versionMatch[1];
-
-      }
-
-      else {
-
-        versionElement.textContent =
-          "Ver. 未設定";
+        version =
+          match[1];
 
       }
 
     }
 
 
-    /* =========================
-       UPDATED DATE
-    ========================= */
+    /*
+    ③ 本文
+    */
+
+    if (!version) {
+
+      const bodyText =
+        doc.body
+          ? doc.body.textContent
+          : "";
+
+
+      const match =
+        bodyText.match(
+          /(?:Ver\.?|Version)\s*([0-9]+(?:\.[0-9]+)*)/i
+        );
+
+
+      if (match) {
+
+        version =
+          match[1];
+
+      }
+
+    }
+
+
+    /*
+    表示
+    */
+
+    if (version) {
+
+      versionElement.textContent =
+        "Ver. " + version;
+
+    }
+
+    else {
+
+      versionElement.textContent =
+        "Ver. 未設定";
+
+    }
+
+
+    /*
+    =====================================
+    UPDATED
+    =====================================
+    */
 
     const updatedMeta =
       doc.querySelector(
@@ -961,15 +888,10 @@ async function loadAppInformation(card) {
       );
 
 
-    if (
-      updatedMeta &&
-      updatedElement
-    ) {
+    if (updatedMeta) {
 
       const date =
-        updatedMeta.getAttribute(
-          "content"
-        );
+        updatedMeta.getAttribute("content");
 
 
       if (date) {
@@ -979,38 +901,22 @@ async function loadAppInformation(card) {
 
       }
 
-      else {
-
-        updatedElement.textContent = "";
-
-      }
-
     }
 
-    else if (updatedElement) {
-
-      updatedElement.textContent = "";
-
-    }
 
   }
 
   catch (error) {
 
-    versionElement.textContent =
-      "Ver. 取得できません";
-
-
-    if (updatedElement) {
-      updatedElement.textContent = "";
-    }
-
-
-    console.log(
-      "取得エラー:",
+    console.error(
+      "アプリ情報取得失敗:",
       appPath,
       error
     );
+
+
+    versionElement.textContent =
+      "Ver. 公開確認中";
 
   }
 
@@ -1019,19 +925,13 @@ async function loadAppInformation(card) {
 
 /*
 =========================================================
-公開中アプリすべてについて実行
+data-app のあるカードをすべて処理
 =========================================================
 */
 
-const appCards =
-  document.querySelectorAll(
-    ".app-card[data-app]"
-  );
-
-
-appCards.forEach(
-  loadAppInformation
-);
+document
+  .querySelectorAll(".app-card[data-app]")
+  .forEach(loadAppInformation);
 
 </script>
 
