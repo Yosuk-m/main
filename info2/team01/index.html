@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ノート共有アプリ (Ver.0.3 試作品)</title>
+    <title>ノート共有アプリ (Ver.0.4 試作品)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -13,7 +13,7 @@
     <header class="bg-indigo-600 text-white shadow-md">
         <div class="max-w-4xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-2">
             <h1 class="text-xl font-bold flex items-center gap-2">
-                📓 ノート共有アプリ <span class="text-xs bg-indigo-500 px-2 py-0.5 rounded-full">Ver.0.3 試作品</span>
+                📓 ノート共有アプリ <span class="text-xs bg-indigo-500 px-2 py-0.5 rounded-full">Ver.0.4 試作品</span>
             </h1>
             <p class="text-xs text-indigo-200">テスト直前の「困った！」を解決する</p>
         </div>
@@ -125,17 +125,18 @@
         </div>
     </main>
 
-    <!-- 画像拡大表示用モーダル -->
-    <div id="imageModal" class="fixed inset-0 bg-black/70 hidden z-50 flex items-center justify-center p-4">
-        <div class="bg-white rounded-xl max-w-2xl w-full p-4 flex flex-col gap-3 relative max-h-[90vh] overflow-y-auto">
+    <!-- 画像拡大表示用モーダル（より大きく表示するように改善） -->
+    <div id="imageModal" class="fixed inset-0 bg-black/80 hidden z-50 flex items-center justify-center p-2 sm:p-4">
+        <div class="bg-white rounded-xl max-w-5xl w-full p-4 flex flex-col gap-3 relative max-h-[95vh] overflow-y-auto shadow-2xl">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 id="modalTitle" class="font-bold text-slate-700 text-sm">ノート画像詳細</h3>
-                <button type="button" onclick="closeImageModal()" class="text-slate-400 hover:text-slate-600 font-bold text-lg px-2">✕</button>
+                <h3 id="modalTitle" class="font-bold text-slate-700 text-base">ノート画像詳細</h3>
+                <button type="button" onclick="closeImageModal()" class="text-slate-400 hover:text-slate-600 font-bold text-xl px-3 py-1">✕</button>
             </div>
-            <div class="flex justify-center bg-slate-100 rounded-lg overflow-hidden">
-                <img id="modalImg" src="" alt="拡大画像" class="max-h-[60vh] object-contain">
+            <!-- 画像表示部分：高さを max-h-[80vh] に拡大 -->
+            <div class="flex justify-center bg-slate-900 rounded-lg overflow-hidden p-2">
+                <img id="modalImg" src="" alt="拡大画像" class="max-h-[80vh] w-auto object-contain">
             </div>
-            <p id="modalMemo" class="text-sm text-slate-600 bg-slate-50 p-3 rounded-lg border border-slate-100"></p>
+            <p id="modalMemo" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-lg border border-slate-200"></p>
         </div>
     </div>
 
@@ -154,12 +155,11 @@
 
     <!-- フッター -->
     <footer class="text-center py-4 text-xs text-slate-400">
-        情報Ⅱ オリジナルWebアプリ試作品 (Ver.0.3)
+        情報Ⅱ オリジナルWebアプリ試作品 (Ver.0.4)
     </footer>
 
     <!-- JavaScript ロジック -->
     <script>
-        // --- 1. アプリの状態管理 ---
         let classes = JSON.parse(localStorage.getItem('sharenote_classes')) || [
             { id: 'class_1a', name: '1年A組 全体ノート' },
             { id: 'class_test_group', name: 'テスト対策・放課後グループ' }
@@ -168,7 +168,6 @@
         let currentClassId = localStorage.getItem('sharenote_current_class') || (classes.length > 0 ? classes[0].id : '');
         let allNotes = JSON.parse(localStorage.getItem('sharenote_notes')) || {};
 
-        // --- 2. 起動時の初期化処理 ---
         window.onload = function() {
             if (!classes.some(c => c.id === currentClassId) && classes.length > 0) {
                 currentClassId = classes[0].id;
@@ -177,21 +176,14 @@
             renderClassSelect();
             renderNotes();
 
-            // イベントリスナーの安全な登録
             const postForm = document.getElementById('postForm');
-            if (postForm) {
-                postForm.addEventListener('submit', handlePostNote);
-            }
+            if (postForm) postForm.addEventListener('submit', handlePostNote);
 
             const searchInput = document.getElementById('searchInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', renderNotes);
-            }
+            if (searchInput) searchInput.addEventListener('input', renderNotes);
 
             const filterSubject = document.getElementById('filterSubject');
-            if (filterSubject) {
-                filterSubject.addEventListener('change', renderNotes);
-            }
+            if (filterSubject) filterSubject.addEventListener('change', renderNotes);
 
             const classSelect = document.getElementById('classSelect');
             if (classSelect) {
@@ -203,7 +195,6 @@
             }
         };
 
-        // --- 3. クラス管理機能 ---
         function renderClassSelect() {
             const select = document.getElementById('classSelect');
             if (!select) return;
@@ -235,16 +226,13 @@
             if (modal && input) {
                 input.value = '';
                 modal.classList.remove('hidden');
-                // モーダルが開いたときに自動で入力欄にフォーカスを当てる
                 setTimeout(() => input.focus(), 50);
             }
         }
 
         function closeClassModal() {
             const modal = document.getElementById('classModal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
+            if (modal) modal.classList.add('hidden');
         }
 
         function createNewClass() {
@@ -293,7 +281,6 @@
             }
         }
 
-        // --- 4. ノート投稿機能 ---
         function handlePostNote(e) {
             e.preventDefault();
 
@@ -338,7 +325,6 @@
             }
         }
 
-        // --- 5. 閲覧・検索・フィルタリング・拡大機能 ---
         function renderNotes() {
             const container = document.getElementById('notesContainer');
             const noNotesMsg = document.getElementById('noNotesMessage');
@@ -363,9 +349,7 @@
                 return matchesSubject && matchesSearch;
             });
 
-            if (noteCount) {
-                noteCount.textContent = filteredNotes.length + '件';
-            }
+            if (noteCount) noteCount.textContent = filteredNotes.length + '件';
 
             if (filteredNotes.length === 0) {
                 if (noNotesMsg) noNotesMsg.classList.remove('hidden');
@@ -388,7 +372,6 @@
                     });
                 }
 
-                // エスケープ処理を通したデータを属性に埋め込む
                 const safeImg = note.image || '';
                 const safeSubj = note.subject || '';
                 const safeMemoAttr = escapeAttribute(note.memo);
@@ -416,7 +399,6 @@
             });
         }
 
-        // --- 6. モーダル操作・セキュリティ用ヘルパー ---
         function openImageModal(imgSrc, subject, memo) {
             const modal = document.getElementById('imageModal');
             const modalImg = document.getElementById('modalImg');
@@ -433,9 +415,7 @@
 
         function closeImageModal() {
             const modal = document.getElementById('imageModal');
-            if (modal) {
-                modal.classList.add('hidden');
-            }
+            if (modal) modal.classList.add('hidden');
         }
 
         function escapeHtml(str) {
