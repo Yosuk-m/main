@@ -3,195 +3,287 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>朝の準備サポートアプリ (Ver.0.1)</title>
+    <title>朝の準備逆算タイマー (Ver.0.2)</title>
     <style>
-        /* スマートフォンでも見やすいシンプルなデザイン（CSS） */
         body {
-            font-family: sans-serif;
+            font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
-            background-color: #f0f4f8;
+            padding: 15px;
+            background-color: #f5f5f5;
             color: #333;
         }
         .container {
             max-width: 500px;
             margin: 0 auto;
-            background: white;
+            background: #fff;
             padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        h1, h2 {
+        h1, h2, h3 {
             text-align: center;
-            color: #0066cc;
-        }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-        input[type="time"] {
-            font-size: 1.2rem;
-            padding: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        button {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background-color: #0066cc;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            cursor: pointer;
             margin-top: 10px;
         }
-        button:hover {
-            background-color: #0052a3;
+        .section {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
         }
-        .task-list {
-            margin-top: 20px;
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
         }
-        .task-item {
+        input[type="time"], input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .inline-inputs {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            width: 100%;
             padding: 12px;
-            border-bottom: 1px solid #eee;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #28a745;
+        }
+        .btn-secondary:hover {
+            background-color: #218838;
+        }
+        /* タスク一覧・逆算結果のスタイル */
+        .list-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border: 1px solid #eee;
+            border-radius: 4px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        .task-item.active {
-            background-color: #fff3cd;
-            border-left: 5px solid #ffc107;
-            font-weight: bold;
+        .task-info {
+            flex-grow: 1;
         }
-        .task-time {
-            color: #666;
-            font-size: 0.9rem;
+        .action-btns {
+            display: flex;
+            gap: 5px;
+        }
+        .action-btns button {
+            width: auto;
+            padding: 5px 8px;
+            font-size: 12px;
+            margin-bottom: 0;
+        }
+        .btn-up, .btn-down { background-color: #6c757d; }
+        .btn-del { background-color: #dc3545; }
+        
+        .result-area {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
         }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>朝の準備サポート</h1>
-    
-    <!-- MUST①: 家出る時間を入力する部分 -->
-    <div class="input-group">
-        <label for="departureTime">家を出る時間（目標）</label>
+    <h1>朝の準備逆算アプリ</h1>
+    <p style="font-size: 12px; color: #666; text-align: center;">試作品 Ver.0.2（機能拡張版）</p>
+
+    <!-- 設定①：家を出る時間 -->
+    <div class="section">
+        <label for="departureTime">① 家を出る時間</label>
         <input type="time" id="departureTime" value="08:00">
-        <button onclick="calculateSchedule()">スケジュールを作成する</button>
     </div>
 
-    <!-- MUST②: 朝やることを順番に表示する部分 -->
-    <div id="scheduleArea" style="display: none;">
-        <h2>逆算スケジュール</h2>
-        <div class="task-list" id="taskList">
-            <!-- ここにJavaScriptでタスクが追加されます -->
+    <!-- 設定②：タスクの追加・変更・全表示（管理エリア） -->
+    <div class="section">
+        <h3>② 朝やる事リスト（全表示）</h3>
+        
+        <!-- 現在登録されているタスクがここにすべて一覧表示されます -->
+        <div id="taskListTotal"></div>
+
+        <h4 style="margin-top: 15px; margin-bottom: 5px;">＋ 新しいやることの追加</h4>
+        <div class="inline-inputs">
+            <input type="text" id="newTaskName" placeholder="例：髪を整える" style="flex: 2;">
+            <input type="number" id="newTaskDuration" placeholder="分" min="1" style="flex: 1;">
         </div>
+        <button id="addTaskButton" class="btn-secondary">リストに追加する</button>
+    </div>
+    
+    <!-- スケジュール生成ボタン -->
+    <button id="calcButton" style="font-size: 18px; font-weight: bold; background-color: #ffc107; color: #333;">⏰ スケジュールを逆算する</button>
+
+    <!-- 結果表示エリア -->
+    <div class="result-area" id="resultArea" style="display: none;">
+        <h2>⌛ 逆算スケジュール</h2>
+        <div id="scheduleList"></div>
     </div>
 </div>
 
 <script>
-    // 【仮データ】高校生が後から内容や所要時間（分）を変更しやすいように配列で定義
-    const defaultTasks = [
-        { name: "起きる・布団から出る", duration: 5 },
-        { name: "洗顔・歯磨き", duration: 10 },
-        { name: "朝ごはんを食べる", duration: 15 },
-        { name: "着替え・髪を整える", duration: 10 },
-        { name: "持ち物の最終チェック", duration: 5 }
+    // JS①：朝やることのデータ（初期状態の仮データ）
+    // ※ユーザーが自由に変更できるよう、初期データを配列で用意しています。
+    // ※「上のタスク」ほど、朝起きて最初にやる事（家を出る時間から最も遠いタスク）として計算します。
+    let taskData = [
+        { name: "起きる・ベッドから出る", duration: 10 },
+        { name: "朝食・歯磨き", duration: 20 },
+        { name: "着替え・カバンの確認", duration: 15 }
     ];
 
-    // スケジュールを逆算して表示する関数（MUST① & MUST②）
-    function calculateSchedule() {
-        const departureInput = document.getElementById('departureTime').value;
-        if (!departureInput) {
-            alert('家を出る時間を入力してください');
+    // 画面の要素を取得
+    const departureTimeInput = document.getElementById('departureTime');
+    const taskListTotal = document.getElementById('taskListTotal');
+    const newTaskNameInput = document.getElementById('newTaskName');
+    const newTaskDurationInput = document.getElementById('newTaskDuration');
+    const addTaskButton = document.getElementById('addTaskButton');
+    const calcButton = document.getElementById('calcButton');
+    const resultArea = document.getElementById('resultArea');
+    const scheduleList = document.getElementById('scheduleList');
+
+    // 最初にタスク一覧を全表示する
+    renderTaskList();
+
+    // 【機能追加】：タスク一覧を画面に全表示する関数
+    function renderTaskList() {
+        taskListTotal.innerHTML = '';
+        
+        if (taskData.length === 0) {
+            taskListTotal.innerHTML = '<p style="color:#999; text-align:center; font-size:14px;">やる事が登録されていません</p>';
             return;
         }
 
-        // 入力された時間を分解（例 "08:00" -> 時:8, 分:0）
-        const [depHours, depMinutes] = departureInput.split(':').map(Number);
-        
-        // 基準となる出発時間を今日のデートオブジェクトとして作成
-        let targetTime = new Date();
-        targetTime.setHours(depHours, depMinutes, 0, 0);
+        taskData.forEach((task, index) => {
+            const item = document.createElement('div');
+            item.className = 'list-item';
+            item.innerHTML = `
+                <div class="task-info">
+                    <strong>${task.name}</strong> (${task.duration}分)
+                </div>
+                <div class="action-btns">
+                    <button class="btn-up" onclick="moveTask(${index}, -1)">↑</button>
+                    <button class="btn-down" onclick="moveTask(${index}, 1)">↓</button>
+                    <button class="btn-del" onclick="deleteTask(${index})">削除</button>
+                </div>
+            `;
+            taskListTotal.appendChild(item);
+        });
+    }
 
-        const taskListDiv = document.getElementById('taskList');
-        taskListDiv.innerHTML = ''; // 表示をクリア
+    // 【機能追加】：新しいタスクを追加する処理
+    addTaskButton.addEventListener('click', () => {
+        const name = newTaskNameInput.value.trim();
+        const duration = parseInt(newTaskDurationInput.value, 10);
 
-        // タスクを後ろから順番に逆算していく
-        // 例：持ち物チェック(5分) -> 7:55開始
-        let schedule = [];
-        
-        for (let i = defaultTasks.length - 1; i >= 0; i--) {
-            const task = defaultTasks[i];
-            // 時間を所要分だけ戻す
-            targetTime.setMinutes(targetTime.getMinutes() - task.duration);
-            
-            // 表示用の時間を文字列にする（例 "07:55"）
-            const timeString = targetTime.toTimeString().slice(0, 5);
-            
-            // 配列の先頭に追加していく（画面には起きる順番で出したいので）
-            schedule.unshift({
-                timeStr: timeString,
-                name: task.name,
-                rawTime: new Date(targetTime) // 通知判定用に時間を保存
-            });
+        if (!name || isNaN(duration) || duration <= 0) {
+            alert('正しい「やる事名」と「時間（分）」を入力してください');
+            return;
         }
 
-        // 画面にタスクを表示する
-        schedule.forEach(item => {
-            const itemDiv = document.createElement('div');
-            itemDiv.className = 'task-item';
-            // 識別しやすくするために時間をデータ属性として持たせる
-            itemDiv.setAttribute('data-time', item.timeStr);
-            
-            itemDiv.innerHTML = `
-                <span>${item.name}</span>
-                <span class="task-time">${item.timeStr} 〜</span>
-            `;
-            taskListDiv.appendChild(itemDiv);
-        });
+        // データを配列の最後に追加
+        taskData.push({ name: name, duration: duration });
+        
+        // 入力欄を空にする
+        newTaskNameInput.value = '';
+        newTaskDurationInput.value = '';
+        
+        // 一覧を再表示
+        renderTaskList();
+    });
 
-        // スケジュールエリアを表示する
-        document.getElementById('scheduleArea').style.display = 'block';
-    }
+    // 【機能追加】：タスクを削除する処理
+    window.deleteTask = function(index) {
+        taskData.splice(index, 1); // 指定した位置のデータを1件削除
+        renderTaskList();          // 一覧を再表示
+    };
 
-    // MUST③: 時間になったら通知する機能（1秒ごとにチェックするシステム）
-    function checkNotification() {
+    // 【機能追加】：タスクを並べ替える処理（上へ・下へボタン）
+    window.moveTask = function(index, direction) {
+        const targetIndex = index + direction;
+        
+        // 配列の範囲外（一番上より上、一番下より下）には移動できないようにする
+        if (targetIndex < 0 || targetIndex >= taskData.length) return;
+        
+        // データを入れ替える
+        const temp = taskData[index];
+        taskData[index] = taskData[targetIndex];
+        taskData[targetIndex] = temp;
+        
+        renderTaskList(); // 一覧を再表示
+    };
+
+    // 【逆算ロジックの修正】：自由な並び替えに対応したスケジュール逆算
+    calcButton.addEventListener('click', () => {
+        const departureTimeValue = departureTimeInput.value;
+        if (!departureTimeValue) {
+            alert('家を出る時間を入力してください');
+            return;
+        }
+        if (taskData.length === 0) {
+            alert('やる事を1つ以上登録してください');
+            return;
+        }
+
         const now = new Date();
-        const currentHours = String(now.getHours()).padStart(2, '0');
-        const currentMinutes = String(now.getMinutes()).padStart(2, '0');
-        const currentTimeStr = `${currentHours}:${currentMinutes}`;
+        const [depHour, depMin] = departureTimeValue.split(':');
+        // ゴール（家を出る時間）を設定
+        let currentTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), depHour, depMin, 0);
 
-        // 画面上にあるタスクの時間を探す
-        const taskItems = document.querySelectorAll('.task-item');
-        taskItems.forEach(item => {
-            const taskTime = item.getAttribute('data-time');
+        let scheduleHTML = '';
+
+        // 家を出る時間を一番下に表示
+        scheduleHTML += `
+            <div class="list-item" style="background:#e6f7ff; border-left: 5px solid #1890ff;">
+                <span>🏠 <strong>${formatTime(currentTime)}</strong></span>
+                <span><strong>家を出る！</strong></span>
+            </div>
+        `;
+
+        // 配列の「後ろ（家を出る直前のタスク）」から順番に逆算していく
+        for (let i = taskData.length - 1; i >= 0; i--) {
+            const task = taskData[i];
+            // タスクにかかる時間分、時計を巻き戻す
+            currentTime.setMinutes(currentTime.getMinutes() - task.duration);
             
-            // 現在時刻とタスクの開始時刻が一致したら通知
-            if (taskTime === currentTimeStr) {
-                // まだ色が変わっていなければ、アクティブ状態（黄色）にする
-                if (!item.classList.contains('active')) {
-                    item.classList.add('active');
-                    
-                    // 【外部サービス・機能の制約に関する説明】
-                    // 通常の「プッシュ通知」はWebブラウザだと設定が複雑で、スマホの仕様制限も多いため、
-                    // Ver.0.1では確実にブラウザで動く「アラート画面（ポップアップ）」で代用しています。
-                    alert(`【時間です！】${item.innerText.split('〜')[0]}を始めてください！`);
-                }
-            }
-        });
-    }
+            // 逆算した開始時間を上に積み重ねていく
+            scheduleHTML = `
+                <div class="list-item" style="border-left: 5px solid #52c41a;">
+                    <span>⏰ <strong>${formatTime(currentTime)}</strong></span>
+                    <span>${task.name} (${task.duration}分)</span>
+                </div>
+            ` + scheduleHTML;
+        }
 
-    // 1秒（1000ミリ秒）ごとに、時間になったかチェックする時計を動かす
-    setInterval(checkNotification, 1000);
+        // 画面に表示
+        scheduleList.innerHTML = scheduleHTML;
+        resultArea.style.display = 'block';
+    });
+
+    // 時間のフォーマット関数
+    function formatTime(date) {
+        const h = String(date.getHours()).padStart(2, '0');
+        const m = String(date.getMinutes()).padStart(2, '0');
+        return `${h}:${m}`;
+    }
 </script>
 
 </body>
