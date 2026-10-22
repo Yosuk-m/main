@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>部室 - 高校生の趣味語り合い場</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap');
+        body {
+            font-family: 'Zen Maru+Gothic', sans-serif;
+            background-color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+
+    <!-- スマホ風コンテナ -->
+    <div class="w-full max-w-md bg-white min-h-screen shadow-lg flex flex-col relative pb-20">
+        
+        <!-- ヘッダー -->
+        <header class="bg-emerald-600 text-white p-4 sticky top-0 z-10 shadow-md flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wider">🌿 部室 (Bushitsu)</h1>
+            <span class="text-xs bg-emerald-700 px-2.5 py-1 rounded-full">β版</span>
+        </header>
+
+        <!-- おやすみモード通知バナー（深夜判定のデモ用としても） -->
+        <div id="night-banner" class="bg-indigo-900 text-indigo-100 text-xs px-4 py-2 text-center hidden">
+            🌙 おやすみモード中（夜22時〜朝6時はゆっくり休もう）
+        </div>
+
+        <!-- タグフィルター -->
+        <div class="flex overflow-x-auto px-4 py-3 gap-2 bg-emerald-50 border-b border-emerald-100 no-scrollbar">
+            <button onclick="filterTag('すべて')" class="tag-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full font-bold whitespace-nowrap shadow-sm">すべて</button>
+            <button onclick="filterTag('プロセカ')" class="tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap">#プロセカ</button>
+            <button onclick="filterTag('物理の沼')" class="tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap">#物理の沼</button>
+            <button onclick="filterTag('イラスト')" class="tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap">#イラスト</button>
+            <button onclick="filterTag('バンド')" class="tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap">#バンド</button>
+        </div>
+
+        <!-- タイムライン（つぶやき一覧） -->
+        <main id="timeline" class="flex-1 p-4 space-y-4 overflow-y-auto">
+            <!-- JavaScriptで動的にカードが挿入されます -->
+        </main>
+
+        <!-- つぶやき入力エリア（固定フッター） -->
+        <div class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 p-3 shadow-lg">
+            <form id="post-form" onsubmit="addPost(event)" class="flex flex-col gap-2">
+                <div class="flex gap-2">
+                    <input type="text" id="user-name" placeholder="ニックネーム (例: 高1・音ゲーマー)" required
+                           class="w-1/3 text-xs border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500">
+                    <select id="post-tag" class="w-1/3 text-xs border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500">
+                        <option value="プロセカ">#プロセカ</option>
+                        <option value="物理の沼">#物理の沼</option>
+                        <option value="イラスト">#イラスト</option>
+                        <option value="バンド">#バンド</option>
+                    </select>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="post-content" placeholder="今なに語りたい？（例: 難所クリアした！）" required
+                           class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500">
+                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition">
+                        投稿
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        // 初期サンプルデータ
+        let posts = [
+            { id: 1, name: "高2・リケジョ", tag: "物理の沼", content: "物理の力学、やっとモル計算と合わせて理解できてきた…！これノーベル賞級にスッキリする", time: "10分前", reactions: { sorena: 5, kami: 2, tsuu: 1 } },
+            { id: 2, name: "高1・ボカロ好き", tag: "プロセカ", content: "イベントのラストスパート走ってる人いるー？一緒に完走しようぜ！", time: "30分前", reactions: { sorena: 8, kami: 4, tsuu: 3 } },
+            { id: 3, name: "高3・軽音部", tag: "バンド", content: "文化祭のコピー曲、やっとバンドの息が合ってきた。最高に楽しい時間だわ", time: "1時間前", reactions: { sorena: 12, kami: 9, tsuu: 5 } }
+        ];
+
+        let currentFilter = "すべて";
+
+        // 描画関数
+        function renderTimeline() {
+            const timeline = document.getElementById('timeline');
+            timeline.innerHTML = '';
+
+            const filteredPosts = currentFilter === "all" || currentFilter === "すべて" 
+                ? posts 
+                : posts.filter(p => p.tag === currentFilter);
+
+            if (filteredPosts.length === 0) {
+                timeline.innerHTML = `<p class="text-center text-gray-400 text-sm py-10">まだこのタグのつぶやきはないよ。<br>最初の話題を投稿してみよう！</p>`;
+                return;
+            }
+
+            filteredPosts.forEach(post => {
+                const card = document.createElement('div');
+                card.className = "bg-amber-50/60 border border-amber-200/60 rounded-xl p-4 shadow-sm relative";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="font-bold text-xs text-gray-700">${escapeHTML(post.name)}</span>
+                            <span class="text-[10px] text-gray-400 ml-2">${post.time}</span>
+                        </div>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">#${escapeHTML(post.tag)}</span>
+                    </div>
+                    <p class="text-sm text-gray-800 mb-3 whitespace-pre-wrap">${escapeHTML(post.content)}</p>
+                    <div class="flex gap-2 pt-2 border-t border-amber-100">
+                        <button onclick="react(${post.id}, 'sorena')" class="text-xs bg-white hover:bg-emerald-50 border border-gray-200 px-2.5 py-1 rounded-full text-gray-600 transition">
+                            👍 それな (${post.reactions.sorena})
+                        </button>
+                        <button onclick="react(${post.id}, 'kami')" class="text-xs bg-white hover:bg-emerald-50 border border-gray-200 px-2.5 py-1 rounded-full text-gray-600 transition">
+                            🔥 神！ (${post.reactions.kami})
+                        </button>
+                        <button onclick="react(${post.id}, 'tsuu')" class="text-xs bg-white hover:bg-emerald-50 border border-gray-200 px-2.5 py-1 rounded-full text-gray-600 transition">
+                            ✨ 尊い (${post.reactions.tsuu})
+                        </button>
+                    </div>
+                `;
+                timeline.appendChild(card);
+            });
+        }
+
+        // 投稿追加
+        function addPost(event) {
+            event.preventDefault();
+            const name = document.getElementById('user-name').value;
+            const tag = document.getElementById('post-tag').value;
+            const content = document.getElementById('post-content').value;
+
+            const newPost = {
+                id: Date.now(),
+                name: name,
+                tag: tag,
+                content: content,
+                time: "たった今",
+                reactions: { sorena: 0, kami: 0, tsuu: 0 }
+            };
+
+            posts.unshift(newPost);
+            document.getElementById('post-content').value = '';
+            renderTimeline();
+        }
+
+        // リアクションボタン
+        function react(id, type) {
+            const post = posts.find(p => p.id === id);
+            if (post) {
+                post.reactions[type]++;
+                renderTimeline();
+            }
+        }
+
+        // タグフィルター
+        function filterTag(tag) {
+            currentFilter = tag;
+            // ボタンの見た目切り替え
+            document.querySelectorAll('.tag-btn').forEach(btn => {
+                if (btn.textContent.includes(tag) || (tag === "すべて" && btn.textContent === "すべて")) {
+                    btn.className = "tag-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full font-bold whitespace-nowrap shadow-sm";
+                } else {
+                    btn.className = "tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap";
+                }
+            });
+            renderTimeline();
+        }
+
+        // 簡易XSS対策
+        function escapeHTML(str) {
+            return str.replace(/[&<انات'"]/g, function(match) {
+                const escapeTable = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+                return escapeTable[match];
+            });
+        }
+
+        // 夜22時〜朝6時におやすみモードバナーを表示するロジック（デモ）
+        const currentHour = new Date().getHours();
+        if (currentHour >= 22 || currentHour < 6) {
+            document.getElementById('night-banner').classList.remove('hidden');
+        }
+
+        // 初回描画
+        renderTimeline();
+    </script>
+</body>
+</html>
