@@ -3,184 +3,523 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>部室 - 高校生の趣味語り合い場</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <title>趣味・悩み共有アプリ (Ver.0.1)</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;700&display=swap');
+        :root {
+            --primary-color: #3b7a57; /* イングリッシュガーデン風の深い緑 */
+            --secondary-color: #f4f7f2;
+            --border-color: #d1dcce;
+            --text-color: #2c3e35;
+            --accent-color: #e67e22;
+        }
+
         body {
-            font-family: 'Zen Maru+Gothic', sans-serif;
-            background-color: #f3f4f6;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            /* 西洋風の庭（イングリッシュガーデン）をイメージした背景パターン */
+            background-color: #2b402e;
+            background-image: 
+                radial-gradient(#3c5a40 15%, transparent 16%),
+                radial-gradient(#243527 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            border-bottom: 4px solid #285438;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.2rem;
+            letter-spacing: 0.05em;
+        }
+
+        header p {
+            margin: 0.3rem 0 0;
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 1.5rem auto;
+            padding: 1.5rem;
+            box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            border: 2px solid #a3c1ad;
+        }
+
+        /* 未成年フィルター用バナー */
+        .filter-banner {
+            background-color: #fcf8e3;
+            border: 1px solid #faebcc;
+            color: #8a6d3b;
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+            font-size: 0.85rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .filter-status {
+            font-weight: bold;
+        }
+
+        .filter-btn {
+            background-color: #f0ad4e;
+            color: white;
+            border: none;
+            padding: 0.3rem 0.6rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+
+        .filter-btn:hover {
+            background-color: #eea236;
+        }
+
+        /* カードデザイン */
+        .card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .card h2 {
+            font-size: 1rem;
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 0.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* フォーム要素 */
+        label {
+            display: block;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+            font-weight: bold;
+        }
+
+        select, textarea, input[type="text"] {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-sizing: border-box;
+            font-size: 0.9rem;
+            background-color: #fafbfc;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 80px;
+        }
+
+        button.submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: background 0.2s;
+        }
+
+        button.submit-btn:hover {
+            background-color: #2c5e42;
+        }
+
+        /* タグフィルターボタン */
+        .tag-filters {
+            display: flex;
+            gap: 0.5rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .tag-filter-btn {
+            background: white;
+            border: 1px solid var(--border-color);
+            padding: 0.4rem 0.8rem;
+            border-radius: 16px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .tag-filter-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        /* 成長する木（コミュニティ・ツリー）の表示パネル */
+        .community-tree-box {
+            background: linear-gradient(to bottom, #eef7ed, #e3f0e0);
+            border: 1px solid #c2e0be;
+            border-radius: 6px;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+
+        .tree-visual {
+            font-size: 2.2rem;
+            margin: 0.2rem 0;
+            line-height: 1;
+            transition: transform 0.3s ease;
+        }
+
+        .tree-title {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #2e5a36;
+        }
+
+        .tree-status-text {
+            font-size: 0.75rem;
+            color: #557a5c;
+            margin-top: 0.2rem;
+        }
+
+        /* 投稿リスト */
+        .post-item {
+            border-bottom: 1px solid var(--secondary-color);
+            padding-bottom: 0.8rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .post-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .post-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: #718093;
+            margin-bottom: 0.3rem;
+        }
+
+        .post-tag {
+            background-color: #e1f5fe;
+            color: #0288d1;
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .post-content {
+            font-size: 0.9rem;
+            word-break: break-all;
+            white-space: pre-wrap;
+        }
+
+        .badge-mock {
+            font-size: 0.7rem;
+            background: #dfe4ea;
+            color: #57606f;
+            padding: 0.1rem 0.3rem;
+            border-radius: 3px;
+            margin-left: 0.3rem;
         }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen flex flex-col items-center">
+<body>
 
-    <!-- スマホ風コンテナ -->
-    <div class="w-full max-w-md bg-white min-h-screen shadow-lg flex flex-col relative pb-20">
-        
-        <!-- ヘッダー -->
-        <header class="bg-emerald-600 text-white p-4 sticky top-0 z-10 shadow-md flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-wider">🌿 部室 (Bushitsu)</h1>
-            <span class="text-xs bg-emerald-700 px-2.5 py-1 rounded-full">β版</span>
-        </header>
+    <header>
+        <h1>趣味・悩み共有アプリ (Ver.0.1 試作品)</h1>
+        <p>同じ話題の仲間とつながる場所</p>
+    </header>
 
-        <!-- おやすみモード通知バナー（深夜判定のデモ用としても） -->
-        <div id="night-banner" class="bg-indigo-900 text-indigo-100 text-xs px-4 py-2 text-center hidden">
-            🌙 おやすみモード中（夜22時〜朝6時はゆっくり休もう）
+    <div class="container">
+
+        <!-- MUST③：未成年のためのフィルター -->
+        <div class="filter-banner">
+            <div>
+                未成年フィルター: <span id="filterStatusText" class="filter-status">有効（安心モード）</span>
+            </div>
+            <button class="filter-btn" id="toggleFilterBtn" onclick="toggleFilter()">切替</button>
         </div>
 
-        <!-- タグフィルター -->
-        <div class="flex overflow-x-auto px-4 py-3 gap-2 bg-emerald-50 border-b border-emerald-100 no-scrollbar">
-            <button onclick="filterTag('すべて')" class="tag-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full font-bold whitespace-nowrap shadow-sm">すべて</button>
-            <button onclick="filterTag('プロセカ')" class="tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap">#プロセカ</button>
-            <button onclick="filterTag('物理の沼')" class="tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap">#物理の沼</button>
-            <button onclick="filterTag('イラスト')" class="tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap">#イラスト</button>
-            <button onclick="filterTag('バンド')" class="tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap">#バンド</button>
-        </div>
+        <!-- MUST①：つぶやく場所 ＆ MUST②：タグ選択 -->
+        <div class="card">
+            <h2>いま話したいこと・悩みを投稿する</h2>
+            <form id="postForm" onsubmit="handlePost(event)">
+                <label for="tagSelect">タグコミュニティを選択</label>
+                <select id="tagSelect" required>
+                    <option value="" disabled selected>選択してください</option>
+                    <option value="趣味：ゲーム・アニメ">趣味：ゲーム・アニメ</option>
+                    <option value="趣味：音楽・アート">趣味：音楽・アート</option>
+                    <option value="悩み：学校・進路">悩み：学校・進路</option>
+                    <option value="悩み：人間関係">悩み：人間関係</option>
+                    <option value="その他・雑談">その他・雑談</option>
+                </select>
 
-        <!-- タイムライン（つぶやき一覧） -->
-        <main id="timeline" class="flex-1 p-4 space-y-4 overflow-y-auto">
-            <!-- JavaScriptで動的にカードが挿入されます -->
-        </main>
+                <label for="postContent">内容（つぶやき）</label>
+                <textarea id="postContent" placeholder="例：最近ハマっているアニメについて語りたい！ / 勉強のモチベーションが上がらない..." required></textarea>
 
-        <!-- つぶやき入力エリア（固定フッター） -->
-        <div class="fixed bottom-0 w-full max-w-md bg-white border-t border-gray-200 p-3 shadow-lg">
-            <form id="post-form" onsubmit="addPost(event)" class="flex flex-col gap-2">
-                <div class="flex gap-2">
-                    <input type="text" id="user-name" placeholder="ニックネーム (例: 高1・音ゲーマー)" required
-                           class="w-1/3 text-xs border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500">
-                    <select id="post-tag" class="w-1/3 text-xs border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500">
-                        <option value="プロセカ">#プロセカ</option>
-                        <option value="物理の沼">#物理の沼</option>
-                        <option value="イラスト">#イラスト</option>
-                        <option value="バンド">#バンド</option>
-                    </select>
-                </div>
-                <div class="flex gap-2">
-                    <input type="text" id="post-content" placeholder="今なに語りたい？（例: 難所クリアした！）" required
-                           class="flex-1 text-sm border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:border-emerald-500">
-                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-bold px-4 py-2 rounded-lg transition">
-                        投稿
-                    </button>
-                </div>
+                <button type="submit" class="submit-btn">投稿する</button>
             </form>
+        </div>
+
+        <!-- MUST②：タグコミュニティー機能 ＆ 成長する木 -->
+        <div class="card">
+            <h2>
+                <span id="currentCommunityTitle">タイムライン</span>
+                <span class="badge-mock">仮データ混入</span>
+            </h2>
+
+            <!-- メッセージ量に応じて成長する木を表示するエリア -->
+            <div class="community-tree-box" id="communityTreeBox">
+                <div class="tree-title" id="treeTitle">「すべて」のコミュニティの木</div>
+                <div class="tree-visual" id="treeVisual">🌿</div>
+                <div class="tree-status-text" id="treeStatusText">投稿数: 3件（若木が育っています）</div>
+            </div>
+            
+            <div class="tag-filters" id="tagFiltersContainer">
+                <button class="tag-filter-btn active" onclick="filterTag('すべて')">すべて</button>
+                <button class="tag-filter-btn" onclick="filterTag('趣味：ゲーム・アニメ')">#ゲーム・アニメ</button>
+                <button class="tag-filter-btn" onclick="filterTag('趣味：音楽・アート')">#音楽・アート</button>
+                <button class="tag-filter-btn" onclick="filterTag('悩み：学校・進路')">#学校・進路</button>
+                <button class="tag-filter-btn" onclick="filterTag('悩み：人間関係')">#人間関係</button>
+                <button class="tag-filter-btn" onclick="filterTag('その他・雑談')">#その他</button>
+            </div>
+
+            <div id="postsContainer">
+                <!-- JavaScriptで投稿カードがここに挿入されます -->
+            </div>
         </div>
 
     </div>
 
     <script>
-        // 初期サンプルデータ
+        // --- 状態管理と仮データ ---
+        let isAdultFilterOn = true; // MUST③：デフォルト有効
+        let currentTagFilter = 'すべて';
+
+        // 仮データ
         let posts = [
-            { id: 1, name: "高2・リケジョ", tag: "物理の沼", content: "物理の力学、やっとモル計算と合わせて理解できてきた…！これノーベル賞級にスッキリする", time: "10分前", reactions: { sorena: 5, kami: 2, tsuu: 1 } },
-            { id: 2, name: "高1・ボカロ好き", tag: "プロセカ", content: "イベントのラストスパート走ってる人いるー？一緒に完走しようぜ！", time: "30分前", reactions: { sorena: 8, kami: 4, tsuu: 3 } },
-            { id: 3, name: "高3・軽音部", tag: "バンド", content: "文化祭のコピー曲、やっとバンドの息が合ってきた。最高に楽しい時間だわ", time: "1時間前", reactions: { sorena: 12, kami: 9, tsuu: 5 } }
+            {
+                id: 1,
+                tag: '趣味：ゲーム・アニメ',
+                content: '最近新しいオープンワールドのゲームを始めました！同じくプレイしている人いませんか？',
+                time: '10:00',
+                isMock: true
+            },
+            {
+                id: 2,
+                tag: '悩み：学校・進路',
+                content: '来年の進路選択で文系理系どちらにするかめちゃくちゃ悩んでいます…先輩方アドバイスください。',
+                time: '09:30',
+                isMock: true
+            },
+            {
+                id: 3,
+                tag: '悩み：人間関係',
+                content: '【閲覧注意・暴言テスト】死ね、殺すぞ、消えろ、このクズが。', 
+                time: '09:00',
+                isMock: true
+            }
         ];
 
-        let currentFilter = "すべて";
+        // NGワードリスト（MUST③の簡易フィルター用）
+        const ngWords = ['死ね', '殺す', '消えろ', 'クズ', 'バカ', 'アホ'];
 
-        // 描画関数
-        function renderTimeline() {
-            const timeline = document.getElementById('timeline');
-            timeline.innerHTML = '';
+        // --- 初期描画 ---
+        window.onload = function() {
+            renderPosts();
+        };
 
-            const filteredPosts = currentFilter === "all" || currentFilter === "すべて" 
-                ? posts 
-                : posts.filter(p => p.tag === currentFilter);
+        // --- MUST③：未成年フィルターの切り替え機能 ---
+        function toggleFilter() {
+            isAdultFilterOn = !isAdultFilterOn;
+            const statusText = document.getElementById('filterStatusText');
+            const btn = document.getElementById('toggleFilterBtn');
+
+            if (isAdultFilterOn) {
+                statusText.textContent = '有効（安心モード）';
+                btn.textContent = '切替';
+            } else {
+                statusText.textContent = '無効（注意：全表示）';
+                btn.textContent = '切替';
+            }
+            renderPosts();
+        }
+
+        // --- MUST①：投稿処理 ---
+        function handlePost(event) {
+            event.preventDefault();
+
+            const tag = document.getElementById('tagSelect').value;
+            let content = document.getElementById('postContent').value;
+
+            // 投稿時にも未成年フィルター（NGワードチェック）を適用
+            if (isAdultFilterOn) {
+                for (let word of ngWords) {
+                    if (content.includes(word)) {
+                        alert('【未成年フィルター作動】不適切な表現（あるいは攻撃的なワード）が含まれているため投稿できません。');
+                        return;
+                    }
+                }
+            }
+
+            const now = new Date();
+            const timeString = String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+
+            const newPost = {
+                id: Date.now(),
+                tag: tag,
+                content: content,
+                time: timeString,
+                isMock: false
+            };
+
+            posts.unshift(newPost);
+            document.getElementById('postForm').reset();
+            renderPosts();
+        }
+
+        // --- MUST②：タグフィルターの切り替え ---
+        function filterTag(tagName) {
+            currentTagFilter = tagName;
+
+            // ボタンの見た目アクティブ切り替え
+            const buttons = document.querySelectorAll('.tag-filter-btn');
+            buttons.forEach(btn => {
+                if (btn.textContent.includes(tagName) || (tagName === 'すべて' && btn.textContent === 'すべて')) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            renderPosts();
+        }
+
+        // --- コミュニティの木を成長させる関数 ---
+        function updateCommunityTree(filteredCount, communityName) {
+            const treeVisual = document.getElementById('treeVisual');
+            const treeTitle = document.getElementById('treeTitle');
+            const treeStatusText = document.getElementById('treeStatusText');
+
+            treeTitle.textContent = `「${communityName}」コミュニティの木`;
+
+            let treeIcon = '🌱';
+            let statusDesc = '';
+
+            if (filteredCount === 0) {
+                treeIcon = '🌱';
+                statusDesc = 'まだ投稿がありません。最初の種を蒔こう！';
+            } else if (filteredCount <= 2) {
+                treeIcon = '🌿';
+                statusDesc = `投稿数: ${filteredCount}件（芽が出てきたよ！）`;
+            } else if (filteredCount <= 5) {
+                treeIcon = '🌳';
+                statusDesc = `投稿数: ${filteredCount}件（すくすく育つ若木）`;
+            } else {
+                treeIcon = '🌲🌸';
+                statusDesc = `投稿数: ${filteredCount}件（大樹に成長し、花が満開です！）`;
+            }
+
+            treeVisual.textContent = treeIcon;
+            treeStatusText.textContent = statusDesc;
+        }
+
+        // --- 画面描画関数 ---
+        function renderPosts() {
+            const container = document.getElementById('postsContainer');
+            container.innerHTML = '';
+
+            // 1. タグによる絞り込み
+            let filteredPosts = posts;
+            if (currentTagFilter !== 'すべて') {
+                filteredPosts = filteredPosts.filter(p => p.tag === currentTagFilter);
+            }
+
+            // 2. 未成年フィルター（ONの場合、NGワードを含む投稿を非表示）
+            if (isAdultFilterOn) {
+                filteredPosts = filteredPosts.filter(p => {
+                    let hasNg = false;
+                    for (let word of ngWords) {
+                        if (p.content.includes(word)) {
+                            hasNg = true;
+                            break;
+                        }
+                    }
+                    return !hasNg;
+                });
+            }
+
+            // 木の成長度合いを更新
+            updateCommunityTree(filteredPosts.length, currentTagFilter);
 
             if (filteredPosts.length === 0) {
-                timeline.innerHTML = `<p class="text-center text-gray-400 text-sm py-10">まだこのタグのつぶやきはないよ。<br>最初の話題を投稿してみよう！</p>`;
+                container.innerHTML = '<p style="font-size:0.85rem; color:#718093; text-align:center; padding: 1rem 0;">投稿がありません。</p>';
                 return;
             }
 
             filteredPosts.forEach(post => {
-                const card = document.createElement('div');
-                card.className = "bg-amber-50/60 border border-amber-200/60 rounded-xl p-4 shadow-sm relative";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-2">
+                const item = document.createElement('div');
+                item.className = 'post-item';
+
+                const dataBadge = post.isMock 
+                    ? '<span class="badge-mock">仮データ</span>' 
+                    : '<span style="font-size:0.7rem; background:#e2f0d9; color:#385723; padding:0.1rem 0.3rem; border-radius:3px; margin-left:0.3rem;">実際の入力</span>';
+
+                item.innerHTML = `
+                    <div class="post-header">
                         <div>
-                            <span class="font-bold text-xs text-gray-700">${escapeHTML(post.name)}</span>
-                            <span class="text-[10px] text-gray-400 ml-2">${post.time}</span>
+                            <span class="post-tag">${post.tag}</span>
+                            ${dataBadge}
                         </div>
-                        <span class="text-[10px] bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded-full font-bold">#${escapeHTML(post.tag)}</span>
+                        <span>${post.time}</span>
                     </div>
-                    <p class="text-sm text-gray-800 mb-3 whitespace-pre-wrap">${escapeHTML(post.content)}</p>
-                    <div class="flex gap-2 pt-2 border-t border-amber-100">
-                        <button onclick="react(${post.id}, 'sorena')" class="text-xs bg-white hover:bg-emerald-50 border border-gray-200 px-2.5 py-1 rounded-full text-gray-600 transition">
-                            👍 それな (${post.reactions.sorena})
-                        </button>
-                        <button onclick="react(${post.id}, 'kami')" class="text-xs bg-white hover:bg-emerald-50 border border-gray-200 px-2.5 py-1 rounded-full text-gray-600 transition">
-                            🔥 神！ (${post.reactions.kami})
-                        </button>
-                        <button onclick="react(${post.id}, 'tsuu')" class="text-xs bg-white hover:bg-emerald-50 border border-gray-200 px-2.5 py-1 rounded-full text-gray-600 transition">
-                            ✨ 尊い (${post.reactions.tsuu})
-                        </button>
-                    </div>
+                    <div class="post-content">${escapeHtml(post.content)}</div>
                 `;
-                timeline.appendChild(card);
+                container.appendChild(item);
             });
         }
 
-        // 投稿追加
-        function addPost(event) {
-            event.preventDefault();
-            const name = document.getElementById('user-name').value;
-            const tag = document.getElementById('post-tag').value;
-            const content = document.getElementById('post-content').value;
-
-            const newPost = {
-                id: Date.now(),
-                name: name,
-                tag: tag,
-                content: content,
-                time: "たった今",
-                reactions: { sorena: 0, kami: 0, tsuu: 0 }
-            };
-
-            posts.unshift(newPost);
-            document.getElementById('post-content').value = '';
-            renderTimeline();
+        // XSS防止のエスケープ処理
+        function escapeHtml(str) {
+            return str.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#039;');
         }
-
-        // リアクションボタン
-        function react(id, type) {
-            const post = posts.find(p => p.id === id);
-            if (post) {
-                post.reactions[type]++;
-                renderTimeline();
-            }
-        }
-
-        // タグフィルター
-        function filterTag(tag) {
-            currentFilter = tag;
-            // ボタンの見た目切り替え
-            document.querySelectorAll('.tag-btn').forEach(btn => {
-                if (btn.textContent.includes(tag) || (tag === "すべて" && btn.textContent === "すべて")) {
-                    btn.className = "tag-btn text-xs bg-emerald-600 text-white px-3 py-1.5 rounded-full font-bold whitespace-nowrap shadow-sm";
-                } else {
-                    btn.className = "tag-btn text-xs bg-white text-emerald-700 border border-emerald-300 px-3 py-1.5 rounded-full whitespace-nowrap";
-                }
-            });
-            renderTimeline();
-        }
-
-        // 簡易XSS対策
-        function escapeHTML(str) {
-            return str.replace(/[&<انات'"]/g, function(match) {
-                const escapeTable = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
-                return escapeTable[match];
-            });
-        }
-
-        // 夜22時〜朝6時におやすみモードバナーを表示するロジック（デモ）
-        const currentHour = new Date().getHours();
-        if (currentHour >= 22 || currentHour < 6) {
-            document.getElementById('night-banner').classList.remove('hidden');
-        }
-
-        // 初回描画
-        renderTimeline();
     </script>
 </body>
 </html>
