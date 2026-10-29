@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="高校生Ring最終選考 5作品紹介ページ">
+  <title>高校生Ring最終選考</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="hero">
+    <p class="eyebrow">FINAL SELECTION</p>
+    <h1>高校生Ring<br><span>最終選考</span></h1>
+    <p class="lead">高校生の視点から生まれた、未来をちょっと良くする5つのアイデア。</p>
+    <a class="scroll-link" href="#works">作品を見る <span aria-hidden="true">↓</span></a>
+  </header>
+
+  <main id="works" class="works">
+    <div class="section-heading">
+      <p>SELECTED WORKS</p>
+      <h2>最終選考 5作品</h2>
+    </div>
+
+    <div class="grid">
+      <article class="card">
+        <div class="card-head"><span>A</span><h3>Kadai Note</h3></div>
+        <button class="poster" data-src="assets/A_Kadai_Note.png" data-title="A — Kadai Note" aria-label="Kadai Noteを拡大表示">
+          <img src="assets/A_Kadai_Note.png" alt="A Kadai Note ポスター">
+        </button>
+      </article>
+      <article class="card">
+        <div class="card-head"><span>B</span><h3>期限チェック</h3></div>
+        <button class="poster" data-src="assets/B_Kigen_Check.png" data-title="B — 期限チェック" aria-label="期限チェックを拡大表示">
+          <img src="assets/B_Kigen_Check.png" alt="B 期限チェック ポスター">
+        </button>
+      </article>
+      <article class="card">
+        <div class="card-head"><span>C</span><h3>Flex umbrella</h3></div>
+        <button class="poster" data-src="assets/C_Flex_umbrella.png" data-title="C — Flex umbrella" aria-label="Flex umbrellaを拡大表示">
+          <img src="assets/C_Flex_umbrella.png" alt="C Flex umbrella ポスター">
+        </button>
+      </article>
+      <article class="card">
+        <div class="card-head"><span>D</span><h3>マネカレ</h3></div>
+        <button class="poster" data-src="assets/D_Manekare.png" data-title="D — マネカレ" aria-label="マネカレを拡大表示">
+          <img src="assets/D_Manekare.png" alt="D マネカレ ポスター">
+        </button>
+      </article>
+      <article class="card">
+        <div class="card-head"><span>E</span><h3>Travel Select</h3></div>
+        <button class="poster" data-src="assets/E_Travel_Select.png" data-title="E — Travel Select" aria-label="Travel Selectを拡大表示">
+          <img src="assets/E_Travel_Select.png" alt="E Travel Select ポスター">
+        </button>
+      </article>
+    </div>
+  </main>
+
+  <footer>高校生Ring 最終選考</footer>
+
+  <dialog id="viewer">
+    <div class="dialog-bar"><strong id="viewer-title"></strong><button id="close" aria-label="閉じる">×</button></div>
+    <img id="viewer-image" alt="">
+  </dialog>
+  <script src="script.js"></script>
+</body>
+</html>

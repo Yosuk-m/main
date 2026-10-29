@@ -1,0 +1,31 @@
+:root{--ink:#15233d;--red:#ff5a56;--cream:#fff9ed;--blue:#3452d1;--line:#ddd5c8}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--cream);color:var(--ink);font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",system-ui,sans-serif}
+.hero{min-height:72vh;display:grid;place-content:center;text-align:center;padding:72px 24px;background:radial-gradient(circle at 15% 20%,#ffd86b 0 4%,transparent 4.2%),radial-gradient(circle at 87% 34%,#9ee2d0 0 5%,transparent 5.2%),linear-gradient(135deg,#fff9ed,#f6f2ff);border-bottom:2px solid var(--ink);position:relative;overflow:hidden}
+.hero:before,.hero:after{content:"";position:absolute;width:150px;height:150px;border:28px solid var(--red);border-radius:50%;opacity:.8}
+.hero:before{left:-70px;bottom:32px}.hero:after{right:-62px;top:45px;border-color:var(--blue)}
+.eyebrow,.section-heading p{font-weight:900;letter-spacing:.22em;color:var(--red);font-size:.82rem}
+h1{font-size:clamp(3rem,9vw,7.5rem);line-height:.88;margin:20px 0 28px;letter-spacing:-.06em}
+h1 span{color:var(--blue)}
+.lead{font-weight:700;font-size:clamp(1rem,2.2vw,1.35rem);line-height:1.8;max-width:650px;margin:0 auto 34px}
+.scroll-link{justify-self:center;color:var(--ink);text-decoration:none;border-bottom:2px solid var(--ink);font-weight:800;padding:8px 2px}
+.works{max-width:1280px;margin:auto;padding:96px 24px 120px}
+.section-heading{text-align:center;margin-bottom:48px}.section-heading h2{font-size:clamp(2.2rem,5vw,4.2rem);margin:6px 0}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:34px}
+.card{background:#fff;border:2px solid var(--ink);border-radius:22px;overflow:hidden;box-shadow:9px 9px 0 var(--ink);transition:transform .2s,box-shadow .2s}
+.card:hover{transform:translate(-3px,-3px);box-shadow:12px 12px 0 var(--ink)}
+.card:last-child{grid-column:1/-1;max-width:610px;width:100%;justify-self:center}
+.card-head{display:flex;align-items:center;gap:15px;padding:16px 20px;border-bottom:2px solid var(--ink)}
+.card-head span{display:grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--red);color:#fff;font-size:1.45rem;font-weight:900}
+.card:nth-child(2) .card-head span,.card:nth-child(5) .card-head span{background:var(--blue)}
+.card:nth-child(3) .card-head span{background:#0d9a7c}.card:nth-child(4) .card-head span{background:#f28a1a}
+.card h3{margin:0;font-size:1.35rem}
+.poster{display:block;width:100%;padding:0;border:0;background:#eee;cursor:zoom-in}
+.poster img{display:block;width:100%;height:auto}
+footer{text-align:center;padding:36px 24px;background:var(--ink);color:#fff;font-weight:800;letter-spacing:.08em}
+dialog{width:min(94vw,900px);max-height:94vh;padding:0;border:2px solid var(--ink);border-radius:18px;box-shadow:14px 14px 0 rgba(0,0,0,.3);overflow:auto}
+dialog::backdrop{background:rgba(9,18,36,.78);backdrop-filter:blur(4px)}
+.dialog-bar{position:sticky;top:0;display:flex;justify-content:space-between;align-items:center;padding:13px 18px;background:#fff;border-bottom:2px solid var(--ink);z-index:2}.dialog-bar button{font:inherit;font-size:1.9rem;line-height:1;background:none;border:0;cursor:pointer}.dialog-bar strong{font-size:1.05rem}dialog img{display:block;width:100%;height:auto}
+@media(max-width:720px){.hero{min-height:64vh}.grid{grid-template-columns:1fr;gap:26px}.card:last-child{grid-column:auto}.works{padding:72px 16px 90px}.card{box-shadow:6px 6px 0 var(--ink)}.card:hover{transform:none;box-shadow:6px 6px 0 var(--ink)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.card{transition:none}}
